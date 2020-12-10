@@ -1,0 +1,155 @@
+@font-face {
+    font-family: 'Poppins';
+    src: url('../font/Poppins-Light.woff2') format('woff2'),
+        url('../font/Poppins-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+html,
+body {
+    font-family: 'Poppins';
+}
+
+main {
+    padding-top: 2em;
+    width: min(80%, 580px);
+    margin: 0 auto;
+}
+
+input[type="text"] {
+    font-size: 1em;
+    padding: 0.3em;
+}
+
+.button {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2em;
+    min-width: 4em;
+    border-radius: 2px;
+    text-align: center;
+    background-color: rgba(0, 130, 243, 1);
+    transition: 0.1s linear;
+}
+
+.button p {
+    text-transform: uppercase;
+    color: #f2f2f2;
+}
+
+.button:hover {
+    box-shadow: 0 0 1px 3px rgba(52, 144, 220, 0.5);
+}
+
+.button:active {
+    box-shadow: 0 0 0px 4px rgba(0, 130, 243, 0.7);
+}
+
+.separator {
+    width: 100%;
+    height: 1px;
+    background-color: lightgray;
+    margin: 3vh 0;
+}
+
+h1 {
+    font-size: 1.6em;
+    font-weight: bold;
+    margin-bottom: 0.4em;
+}
+
+.subtitle {
+    font-size: 0.8em;
+    font-style: italic;
+    color: #A1A1A1;
+    margin: 1em 0;
+}
+
+.explanation {
+    margin: 1em 0;
+    line-height: 1.2em;
+    font-size: 0.9em;
+}
+
+.main-options {
+    padding-top: 1.4vh;
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: auto;
+    align-items: center;
+}
+
+.weather input[type="text"] {
+    margin-top: 0.4em;
+    margin-right: 1em;
+    display: block;
+}
+
+.weather label {
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.radio-selector {
+    display: flex;
+    justify-content: space-between;
+    height: 3.4em;
+    align-items: center;
+}
+
+.position-selector {
+    display: flex;
+}
+
+.position-buttons {
+    align-self: flex-end;
+}
+
+.search p {
+    padding: 1vh 0;
+}
+
+.background {
+    padding-top: 1vh;
+}
+
+.background-category {
+    padding-top: 1em;
+    display: flex;
+}
+
+.background-category input[type="text"] {
+    margin: 0 1em;
+}
+
+.information {
+    text-align: left;
+    padding-bottom: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+a {
+    color: rgba(0, 130, 243, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #202020;
+    }
+
+    h1,
+    p,
+    label {
+        color: white;
+    }
+
+    span {
+        color: lightgray;
+    }
+}

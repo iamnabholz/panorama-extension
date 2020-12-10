@@ -1,0 +1,30 @@
+{
+    "name": "Panorama Tab",
+    "description": "Replace your new tab with a unique design and set of features that you can customize.",
+    "version": "1.0.0",
+    "manifest_version": 2,
+
+    "icons": {
+      "16": "/icons/icon16.png",
+      "48": "/icons/icon48.png",
+      "96": "/icons/icon96.png",
+      "128": "/icons/icon128.png"
+    },
+  
+    "chrome_url_overrides" : {
+        "newtab": "index.html"
+    },
+
+    "permissions" : [
+      "https://*/",
+      "http://*/",
+      "geolocation",
+      "topSites"
+    ],
+
+    "options_ui": {
+      "page": "/options/index.html",
+      "open_in_tab": true,
+      "chrome_style": true
+    }
+  }

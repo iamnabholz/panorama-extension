@@ -148,6 +148,10 @@
     align-items: center;
     box-shadow: 0px 1px 5px 2px rgba(88, 88, 88, 0.1);
   }
+  .input-container a {
+    display: flex;
+    align-items: center;
+  }
 
   span {
     border-radius: 5px;
@@ -161,6 +165,8 @@
 
   span:focus {
     min-width: 6em;
+    border-radius: 5px;
+    outline: 3px lightcoral solid;
   }
 
   select {

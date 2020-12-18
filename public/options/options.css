@@ -12,6 +12,10 @@ body {
     font-family: 'Poppins';
 }
 
+body {
+    font-size: 100%;
+}
+
 main {
     padding-top: 2em;
     width: min(80%, 580px);
@@ -29,7 +33,7 @@ input[type="text"] {
     align-items: center;
     justify-content: center;
     min-height: 2em;
-    min-width: 4em;
+    min-width: 5em;
     border-radius: 2px;
     text-align: center;
     background-color: rgba(0, 130, 243, 1);
@@ -39,6 +43,7 @@ input[type="text"] {
 .button p {
     text-transform: uppercase;
     color: #f2f2f2;
+    margin: 0;
 }
 
 .button:hover {

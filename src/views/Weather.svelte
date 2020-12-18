@@ -186,6 +186,7 @@
     </div>
   {:else}
     <p
+      style="cursor: pointer;"
       on:click|once={() => {
         ask();
       }}>

@@ -62,14 +62,20 @@
   }
 
   async function getWeather() {
-    const result = await fetch(
+    const response = await fetch(
       "https://get-weather.nabholz.workers.dev/?lat=" + lat + "&lon=" + lon
     );
-    const json = await result.json();
 
-    weatherResponse = json;
-    localStorage.setItem("weee", JSON.stringify(json));
-    localStorage.setItem("wooo", Date.now());
+    if ((await response.status) === 200) {
+      const json = await result.json();
+
+      weatherResponse = json;
+      localStorage.setItem("weee", JSON.stringify(json));
+      localStorage.setItem("wooo", Date.now());
+    } else {
+      console.log("Problem getting a weather information");
+      console.log(response);
+    }
   }
 
   function getTemp(num) {

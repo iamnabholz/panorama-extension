@@ -40,14 +40,20 @@
   }
 
   async function getBackground() {
-    const result = await fetch(
+    const response = await fetch(
       "https://get-background.nabholz.workers.dev/?cat=" + searchQuery
     );
-    const json = await result.json();
 
-    localStorage.setItem("ttt", Date.now());
-    backgroundResponse = json;
-    localStorage.setItem("bar", JSON.stringify(json));
+    if ((await response.status) === 200) {
+      const json = await response.json();
+
+      localStorage.setItem("ttt", Date.now());
+      backgroundResponse = json;
+      localStorage.setItem("bar", JSON.stringify(json));
+    } else {
+      console.log("Problem getting a new background");
+      console.log(response);
+    }
   }
 </script>
 

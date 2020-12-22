@@ -2,7 +2,7 @@
   import { fly } from "svelte/transition";
   import { onMount } from "svelte";
 
-  let defaultSearch = localStorage.getItem("enginee") || "g";
+  let defaultSearch = localStorage.getItem("engine") || "g";
   let search = "";
   let showButt = false;
 

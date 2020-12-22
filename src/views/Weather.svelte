@@ -8,11 +8,13 @@
     localStorage.getItem("perm") != null ? localStorage.getItem("perm") : false;
 
   $: time =
-    localStorage.getItem("wooo") != null ? localStorage.getItem("wooo") : 0;
+    localStorage.getItem("weather-timer") != null
+      ? localStorage.getItem("weather-timer")
+      : 0;
 
   let weatherResponse =
-    localStorage.getItem("weee") != null
-      ? JSON.parse(localStorage.getItem("weee"))
+    localStorage.getItem("weather") != null
+      ? JSON.parse(localStorage.getItem("weather"))
       : JSON.parse(weatherDefault);
 
   $: iconId = weatherResponse.current.weather[0].icon;
@@ -23,7 +25,7 @@
   $: temp = weatherResponse.current.temp;
   $: value = getTemp(temp);
 
-  let lat = localStorage.getItem("lattitude") || weatherResponse.lat;
+  let lat = localStorage.getItem("latitude") || weatherResponse.lat;
 
   let lon = localStorage.getItem("longitude") || weatherResponse.lon;
 
@@ -51,7 +53,7 @@
     lat = position.coords.latitude;
     lon = position.coords.longitude;
 
-    localStorage.setItem("lattitude", position.coords.latitude);
+    localStorage.setItem("latitude", position.coords.latitude);
     localStorage.setItem("longitude", position.coords.longitude);
 
     getWeather();
@@ -70,8 +72,8 @@
       const json = await response.json();
 
       weatherResponse = json;
-      localStorage.setItem("weee", JSON.stringify(json));
-      localStorage.setItem("wooo", Date.now());
+      localStorage.setItem("weather", JSON.stringify(json));
+      localStorage.setItem("weather-timer", Date.now());
     } else {
       console.log("Problem getting a weather information");
       console.log(response);

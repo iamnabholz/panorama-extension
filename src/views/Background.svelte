@@ -6,11 +6,13 @@
   let y;
 
   let timer =
-    localStorage.getItem("ttt") != null ? localStorage.getItem("ttt") : 0;
+    localStorage.getItem("bg-timer") != null
+      ? localStorage.getItem("bg-timer")
+      : 0;
 
   let backgroundResponse =
-    localStorage.getItem("bar") != null
-      ? JSON.parse(localStorage.getItem("bar"))
+    localStorage.getItem("background") != null
+      ? JSON.parse(localStorage.getItem("background"))
       : JSON.parse(defaultAnswer);
 
   let enabled = localStorage.getItem("bg-toggle") || "true";
@@ -47,9 +49,9 @@
     if ((await response.status) === 200) {
       const json = await response.json();
 
-      localStorage.setItem("ttt", Date.now());
+      localStorage.setItem("bg-timer", Date.now());
       backgroundResponse = json;
-      localStorage.setItem("bar", JSON.stringify(json));
+      localStorage.setItem("background", JSON.stringify(json));
     } else {
       console.log("Problem getting a new background");
       console.log(response);

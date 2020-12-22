@@ -7,7 +7,7 @@ function openPage() {
     // SET UP PAGE AND LOAD SAVED VALUES
 
     //LOCATION
-    var lat = localStorage.getItem("lattitude") || 0;
+    var lat = localStorage.getItem("latitude") || 0;
     var lon = localStorage.getItem("longitude") || 0;
 
     document.getElementById("lat").value = lat.toString();
@@ -31,7 +31,7 @@ function openPage() {
         }
     }
 
-    var engine = localStorage.getItem("enginee") || "g";
+    var engine = localStorage.getItem("engine") || "g";
     if (engine == "g") {
         document.getElementById("G").checked = true;
     } else if (engine == "d") {
@@ -45,7 +45,7 @@ function openPage() {
 
 for (var i = 0; i < engineRadio.length; i++) {
     engineRadio[i].addEventListener('input', function () {
-        localStorage.setItem("enginee", this.value);
+        localStorage.setItem("engine", this.value);
     });
 }
 
@@ -82,14 +82,14 @@ function getError(error) {
 document.getElementById("save-location").addEventListener("click", saveCoords);
 
 function saveCoords() {
-    localStorage.setItem("lattitude", document.getElementById("lat").value);
+    localStorage.setItem("latitude", document.getElementById("lat").value);
     localStorage.setItem("longitude", document.getElementById("lon").value);
-    localStorage.setItem("wooo", 0);
+    localStorage.setItem("weather-timer", 0);
 }
 
 document.getElementById("save-category").addEventListener("click", saveCategory);
 
 function saveCategory() {
     localStorage.setItem("search", document.getElementById("cat").value);
-    localStorage.setItem("ttt", 0);
+    localStorage.setItem("bg-timer", 0);
 }

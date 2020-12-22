@@ -2,8 +2,8 @@
   import { onMount } from "svelte";
 
   let result =
-    localStorage.getItem("sitt") != null
-      ? JSON.parse(localStorage.getItem("sitt"))
+    localStorage.getItem("sites") != null
+      ? JSON.parse(localStorage.getItem("sites"))
       : [];
 
   onMount(() => {
@@ -22,7 +22,7 @@
             /^((http|https|ftp):\/\/)/.test(data.url)
           );
           result = result.slice(0, 10);
-          localStorage.setItem("sitt", JSON.stringify(result));
+          localStorage.setItem("sites", JSON.stringify(result));
         }
         //result = sites;
       });

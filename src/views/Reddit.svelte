@@ -6,18 +6,20 @@
   let inputSpan;
   let isShowing = false;
 
-  let subreddit = localStorage.getItem("subb") || "space";
-  let selectedSort = localStorage.getItem("sotr") || "hot";
+  let subreddit = localStorage.getItem("subreddit") || "space";
+  let selectedSort = localStorage.getItem("sr-sort") || "hot";
 
   let allPosts =
-    localStorage.getItem("postansgos") != null
-      ? JSON.parse(localStorage.getItem("postansgos"))
+    localStorage.getItem("reddit-posts") != null
+      ? JSON.parse(localStorage.getItem("reddit-posts"))
       : [];
 
   $: showingPosts = allPosts.slice(0, 4) || [];
 
   $: postsTime =
-    localStorage.getItem("tiii") != null ? localStorage.getItem("tiii") : 0;
+    localStorage.getItem("posts-timer") != null
+      ? localStorage.getItem("posts-timer")
+      : 0;
 
   onMount(() => {
     inputSpan.innerHTML = subreddit;
@@ -33,14 +35,14 @@
     if (inputSpan.innerHTML == "") {
       inputSpan.innerHTML = "all";
       subreddit = "all";
-      localStorage.setItem("subb", subreddit);
+      localStorage.setItem("subreddit", subreddit);
 
       getPosts();
     }
 
     if (inputSpan.innerHTML != null && inputSpan.innerHTML != subreddit) {
       subreddit = inputSpan.innerHTML;
-      localStorage.setItem("subb", subreddit);
+      localStorage.setItem("subreddit", subreddit);
 
       getPosts();
     } else {
@@ -64,8 +66,8 @@
       filtered = filtered.slice(0, 50);
 
       if (filtered != allPosts) {
-        localStorage.setItem("postansgos", JSON.stringify(filtered));
-        localStorage.setItem("tiii", Date.now());
+        localStorage.setItem("reddit-posts", JSON.stringify(filtered));
+        localStorage.setItem("posts-timer", Date.now());
         allPosts = filtered;
         isShowing = false;
       }
@@ -217,9 +219,9 @@
 
       <select
         bind:value={selectedSort}
-        on:change={() => {
-          if (selectedSort != localStorage.getItem('sotr')) {
-            localStorage.setItem('sotr', selectedSort);
+        on:blur={() => {
+          if (selectedSort != localStorage.getItem('sr-sort')) {
+            localStorage.setItem('sr-sort', selectedSort);
             getPosts();
           }
         }}>

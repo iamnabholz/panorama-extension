@@ -67,7 +67,7 @@
     );
 
     if ((await response.status) === 200) {
-      const json = await result.json();
+      const json = await response.json();
 
       weatherResponse = json;
       localStorage.setItem("weee", JSON.stringify(json));

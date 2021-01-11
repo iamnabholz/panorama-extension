@@ -31,7 +31,7 @@ reddit.subscribe(val => localStorage.setItem("reddit-toggle", val));
 export const background = writable(localStorage.getItem("bg-toggle") || "true");
 background.subscribe(val => localStorage.setItem("bg-toggle", val));
 
-export const searchBackground = writable(localStorage.getItem("search") || "true");
+export const searchBackground = writable(localStorage.getItem("search") || "nasa");
 searchBackground.subscribe(val => localStorage.setItem("search", val));
 
 export const backgroundColor = writable(localStorage.getItem("bg-color") || "#f2f2f2");

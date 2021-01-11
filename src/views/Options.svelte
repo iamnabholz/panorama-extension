@@ -487,7 +487,7 @@
             </Checkbox>
             <div class="text" style="padding-top: 0.4rem;">
               <label for="cat">Category:</label>
-              <input bind:value={bgCategory} type="text" />
+              <input name="cat" bind:value={bgCategory} type="text" />
             </div>
             <div style="align-self: flex-end;">
               <Button
@@ -530,8 +530,9 @@
             </div>
 
             <div class="text" style="padding-top: 0.4rem;">
-              <label for="cat">HEX Color Code:</label>
+              <label for="color">HEX Color Code:</label>
               <input
+                name="color"
                 maxlength="7"
                 minlength="4"
                 bind:value={bgColor}

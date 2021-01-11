@@ -1,7 +1,7 @@
 <script>
-  export let size = 16;
-  export let color = "white";
-  export let unit = "px";
+  //export let size = 16;
+  //export let color = "white";
+  //export let unit = "px";
 </script>
 
 <style>

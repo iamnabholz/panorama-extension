@@ -30,8 +30,8 @@
   $: temp = weatherResponse.current.temp;
   $: value = getTemp(temp);
 
-  let lat = localStorage.getItem("latitude") || weatherResponse.lat;
-  let lon = localStorage.getItem("longitude") || weatherResponse.lon;
+  let lat = $latitude || weatherResponse.lat;
+  let lon = $longitude || weatherResponse.lon;
 
   let loadingInfo = false;
   let errorLoading = false;
@@ -62,11 +62,8 @@
       permission = true;
     }
 
-    lat = position.coords.latitude;
-    lon = position.coords.longitude;
-
-    localStorage.setItem("latitude", position.coords.latitude);
-    localStorage.setItem("longitude", position.coords.longitude);
+    latitude.set(position.coords.latitude);
+    longitude.set(position.coords.longitude);
 
     getWeather();
 

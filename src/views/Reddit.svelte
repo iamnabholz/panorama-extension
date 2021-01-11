@@ -1,7 +1,9 @@
 <script>
   import { onMount } from "svelte";
-  import { slide } from "svelte/transition";
+  import { slide, fade } from "svelte/transition";
   import Post from "../components/Post.svelte";
+
+  import LoadingIndicator from "../components/LoadingIndicator.svelte";
 
   let inputSpan;
   let isShowing = false;
@@ -20,6 +22,8 @@
     localStorage.getItem("posts-timer") != null
       ? localStorage.getItem("posts-timer")
       : 0;
+
+  let loadingPosts = false;
 
   onMount(() => {
     inputSpan.innerHTML = subreddit;
@@ -51,6 +55,7 @@
   }
 
   async function getPosts() {
+    loadingPosts = true;
     let feed = await fetch(
       "https://www.reddit.com/r/" +
         subreddit +
@@ -71,7 +76,9 @@
         allPosts = filtered;
         isShowing = false;
       }
+      loadingPosts = false;
     } else {
+      loadingPosts = false;
       allPosts = [];
       isShowing = false;
     }
@@ -150,32 +157,32 @@
     align-items: center;
     box-shadow: 0px 1px 5px 2px rgba(88, 88, 88, 0.1);
   }
+
   .input-container a {
     display: flex;
     align-items: center;
   }
 
   span {
-    border-radius: 5px;
+    display: block;
     font-size: 0.9em;
-    border: none;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    box-sizing: content-box;
     -webkit-padding: 0.6em 0.3em;
     padding: 0.6em 0.3em;
-    min-width: 3em;
-    transition: min-width 0.15s linear;
+    min-width: 4.4rem;
+    outline: none;
   }
 
   span:focus {
-    min-width: 6em;
-    border-radius: 5px;
-    outline: 3px lightcoral solid;
+    border-color: rgba(0, 130, 243, 1);
   }
 
   select {
     font-size: 0.8em;
     border: none;
-    margin-left: 1em;
-    width: 5em;
+    width: 5rem;
     -moz-appearance: none; /* Firefox */
     -webkit-appearance: none; /* Safari and Chrome */
     appearance: none;
@@ -194,47 +201,60 @@
 
 <main>
   <section class="reddit-controls">
-    <div class="input-container">
-      <a href={'https://www.reddit.com/r/' + subreddit + '/' + selectedSort}>
-        <img alt="Reddit Icon" src="/icons/reddit-ico.png" />
-      </a>
-      <span
-        spellcheck="false"
-        bind:this={inputSpan}
-        contenteditable="true"
-        on:focusout={() => {
-          subredditChange();
-        }}
-        on:keydown={key => {
-          if (key.keyCode === 13) {
-            key.preventDefault();
-            inputSpan.blur();
+    <div style="display: flex; align-items: center; height: 100%;">
+      <div class="input-container">
+        <a href={'https://www.reddit.com/r/' + subreddit + '/' + selectedSort}>
+          <img alt="Reddit Icon" src="/icons/reddit-ico.png" />
+        </a>
+        <span
+          spellcheck="false"
+          bind:this={inputSpan}
+          contenteditable="true"
+          on:focusout={() => {
             subredditChange();
-          }
-          let char = String.fromCharCode(key.keyCode);
-          if (/[A-Za-z0-9_]/.test(char) == false && key.keyCode != 8 && key.keyCode != 37 && key.keyCode != 39 && key.keyCode != 46) {
-            key.preventDefault();
-          }
-        }} />
+          }}
+          on:keydown={key => {
+            if (key.keyCode === 13) {
+              key.preventDefault();
+              inputSpan.blur();
+              subredditChange();
+            }
+            let char = String.fromCharCode(key.keyCode);
+            if (/[A-Za-z0-9_]/.test(char) == false && key.keyCode != 8 && key.keyCode != 37 && key.keyCode != 39 && key.keyCode != 46) {
+              key.preventDefault();
+            }
+          }} />
 
-      <select
-        bind:value={selectedSort}
-        on:blur={() => {
-          if (selectedSort != localStorage.getItem('sr-sort')) {
-            localStorage.setItem('sr-sort', selectedSort);
-            getPosts();
-          }
-        }}>
-        <option value="hot">
-          <p>Hot</p>
-        </option>
-        <option value="new">
-          <p>New</p>
-        </option>
-        <option value="rising">
-          <p>Rising</p>
-        </option>
-      </select>
+        <div
+          style="background-color: lightgray; width: 1px; height: 65%; margin: 0
+          0.25rem;" />
+
+        <select
+          bind:value={selectedSort}
+          on:blur={() => {
+            if (selectedSort != localStorage.getItem('sr-sort')) {
+              localStorage.setItem('sr-sort', selectedSort);
+              getPosts();
+            }
+          }}>
+          <option value="hot">
+            <p>Hot</p>
+          </option>
+          <option value="new">
+            <p>New</p>
+          </option>
+          <option value="rising">
+            <p>Rising</p>
+          </option>
+        </select>
+
+      </div>
+
+      {#if loadingPosts}
+        <div transition:fade style="margin-left: 10px;">
+          <LoadingIndicator />
+        </div>
+      {/if}
     </div>
 
     {#if allPosts.length > 4}

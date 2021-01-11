@@ -1,13 +1,18 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
+  import { fade, slide } from "svelte/transition";
   import { weatherDefault } from "../stores/weather.js";
+  import { latitude, longitude } from "../stores/options.js";
+
+  import LoadingIndicator from "../components/LoadingIndicator.svelte";
+  import ErrorLoadIndicator from "../components/ErrorLoadIndicator.svelte";
 
   let unit = localStorage.getItem("unit") || "c";
 
   let permission =
     localStorage.getItem("perm") != null ? localStorage.getItem("perm") : false;
 
-  $: time =
+  let time =
     localStorage.getItem("weather-timer") != null
       ? localStorage.getItem("weather-timer")
       : 0;
@@ -26,8 +31,12 @@
   $: value = getTemp(temp);
 
   let lat = localStorage.getItem("latitude") || weatherResponse.lat;
-
   let lon = localStorage.getItem("longitude") || weatherResponse.lon;
+
+  let loadingInfo = false;
+  let errorLoading = false;
+
+  let hovering = false;
 
   const options = {
     enableHighAccuracy: true
@@ -41,8 +50,11 @@
   });
 
   function ask() {
+    asking = true;
     navigator.geolocation.getCurrentPosition(getLocation, getError, options);
   }
+
+  let asking = false;
 
   function getLocation(position) {
     if (permission == false) {
@@ -57,13 +69,18 @@
     localStorage.setItem("longitude", position.coords.longitude);
 
     getWeather();
+
+    asking = false;
   }
 
   function getError(error) {
     console.log(error);
+    asking = false;
+    errorLoading = true;
   }
 
   async function getWeather() {
+    loadingInfo = true;
     const response = await fetch(
       "https://get-weather.nabholz.workers.dev/?lat=" + lat + "&lon=" + lon
     );
@@ -74,7 +91,12 @@
       weatherResponse = json;
       localStorage.setItem("weather", JSON.stringify(json));
       localStorage.setItem("weather-timer", Date.now());
+
+      loadingInfo = false;
     } else {
+      loadingInfo = false;
+      errorLoading = true;
+
       console.log("Problem getting a weather information");
       console.log(response);
     }
@@ -90,6 +112,16 @@
     }
     return toreturn;
   }
+
+  const unsubscribe = latitude.subscribe(value => {
+    if (lat !== value || lon !== $longitude) {
+      lat = value;
+      lon = $longitude;
+      getWeather();
+    }
+  });
+
+  onDestroy(unsubscribe);
 </script>
 
 <style>
@@ -109,6 +141,10 @@
 
   h1 {
     font-size: 2.2em;
+  }
+
+  h3 {
+    font-size: 1.2em;
   }
 
   .weather {
@@ -142,6 +178,23 @@
   .text-temperature p {
     font-size: 1.2em;
     letter-spacing: 0.06em;
+  }
+
+  .setup-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .get-button {
+    margin-left: 10px;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
   }
 
   .reverse {
@@ -185,15 +238,61 @@
         </div>
       </div>
 
+      {#if loadingInfo}
+        <div transition:fade style="margin-left: 10px;">
+          <LoadingIndicator />
+        </div>
+      {/if}
+
+      {#if errorLoading}
+        <div transition:fade style="margin-left: 10px;">
+          <ErrorLoadIndicator />
+        </div>
+      {/if}
     </div>
   {:else}
-    <p
+    <div
+      on:mouseenter={() => {
+        hovering = true;
+      }}
+      on:mouseleave={() => {
+        hovering = false;
+      }}
       style="cursor: pointer;"
       on:click|once={() => {
         ask();
       }}>
-      Set Up Weather Location
-    </p>
+
+      <div class="setup-container">
+        <h3 style="height: 36px; line-height: 2;">Weather Location</h3>
+
+        {#if !asking && !errorLoading}
+          <div class="get-button">></div>
+        {/if}
+
+        {#if asking}
+          <div transition:fade style="margin-left: 10px;">
+            <LoadingIndicator />
+          </div>
+        {/if}
+
+        {#if errorLoading}
+          <div transition:fade style="margin-left: 10px;">
+            <ErrorLoadIndicator />
+          </div>
+        {/if}
+      </div>
+
+      {#if hovering}
+        <p
+          transition:slide
+          style="font-size: 0.9em; text-align: left; opacity: 0.8;">
+          Click to get coordinates from the browser
+          <br />
+          or you can set them from the options menu.
+        </p>
+      {/if}
+    </div>
   {/if}
 
 </main>

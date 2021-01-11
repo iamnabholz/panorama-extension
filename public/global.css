@@ -1,6 +1,7 @@
 * {
 	margin: 0;
 	scrollbar-width: thin;
+	box-sizing: border-box;
 }
 
 html,
@@ -20,9 +21,6 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
-	body {
-		background-color: #202020;
-	}
 
 	/* Handle */
 	::-webkit-scrollbar-thumb {
@@ -53,7 +51,6 @@ body {
 	margin: 0;
 	box-sizing: border-box;
 	font-family: "Poppins";
-	background-color: #f2f2f2;
 	color: #333;
 	font-size: 100%;
 }
@@ -79,7 +76,7 @@ input,
 button,
 select,
 textarea {
-	font-family: inherit;
+	font-family: "Poppins";
 	font-size: inherit;
 	-webkit-padding: 0.4em 0;
 	padding: 0.4em;

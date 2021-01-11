@@ -5,10 +5,9 @@
   import Reddit from "./views/Reddit.svelte";
   import Background from "./views/Background.svelte";
 
-  let weather = localStorage.getItem("weather-toggle") || "true";
-  let search = localStorage.getItem("search-toggle") || "true";
-  let sites = localStorage.getItem("sites-toggle") || "true";
-  let reddit = localStorage.getItem("reddit-toggle") || "true";
+  import { fade, fly, slide } from "svelte/transition";
+
+  import { weather, search, sites, reddit } from "./stores/options.js";
 </script>
 
 <style>
@@ -24,6 +23,10 @@
     height: 120px;
     display: flex;
     justify-content: center;
+  }
+
+  .header {
+    height: 120px;
   }
 
   .search-bar,
@@ -45,26 +48,28 @@
 <Background />
 
 <main>
-  <section class="header">
-    {#if weather == 'true'}
-      <Weather />
+  <div class="header">
+    {#if $weather === 'true'}
+      <section transition:slide>
+        <Weather />
+      </section>
     {/if}
-  </section>
+  </div>
 
-  {#if search == 'true'}
-    <section class="search-bar">
+  {#if $search === 'true'}
+    <section transition:slide class="search-bar">
       <SearchBar />
     </section>
   {/if}
 
-  {#if sites == 'true'}
-    <section class="top-sites">
+  {#if $sites === 'true'}
+    <section transition:slide class="top-sites">
       <TopSites />
     </section>
   {/if}
 
-  {#if reddit == 'true'}
-    <section class="reddit">
+  {#if $reddit === 'true'}
+    <section transition:fly class="reddit">
       <Reddit />
     </section>
   {/if}

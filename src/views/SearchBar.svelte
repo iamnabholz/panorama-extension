@@ -2,7 +2,8 @@
   import { fly } from "svelte/transition";
   import { onMount } from "svelte";
 
-  let defaultSearch = localStorage.getItem("engine") || "g";
+  import { defaultSearch } from "../stores/options.js";
+
   let search = "";
   let showButt = false;
 
@@ -114,14 +115,14 @@
     on:keydown={key => {
       if (key.keyCode === 13) {
         key.preventDefault();
-        openLink(defaultSearch);
+        openLink($defaultSearch);
       }
     }} />
 
   {#if showButt}
     <div transition:fly={{ duration: 300, x: 20 }} class="buttons">
       <input
-        class:selected={defaultSearch === 'g'}
+        class:selected={$defaultSearch === 'g'}
         title="Search with Google"
         alt="Google Icon"
         src="/icons/google-ico.png"
@@ -131,7 +132,7 @@
         }} />
 
       <input
-        class:selected={defaultSearch === 'd'}
+        class:selected={$defaultSearch === 'd'}
         title="Search with DuckDuckGo"
         alt="DuckDuckGo Icon"
         src="/icons/duckduckgo-ico.png"
@@ -141,7 +142,7 @@
         }} />
 
       <input
-        class:selected={defaultSearch === 'e'}
+        class:selected={$defaultSearch === 'e'}
         title="Search with Ecosia"
         alt="Ecosia Icon"
         src="/icons/ecosia-ico.png"
@@ -151,7 +152,7 @@
         }} />
 
       <input
-        class:selected={defaultSearch === 'w'}
+        class:selected={$defaultSearch === 'w'}
         title="Search on Wikipedia"
         alt="Wikipedia Icon"
         src="/icons/wikipedia-ico.png"

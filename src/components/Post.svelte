@@ -138,8 +138,8 @@
   }
 
   .post-details img {
-    padding: 0 0.2em;
     width: 14px;
+    margin-right: 0.2rem;
   }
 
   .post-details p {

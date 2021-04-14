@@ -34,4 +34,4 @@ background.subscribe(val => localStorage.setItem("bg-toggle", val));
 export const searchBackground = writable(localStorage.getItem("search") || "nasa");
 searchBackground.subscribe(val => localStorage.setItem("search", val));
 
-export const backgroundColor = writable(localStorage.getItem("bg-color") || "#f2f2f2");
+export const backgroundColor = writable(localStorage.getItem("bg-color") || "f2f2f2");

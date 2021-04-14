@@ -5,11 +5,12 @@
 
   import LoadingIndicator from "../components/LoadingIndicator.svelte";
   import Options from "./Options.svelte";
+  import Notes from "./Notes.svelte";
 
   import {
     background,
     searchBackground,
-    backgroundColor
+    backgroundColor,
   } from "../stores/options.js";
 
   let y;
@@ -38,6 +39,7 @@
   $: username = backgroundResponse.user.username;
 
   let showingSettings = false;
+  let showingNotes = false;
 
   onMount(() => {
     if (parseInt(timer) === 0) {
@@ -64,10 +66,18 @@
 
     if ((await response.status) === 200) {
       const json = await response.json();
-
       localStorage.setItem("bg-timer", Date.now());
-      backgroundResponse = json;
-      localStorage.setItem("background", JSON.stringify(json));
+
+      if (json.urls !== undefined) {
+        backgroundResponse = json;
+        localStorage.setItem("background", JSON.stringify(json));
+      } else {
+        loadingBackground = false;
+
+        console.log(
+          "We couldn't find any background with that description, search for something different."
+        );
+      }
     } else {
       loadingBackground = false;
 
@@ -80,8 +90,8 @@
     };
   }
 
-  const unsubscribe = searchBackground.subscribe(value => {
-    if (searchQuery !== value) {
+  const unsubscribe = searchBackground.subscribe((value) => {
+    if (value !== searchQuery && parseInt(timer) !== 0) {
       searchQuery = value;
       getBackground();
     }
@@ -89,6 +99,153 @@
 
   onDestroy(unsubscribe);
 </script>
+
+<div class="settings-container">
+  <div class:open-settings={showingSettings} class="button-container">
+    {#if !showingSettings}
+      <svg
+        title="Open Options"
+        on:click={() => {
+          showSettings();
+        }}
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="icon-settings"
+      >
+        <circle cx="12" cy="12" r="3" />
+        <path
+          d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0
+          1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2
+          2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0
+          0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65
+          0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1
+          2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0
+          0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65
+          0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51
+          1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0
+          2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2
+          0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+        />
+      </svg>
+    {:else}
+      <svg
+        title="Close Options"
+        on:click={() => {
+          showingSettings = false;
+        }}
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    {/if}
+  </div>
+
+  {#if enabled == "true" && y < 180}
+    <span class="text" transition:slide>
+      <a href={"https://unsplash.com/@" + username}>
+        {user}
+        <br />
+        on Unsplash
+      </a>
+    </span>
+
+    {#if loadingBackground}
+      <div transition:fade|local style="margin-left: 10px;">
+        <LoadingIndicator />
+      </div>
+    {/if}
+  {/if}
+</div>
+
+<div class="notes-container">
+  <div class:open-notes={showingNotes} class="button-container">
+    <svg
+      title="Open Notes"
+      on:click={() => {
+        if (showingNotes) {
+          showingNotes = false;
+        } else {
+          showingNotes = true;
+        }
+      }}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="icon-settings"
+    >
+      <circle cx="12" cy="12" r="3" />
+      <path
+        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0
+        1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2
+        0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0
+        0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0
+        0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1
+        2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0
+        1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0
+        0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65
+        1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0
+        2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0
+        0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+      />
+    </svg>
+  </div>
+</div>
+
+<div class="background">
+  {#if enabled == "true"}
+    <img
+      transition:fade={{ duration: 120 }}
+      bind:this={imgElement}
+      {alt}
+      src={image}
+    />
+  {:else}
+    <div
+      style="background-color: #{$backgroundColor};"
+      class="color-background"
+    />
+  {/if}
+
+  {#if y > 180}
+    <div transition:fade class="gradient" />
+  {/if}
+</div>
+
+<svelte:window bind:scrollY={y} />
+
+{#if showingSettings}
+  <div class="options-menu" transition:fly|local={{ x: -200 }}>
+    <Options />
+  </div>
+{/if}
+
+{#if showingNotes}
+  <div class="notes-menu" transition:fly|local={{ x: 200 }}>
+    <Notes />
+  </div>
+{/if}
 
 <style>
   .background {
@@ -119,13 +276,21 @@
     background: rgba(20, 20, 20, 0.35);
   }
 
-  .text-container {
+  .settings-container {
     position: fixed;
     bottom: 0.6rem;
     left: 0.6rem;
     display: flex;
     align-items: center;
     text-align: left;
+    height: 32px;
+    mix-blend-mode: difference;
+  }
+
+  .notes-container {
+    position: fixed;
+    bottom: 0.6rem;
+    right: 0.6rem;
     height: 32px;
     mix-blend-mode: difference;
   }
@@ -155,7 +320,13 @@
     transition: background-color 0.1s linear;
   }
 
-  .open-button {
+  .open-settings {
+    mix-blend-mode: normal;
+    background-color: white;
+    box-shadow: 0 1px 2px 0 grey;
+  }
+
+  .open-notes {
     mix-blend-mode: normal;
     background-color: white;
     box-shadow: 0 1px 2px 0 grey;
@@ -182,6 +353,16 @@
     z-index: 10;
   }
 
+  .notes-menu {
+    position: fixed;
+    top: 0.6rem;
+    bottom: 3.2rem;
+    right: 0.6rem;
+    width: min(660px, 100%);
+    min-height: 100%;
+    z-index: 15;
+  }
+
   a {
     opacity: 0.8;
   }
@@ -190,99 +371,3 @@
     text-decoration: none;
   }
 </style>
-
-<div class="text-container">
-  <div class:open-button={showingSettings} class="button-container">
-    {#if !showingSettings}
-      <svg
-        title="Open Options"
-        on:click={() => {
-          showSettings();
-        }}
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="icon-settings">
-        <circle cx="12" cy="12" r="3" />
-        <path
-          d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0
-          1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2
-          2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0
-          0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65
-          0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1
-          2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0
-          0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65
-          0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51
-          1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0
-          2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2
-          0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-      </svg>
-    {:else}
-      <svg
-        title="Close Options"
-        on:click={() => {
-          showingSettings = false;
-        }}
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18" />
-        <line x1="6" y1="6" x2="18" y2="18" />
-      </svg>
-    {/if}
-  </div>
-
-  {#if enabled == 'true' && y < 180}
-    <span class="text" transition:slide>
-      <a href={'https://unsplash.com/@' + username}>
-        {user}
-        <br />
-        on Unsplash
-      </a>
-    </span>
-
-    {#if loadingBackground}
-      <div transition:fade style="margin-left: 10px;">
-        <LoadingIndicator />
-      </div>
-    {/if}
-  {/if}
-</div>
-
-<div class="background">
-  {#if enabled == 'true'}
-    <img
-      transition:fade={{ duration: 120 }}
-      bind:this={imgElement}
-      {alt}
-      src={image} />
-  {:else}
-    <div
-      style="background-color: {$backgroundColor};"
-      class="color-background" />
-  {/if}
-
-  {#if y > 180}
-    <div transition:fade class="gradient" />
-  {/if}
-</div>
-
-<svelte:window bind:scrollY={y} />
-
-{#if showingSettings}
-  <div class="options-menu" transition:fly={{ x: -200 }}>
-    <Options />
-  </div>
-{/if}

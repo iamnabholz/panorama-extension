@@ -39,7 +39,7 @@
   let hovering = false;
 
   const options = {
-    enableHighAccuracy: true
+    enableHighAccuracy: true,
   };
 
   onMount(() => {
@@ -58,8 +58,8 @@
 
   function getLocation(position) {
     if (permission == false) {
-      localStorage.setItem("perm", true);
       permission = true;
+      localStorage.setItem("perm", true);
     }
 
     latitude.set(position.coords.latitude);
@@ -110,7 +110,7 @@
     return toreturn;
   }
 
-  const unsubscribe = latitude.subscribe(value => {
+  const unsubscribe = latitude.subscribe((value) => {
     if (lat !== value || lon !== $longitude) {
       lat = value;
       lon = $longitude;
@@ -120,6 +120,98 @@
 
   onDestroy(unsubscribe);
 </script>
+
+<main>
+  {#if permission}
+    <div title="Current Weather" class="weather">
+      <div class="icon-weather">
+        <img
+          title={text.charAt(0).toUpperCase() + text.slice(1)}
+          alt={text}
+          src={iconLink}
+        />
+      </div>
+
+      <div class="text-weather">
+        <h1>{value}</h1>
+
+        <div
+          title="Switch Temperature Unit"
+          class:reverse={unit == "f"}
+          class="text-temperature"
+          on:click={() => {
+            if (unit == "c") {
+              unit = "f";
+            } else {
+              unit = "c";
+            }
+            localStorage.setItem("unit", unit);
+            value = getTemp(temp);
+          }}
+        >
+          <p class:hide={unit == "f"}>°C</p>
+          <p class:hide={unit == "c"}>°F</p>
+        </div>
+      </div>
+
+      {#if loadingInfo}
+        <div transition:fade style="margin-left: 10px;">
+          <LoadingIndicator />
+        </div>
+      {/if}
+
+      {#if errorLoading}
+        <div transition:fade style="margin-left: 10px;">
+          <ErrorLoadIndicator />
+        </div>
+      {/if}
+    </div>
+  {:else}
+    <div
+      class="setup-container"
+      on:mouseenter={() => {
+        hovering = true;
+      }}
+      on:mouseleave={() => {
+        hovering = false;
+      }}
+      on:click|once={() => {
+        ask();
+      }}
+    >
+      <div style="display: flex; align-items: center;">
+        <h3 style="height: 36px; line-height: 2;">Weather Location</h3>
+
+        {#if !asking && !errorLoading}
+          <div class="get-button">></div>
+        {/if}
+
+        {#if asking}
+          <div transition:fade|local style="margin-left: 10px;">
+            <LoadingIndicator />
+          </div>
+        {/if}
+
+        {#if errorLoading}
+          <div transition:fade|local style="margin-left: 10px;">
+            <ErrorLoadIndicator />
+          </div>
+        {/if}
+      </div>
+
+      {#if hovering}
+        <p
+          transition:slide|local
+          style="font-size: 0.9em; text-align: left; opacity: 0.8;"
+        >
+          Click to get coordinates from the browser
+          <br />
+          or you can set them from the options menu.
+        </p>
+      {/if}
+    </div>
+  {/if}
+</main>
 
 <style>
   main {
@@ -178,8 +270,8 @@
   }
 
   .setup-container {
-    display: flex;
-    align-items: center;
+    cursor: pointer;
+    mix-blend-mode: difference;
   }
 
   .get-button {
@@ -202,94 +294,3 @@
     display: none;
   }
 </style>
-
-<main>
-  {#if permission}
-    <div title="Current Weather" class="weather">
-      <div class="icon-weather">
-        <img
-          title={text.charAt(0).toUpperCase() + text.slice(1)}
-          alt={text}
-          src={iconLink} />
-      </div>
-
-      <div class="text-weather">
-        <h1>{value}</h1>
-
-        <div
-          title="Switch Temperature Unit"
-          class:reverse={unit == 'f'}
-          class="text-temperature"
-          on:click={() => {
-            if (unit == 'c') {
-              unit = 'f';
-            } else {
-              unit = 'c';
-            }
-            localStorage.setItem('unit', unit);
-            value = getTemp(temp);
-          }}>
-
-          <p class:hide={unit == 'f'}>°C</p>
-          <p class:hide={unit == 'c'}>°F</p>
-        </div>
-      </div>
-
-      {#if loadingInfo}
-        <div transition:fade style="margin-left: 10px;">
-          <LoadingIndicator />
-        </div>
-      {/if}
-
-      {#if errorLoading}
-        <div transition:fade style="margin-left: 10px;">
-          <ErrorLoadIndicator />
-        </div>
-      {/if}
-    </div>
-  {:else}
-    <div
-      on:mouseenter={() => {
-        hovering = true;
-      }}
-      on:mouseleave={() => {
-        hovering = false;
-      }}
-      style="cursor: pointer;"
-      on:click|once={() => {
-        ask();
-      }}>
-
-      <div class="setup-container">
-        <h3 style="height: 36px; line-height: 2;">Weather Location</h3>
-
-        {#if !asking && !errorLoading}
-          <div class="get-button">></div>
-        {/if}
-
-        {#if asking}
-          <div transition:fade style="margin-left: 10px;">
-            <LoadingIndicator />
-          </div>
-        {/if}
-
-        {#if errorLoading}
-          <div transition:fade style="margin-left: 10px;">
-            <ErrorLoadIndicator />
-          </div>
-        {/if}
-      </div>
-
-      {#if hovering}
-        <p
-          transition:slide
-          style="font-size: 0.9em; text-align: left; opacity: 0.8;">
-          Click to get coordinates from the browser
-          <br />
-          or you can set them from the options menu.
-        </p>
-      {/if}
-    </div>
-  {/if}
-
-</main>

@@ -66,7 +66,7 @@
     const json = await feed.json();
     if (json.data != null) {
       let data = json.data.children;
-      let filtered = data.filter(el => el.data.stickied != true);
+      let filtered = data.filter((el) => el.data.stickied != true);
 
       filtered = filtered.slice(0, 50);
 
@@ -94,6 +94,98 @@
     }
   }
 </script>
+
+<main>
+  <section class="reddit-controls">
+    <div style="display: flex; align-items: center; height: 100%;">
+      <div class="input-container">
+        <a href={"https://www.reddit.com/r/" + subreddit + "/" + selectedSort}>
+          <img alt="Reddit Icon" src="/icons/reddit-ico.png" />
+        </a>
+        <span
+          spellcheck="false"
+          bind:this={inputSpan}
+          contenteditable="true"
+          on:focusout={() => {
+            subredditChange();
+          }}
+          on:keydown={(key) => {
+            if (key.keyCode === 13) {
+              key.preventDefault();
+              inputSpan.blur();
+              subredditChange();
+            }
+            let char = String.fromCharCode(key.keyCode);
+            if (
+              /[A-Za-z0-9_]/.test(char) == false &&
+              key.keyCode != 8 &&
+              key.keyCode != 37 &&
+              key.keyCode != 39 &&
+              key.keyCode != 46
+            ) {
+              key.preventDefault();
+            }
+          }}
+        />
+
+        <div
+          style="background-color: lightgray; width: 1px; height: 65%; margin: 0
+          0.25rem;"
+        />
+
+        <select
+          bind:value={selectedSort}
+          on:blur={() => {
+            if (selectedSort != localStorage.getItem("sr-sort")) {
+              localStorage.setItem("sr-sort", selectedSort);
+              getPosts();
+            }
+          }}
+        >
+          <option value="hot">
+            <p>Hot</p>
+          </option>
+          <option value="new">
+            <p>New</p>
+          </option>
+          <option value="rising">
+            <p>Rising</p>
+          </option>
+        </select>
+      </div>
+
+      {#if loadingPosts}
+        <div transition:fade|local style="margin-left: 10px;">
+          <LoadingIndicator />
+        </div>
+      {/if}
+    </div>
+
+    {#if allPosts.length > 4}
+      <div transition:slide class="control-arrow">
+        <button
+          on:click={() => {
+            showPosts();
+          }}
+        >
+          <img
+            class:open={isShowing === true}
+            src="icons/chevron-down.svg"
+            alt="Left Arrow"
+          />
+        </button>
+      </div>
+    {/if}
+  </section>
+
+  <section class="reddit-posts">
+    <div class="reddit-posts-container">
+      {#each showingPosts as post, i}
+        <Post {post} />
+      {/each}
+    </div>
+  </section>
+</main>
 
 <style>
   main {
@@ -198,85 +290,3 @@
     }
   }
 </style>
-
-<main>
-  <section class="reddit-controls">
-    <div style="display: flex; align-items: center; height: 100%;">
-      <div class="input-container">
-        <a href={'https://www.reddit.com/r/' + subreddit + '/' + selectedSort}>
-          <img alt="Reddit Icon" src="/icons/reddit-ico.png" />
-        </a>
-        <span
-          spellcheck="false"
-          bind:this={inputSpan}
-          contenteditable="true"
-          on:focusout={() => {
-            subredditChange();
-          }}
-          on:keydown={key => {
-            if (key.keyCode === 13) {
-              key.preventDefault();
-              inputSpan.blur();
-              subredditChange();
-            }
-            let char = String.fromCharCode(key.keyCode);
-            if (/[A-Za-z0-9_]/.test(char) == false && key.keyCode != 8 && key.keyCode != 37 && key.keyCode != 39 && key.keyCode != 46) {
-              key.preventDefault();
-            }
-          }} />
-
-        <div
-          style="background-color: lightgray; width: 1px; height: 65%; margin: 0
-          0.25rem;" />
-
-        <select
-          bind:value={selectedSort}
-          on:blur={() => {
-            if (selectedSort != localStorage.getItem('sr-sort')) {
-              localStorage.setItem('sr-sort', selectedSort);
-              getPosts();
-            }
-          }}>
-          <option value="hot">
-            <p>Hot</p>
-          </option>
-          <option value="new">
-            <p>New</p>
-          </option>
-          <option value="rising">
-            <p>Rising</p>
-          </option>
-        </select>
-
-      </div>
-
-      {#if loadingPosts}
-        <div transition:fade style="margin-left: 10px;">
-          <LoadingIndicator />
-        </div>
-      {/if}
-    </div>
-
-    {#if allPosts.length > 4}
-      <div transition:slide class="control-arrow">
-        <button
-          on:click={() => {
-            showPosts();
-          }}>
-          <img
-            class:open={isShowing === true}
-            src="icons/chevron-down.svg"
-            alt="Left Arrow" />
-        </button>
-      </div>
-    {/if}
-  </section>
-
-  <section class="reddit-posts">
-    <div class="reddit-posts-container">
-      {#each showingPosts as post, i}
-        <Post {post} />
-      {/each}
-    </div>
-  </section>
-</main>

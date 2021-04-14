@@ -69,6 +69,10 @@
     padding: 0 0.7em;
   }
 
+  .empty-list {
+    mix-blend-mode: difference;
+  }
+
   @media screen and (max-width: 730px) {
     main {
       display: grid;
@@ -92,7 +96,7 @@
 
 <main>
   {#if result.length == 0}
-    <p>You don't have any top sites yet.</p>
+    <p class="empty-list">You don't have any top sites yet.</p>
   {/if}
 
   {#each result as site, i}

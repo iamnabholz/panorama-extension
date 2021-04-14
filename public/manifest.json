@@ -1,7 +1,7 @@
 {
   "name": "Panorama Tab",
-  "description": "Replace your new tab with a unique design and set of features that you can customize.",
-  "version": "1.0.3",
+  "description": "Replace your new tab with a new unique design and set of features that you can customize.",
+  "version": "1.0.4",
   "manifest_version": 2,
 
   "icons": {

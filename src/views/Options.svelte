@@ -32,6 +32,8 @@
 
   let bgRefresh = true;
 
+  let bgTimer = parseInt(localStorage.getItem("bg-timer")) || 0;
+
   if (localStorage.getItem("bg-refresh-toggle") !== null) {
     if (localStorage.getItem("bg-refresh-toggle") === "false") {
       bgRefresh = false;
@@ -107,8 +109,8 @@
 
   .explanation {
     font-size: 0.9em;
-    padding-bottom: 0.8rem;
-    line-height: 1.1;
+    margin-bottom: 0.8rem;
+    line-height: 1.2;
   }
 
   .options-content {
@@ -189,18 +191,19 @@
   }
 
   .colors-showcase {
-    display: flex;
-    padding: 0.3rem 0;
+    display: grid;
+    column-gap: 0.3rem;
+    grid-template-columns: repeat(3, auto);
+    padding-top: 0.5rem;
+    height: 40px;
   }
 
   .color {
-    width: 34px;
-    height: 34px;
-    margin-right: 0.3rem;
+    width: 100%;
+    height: 100%;
     border-radius: 3px;
     border: 4px solid lightgray;
     box-sizing: border-box;
-    flex: 1 1 0px;
     cursor: pointer;
   }
 
@@ -209,19 +212,48 @@
     border-color: rgba(0, 130, 243, 1);
   }
 
-  .information {
-    border-top: 1px solid rgba(180, 180, 180, 0.3);
-    background-color: white;
-    padding: 1rem;
+  .color-text-input {
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .color-text-input input[type="text"] {
+    margin-left: 45px;
+    border-radius: 0;
+    width: 7em;
+  }
+
+  .color-text-input input[type="text"]:focus {
+    border-color: var(--color);
+  }
+
+  .color-preview {
+    position: absolute;
+    left: 0;
+    height: 100%;
+    width: 50px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+
+  .color-preview p {
+    font-size: 2em;
+    color: white;
+    mix-blend-mode: difference;
   }
 
   .information-links {
     display: flex;
-    flex-direction: column;
     font-size: 0.86rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .information-links p {
+    font-size: 1rem;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -231,7 +263,6 @@
     }
 
     .option,
-    .information,
     .header {
       background-color: rgb(24, 24, 24);
     }
@@ -281,8 +312,13 @@
     {#if currentOption === 'weather' && weatherBind}
       <section transition:slide class="options-content">
         <p class="explanation">
-          Coordinates sometimes can be off by a small margin and as a result you
-          get wrong information, check that they're correct for your location.
+          Click the °C (or °F) to the side of the temperature to switch between
+          units.
+        </p>
+
+        <p class="explanation">
+          Check that your coordinates are correct to get the most accurate
+          weather data.
         </p>
         <div class="position-selector">
           <div class="text">
@@ -494,11 +530,25 @@
                 disableButton={bgCategory === $searchBackground}
                 buttonAction={() => {
                   searchBackground.set(bgCategory);
-                  localStorage.setItem('bg-timer', 0);
                 }}>
                 Save
               </Button>
             </div>
+            {#if !bgRefresh && bgTimer + 6600000 < Date.now()}
+              <div transition:slide|local class="text">
+                <p>Refresh Background Now</p>
+                <Button
+                  disableButton={false}
+                  buttonAction={() => {
+                    bgTimer = Date.now();
+                    let ref = $searchBackground;
+                    searchBackground.set('ni');
+                    searchBackground.set(ref);
+                  }}>
+                  Refresh
+                </Button>
+              </div>
+            {/if}
           </div>
         {:else}
           <div
@@ -507,23 +557,23 @@
             <p>Select a background color</p>
             <div class="colors-showcase">
               <div
-                class:selected-color={bgColor === '#f2f2f2'}
+                class:selected-color={bgColor === 'f2f2f2'}
                 on:click={() => {
-                  bgColor = '#f2f2f2';
+                  bgColor = 'f2f2f2';
                 }}
                 class="color"
                 style="background-color: #f2f2f2;" />
               <div
-                class:selected-color={bgColor === '#333'}
+                class:selected-color={bgColor === '181818'}
                 on:click={() => {
-                  bgColor = '#333';
+                  bgColor = '181818';
                 }}
                 class="color"
-                style="background-color: #333;" />
+                style="background-color: #181818;" />
               <div
-                class:selected-color={bgColor === '#d7be69'}
+                class:selected-color={bgColor === 'd7be69'}
                 on:click={() => {
-                  bgColor = '#d7be69';
+                  bgColor = 'd7be69';
                 }}
                 class="color"
                 style="background-color: #d7be69;" />
@@ -531,12 +581,19 @@
 
             <div class="text" style="padding-top: 0.4rem;">
               <label for="color">HEX Color Code:</label>
-              <input
-                name="color"
-                maxlength="7"
-                minlength="4"
-                bind:value={bgColor}
-                type="text" />
+              <div class="color-text-input">
+                <div class="color-preview" style="background-color: #{bgColor}">
+                  <p>#</p>
+                </div>
+                <input
+                  style="--color: #{bgColor}"
+                  name="color"
+                  maxlength="6"
+                  minlength="3"
+                  bind:value={bgColor}
+                  type="text" />
+
+              </div>
             </div>
             <div style="align-self: flex-end;">
               <Button
@@ -554,28 +611,66 @@
     {/if}
   </div>
 
-  <div class="information">
-    <div class="information-links">
-      <p style="color: grey;">Panorama Tab v1.0.3</p>
-      <a
-        style="margin: 0.4rem 0; "
-        href="https://panoramatab.netlify.app/privacy%20policy.html"
-        target="_blank">
-        Privacy Policy
-      </a>
-      <span>
-        <a href="https://nabholz.work/" target="_blank">
-          nabholz.work &#8599;&#xFE0E;
-        </a>
-      </span>
+  <div>
+    <div class="option">
+      <h1>About</h1>
+      <div style="margin-left: auto;">
+        <Button
+          arrowButton={true}
+          buttonAction={() => {
+            if (currentOption != 'about') {
+              currentOption = 'about';
+            } else {
+              currentOption = '';
+            }
+          }}>
+          <img
+            style="width: 22px;"
+            class:open={currentOption === 'about'}
+            src="icons/chevron-down.svg"
+            alt="Left Arrow" />
+        </Button>
+      </div>
     </div>
-    <a class="kofi-button" href="https://ko-fi.com/Z8Z82TKAA" target="_blank">
-      <img
-        height="36"
-        style="border:0px;height:36px;"
-        src="/icons/kofi3.png"
-        border="0"
-        alt="Buy Me a Coffee at ko-fi.com" />
-    </a>
+
+    {#if currentOption === 'about'}
+      <section transition:slide class="options-content">
+        <div
+          class="information-links"
+          style="flex-direction: column; margin: 0.6rem 0 1rem 0;">
+          <p>Panorama Tab v2.0.0</p>
+          <a
+            style="margin: 0.56rem 0;"
+            href="https://panoramatab.netlify.app/privacy%20policy.html"
+            target="_blank">
+            Privacy Policy &#8599;&#xFE0E;
+          </a>
+          <a href="mailto:support@nabholz.work?subject=Panorama Tab">
+            support@nabholz.work &#128231;&#xFE0E;
+          </a>
+        </div>
+
+        <div class="information-links">
+          <span style="margin-top: 0.3rem;">
+            by
+            <a href="https://nabholz.work/" target="_blank">
+              nabholz.work &#8599;&#xFE0E;
+            </a>
+          </span>
+
+          <a
+            class="kofi-button"
+            href="https://ko-fi.com/Z8Z82TKAA"
+            target="_blank">
+            <img
+              height="36"
+              style="border:0px;height:36px;"
+              src="/icons/kofi3.png"
+              border="0"
+              alt="Buy Me a Coffee at ko-fi.com" />
+          </a>
+        </div>
+      </section>
+    {/if}
   </div>
 </div>

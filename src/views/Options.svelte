@@ -638,7 +638,7 @@
         <div
           class="information-links"
           style="flex-direction: column; margin: 0.6rem 0 1rem 0;">
-          <p>Panorama Tab v2.0.0</p>
+          <p>Panorama Tab v1.1.0</p>
           <a
             style="margin: 0.56rem 0;"
             href="https://panoramatab.netlify.app/privacy%20policy.html"

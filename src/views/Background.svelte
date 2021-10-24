@@ -5,7 +5,6 @@
 
   import LoadingIndicator from "../components/LoadingIndicator.svelte";
   import Options from "./Options.svelte";
-  import Notes from "./Notes.svelte";
 
   import {
     background,
@@ -39,7 +38,6 @@
   $: username = backgroundResponse.user.username;
 
   let showingSettings = false;
-  let showingNotes = false;
 
   onMount(() => {
     if (parseInt(timer) === 0) {
@@ -61,7 +59,8 @@
   async function getBackground() {
     loadingBackground = true;
     const response = await fetch(
-      "https://get-background.nabholz.workers.dev/?cat=" + searchQuery
+      "https://get-background.nabholz.workers.dev/?cat=" + searchQuery,
+      { mode: "no-cors" }
     );
 
     if ((await response.status) === 200) {
@@ -173,46 +172,6 @@
   {/if}
 </div>
 
-<div class="notes-container">
-  <div class:open-notes={showingNotes} class="button-container">
-    <svg
-      title="Open Notes"
-      on:click={() => {
-        if (showingNotes) {
-          showingNotes = false;
-        } else {
-          showingNotes = true;
-        }
-      }}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      class="icon-settings"
-    >
-      <circle cx="12" cy="12" r="3" />
-      <path
-        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0
-        1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2
-        0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0
-        0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0
-        0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1
-        2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0
-        1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0
-        0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65
-        1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0
-        2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0
-        0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
-      />
-    </svg>
-  </div>
-</div>
-
 <div class="background">
   {#if enabled == "true"}
     <img
@@ -238,12 +197,6 @@
 {#if showingSettings}
   <div class="options-menu" transition:fly|local={{ x: -200 }}>
     <Options />
-  </div>
-{/if}
-
-{#if showingNotes}
-  <div class="notes-menu" transition:fly|local={{ x: 200 }}>
-    <Notes />
   </div>
 {/if}
 
@@ -287,14 +240,6 @@
     mix-blend-mode: difference;
   }
 
-  .notes-container {
-    position: fixed;
-    bottom: 0.6rem;
-    right: 0.6rem;
-    height: 32px;
-    mix-blend-mode: difference;
-  }
-
   .text a {
     display: block;
     color: white;
@@ -326,12 +271,6 @@
     box-shadow: 0 1px 2px 0 grey;
   }
 
-  .open-notes {
-    mix-blend-mode: normal;
-    background-color: white;
-    box-shadow: 0 1px 2px 0 grey;
-  }
-
   .icon-settings {
     stroke: white;
     opacity: 0.8;
@@ -351,16 +290,6 @@
     left: 0.6rem;
     width: min(380px, 100%);
     z-index: 10;
-  }
-
-  .notes-menu {
-    position: fixed;
-    top: 0.6rem;
-    bottom: 3.2rem;
-    right: 0.6rem;
-    width: min(660px, 100%);
-    min-height: 100%;
-    z-index: 15;
   }
 
   a {

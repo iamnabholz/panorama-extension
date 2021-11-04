@@ -180,7 +180,9 @@
       }}
     >
       <div style="display: flex; align-items: center;">
-        <h3 style="height: 36px; line-height: 2;">Weather Location</h3>
+        <h3 style="font-weight: 400; height: 36px; line-height: 2;">
+          Weather Location
+        </h3>
 
         {#if !asking && !errorLoading}
           <div class="get-button">></div>

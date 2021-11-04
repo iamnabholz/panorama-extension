@@ -64,11 +64,24 @@
     defaultSearch.set(engine);
     localStorage.setItem("engine", engine);
   }
+
+  let manifest =
+    typeof chrome !== null
+      ? chrome.runtime.getManifest()
+      : browser.runtime.getManifest();
+
+  /*if (typeof chrome !== null) {
+    manifest = chrome.runtime.getManifest();
+  } else {
+    manifest = browser.runtime.getManifest();
+  }*/
+
+  let version = manifest.version;
 </script>
 
 <div class="modal-container">
   <div class="header">
-    <h2 style="font-size: 1.1em; font-weight: 500;">Options</h2>
+    <h2 style="font-size: 1.1em; font-weight: 800;">Options</h2>
   </div>
 
   <div>
@@ -464,7 +477,7 @@
           class="information-links"
           style="flex-direction: column; margin: 0.6rem 0 1rem 0;"
         >
-          <p>Panorama Tab v1.0.4</p>
+          <p>Panorama Tab v{version}</p>
           <a
             style="margin: 0.56rem 0;"
             href="https://panoramatab.netlify.app/privacy%20policy.html"
@@ -543,6 +556,7 @@
 
   .option h1 {
     padding-left: 0.4em;
+    font-weight: 400;
   }
 
   .explanation {

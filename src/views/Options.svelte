@@ -9,7 +9,7 @@
     reddit,
     background,
     searchBackground,
-    backgroundColor
+    backgroundColor,
   } from "../stores/options.js";
   import { slide, fade } from "svelte/transition";
   import LoadingIndicator from "../components/LoadingIndicator.svelte";
@@ -43,7 +43,7 @@
 
   function requestCoordinates() {
     const options = {
-      enableHighAccuracy: true
+      enableHighAccuracy: true,
     };
     navigator.geolocation.getCurrentPosition(getLocation, getError, options);
   }
@@ -65,6 +65,444 @@
     localStorage.setItem("engine", engine);
   }
 </script>
+
+<div class="modal-container">
+  <div class="header">
+    <h2 style="font-size: 1.1em; font-weight: 500;">Options</h2>
+  </div>
+
+  <div>
+    <div class="option">
+      <Checkbox
+        checkboxValue={weatherBind}
+        checkboxAction={() => {
+          if (weatherBind === true) {
+            weatherBind = false;
+            weather.set("false");
+          } else {
+            weatherBind = true;
+            weather.set("true");
+          }
+        }}
+      >
+        <h1>Weather</h1>
+      </Checkbox>
+
+      <div style="margin-left: auto;">
+        <Button
+          arrowButton={true}
+          disableButton={!weatherBind}
+          buttonAction={() => {
+            if (currentOption != "weather") {
+              currentOption = "weather";
+            } else {
+              currentOption = "";
+            }
+          }}
+        >
+          <img
+            style="width: 22px;"
+            class:open={currentOption === "weather" && weatherBind}
+            src="icons/chevron-down.svg"
+            alt="Left Arrow"
+          />
+        </Button>
+      </div>
+    </div>
+    {#if currentOption === "weather" && weatherBind}
+      <section transition:slide class="options-content">
+        <p class="explanation">
+          Click the °C (or °F) to the side of the temperature to switch between
+          units.
+        </p>
+
+        <p class="explanation">
+          Check that your coordinates are correct to get the most accurate
+          weather data.
+        </p>
+        <div class="position-selector">
+          <div class="text">
+            <label for="lat">Latitude:</label>
+            <input bind:value={lat} type="text" />
+          </div>
+          <div class="text">
+            <label for="lon">Longitude:</label>
+            <input bind:value={lon} type="text" />
+          </div>
+        </div>
+        <div class="position-buttons">
+          {#if loadingCoords}
+            <div transition:fade style="margin-right: 10px;">
+              <LoadingIndicator />
+            </div>
+          {/if}
+          <Button
+            disableButton={loadingCoords}
+            buttonAction={() => {
+              loadingCoords = true;
+              requestCoordinates();
+            }}
+          >
+            Get
+          </Button>
+          <div style="width: 0.2rem;" />
+          <Button
+            disableButton={lat === $latitude && lon === $longitude}
+            buttonAction={() => {
+              latitude.set(lat);
+              longitude.set(lon);
+            }}
+          >
+            Save
+          </Button>
+        </div>
+      </section>
+    {/if}
+  </div>
+
+  <div>
+    <div class="option">
+      <Checkbox
+        checkboxValue={searchBind}
+        checkboxAction={() => {
+          if (searchBind === true) {
+            searchBind = false;
+            search.set("false");
+          } else {
+            searchBind = true;
+            search.set("true");
+          }
+        }}
+      >
+        <h1>Search Bar</h1>
+      </Checkbox>
+      <div style="margin-left: auto;">
+        <Button
+          arrowButton={true}
+          disableButton={!searchBind}
+          buttonAction={() => {
+            if (currentOption != "search") {
+              currentOption = "search";
+            } else {
+              currentOption = "";
+            }
+          }}
+        >
+          <img
+            style="width: 22px;"
+            class:open={currentOption === "search" && searchBind}
+            src="icons/chevron-down.svg"
+            alt="Left Arrow"
+          />
+        </Button>
+      </div>
+    </div>
+    {#if currentOption === "search" && searchBind}
+      <section transition:slide class="options-content">
+        <p>Default Search Engine:</p>
+
+        <div class="search-engines">
+          <div
+            class:selected-engine={$defaultSearch === "g"}
+            on:click={() => {
+              setDefaultSearch("g");
+            }}
+          >
+            <img alt="Google Logo" src="/icons/google-ico.png" />
+            <p>Google</p>
+          </div>
+          <div
+            class:selected-engine={$defaultSearch === "d"}
+            on:click={() => {
+              setDefaultSearch("d");
+            }}
+          >
+            <img alt="Google Logo" src="/icons/duckduckgo-ico.png" />
+            <p>DuckDuckGo</p>
+          </div>
+          <div
+            class:selected-engine={$defaultSearch === "e"}
+            on:click={() => {
+              setDefaultSearch("e");
+            }}
+          >
+            <img alt="Google Logo" src="/icons/ecosia-ico.png" />
+            <p>Ecosia</p>
+          </div>
+          <div
+            class:selected-engine={$defaultSearch === "w"}
+            on:click={() => {
+              setDefaultSearch("w");
+            }}
+          >
+            <img alt="Google Logo" src="/icons/wikipedia-ico.png" />
+            <p>Wikipedia</p>
+          </div>
+        </div>
+      </section>
+    {/if}
+  </div>
+
+  <div class="option">
+    <Checkbox
+      checkboxValue={sitesBind}
+      checkboxAction={() => {
+        if (sitesBind === true) {
+          sitesBind = false;
+          sites.set("false");
+        } else {
+          sitesBind = true;
+          sites.set("true");
+        }
+      }}
+    >
+      <h1>Top Sites</h1>
+    </Checkbox>
+  </div>
+
+  <div class="option">
+    <Checkbox
+      checkboxValue={redditBind}
+      checkboxAction={() => {
+        if (redditBind === true) {
+          redditBind = false;
+          reddit.set("false");
+        } else {
+          redditBind = true;
+          reddit.set("true");
+        }
+      }}
+    >
+      <h1>Reddit Posts</h1>
+    </Checkbox>
+  </div>
+
+  <div>
+    <div class="option">
+      <h1>Background</h1>
+      <div style="margin-left: auto;">
+        <Button
+          arrowButton={true}
+          disableButton={false}
+          buttonAction={() => {
+            if (currentOption != "background") {
+              currentOption = "background";
+            } else {
+              currentOption = "";
+            }
+          }}
+        >
+          <img
+            style="width: 22px;"
+            class:open={currentOption === "background"}
+            src="icons/chevron-down.svg"
+            alt="Left Arrow"
+          />
+        </Button>
+      </div>
+    </div>
+
+    {#if currentOption === "background"}
+      <section transition:slide class="options-content">
+        <Checkbox
+          checkboxValue={backgroundBind}
+          checkboxAction={() => {
+            if (backgroundBind === true) {
+              backgroundBind = false;
+              background.set("false");
+            } else {
+              backgroundBind = true;
+              background.set("true");
+            }
+          }}
+        >
+          Background Images
+        </Checkbox>
+        {#if backgroundBind}
+          <div
+            transition:slide|local
+            style="display: flex; flex-direction: column;"
+          >
+            <Checkbox
+              checkboxValue={bgRefresh}
+              checkboxAction={() => {
+                if (bgRefresh === true) {
+                  bgRefresh = false;
+                  localStorage.setItem("bg-refresh-toggle", "false");
+                } else {
+                  bgRefresh = true;
+                  localStorage.setItem("bg-refresh-toggle", "true");
+                }
+              }}
+            >
+              Refresh background images hourly
+            </Checkbox>
+            <div class="text" style="padding-top: 0.4rem;">
+              <label for="cat">Category:</label>
+              <input name="cat" bind:value={bgCategory} type="text" />
+            </div>
+            <div style="align-self: flex-end;">
+              <Button
+                disableButton={bgCategory === $searchBackground}
+                buttonAction={() => {
+                  searchBackground.set(bgCategory);
+                }}
+              >
+                Save
+              </Button>
+            </div>
+            {#if !bgRefresh && bgTimer + 6600000 < Date.now()}
+              <div transition:slide|local class="text">
+                <p>Refresh Background Now</p>
+                <Button
+                  disableButton={false}
+                  buttonAction={() => {
+                    bgTimer = Date.now();
+                    let ref = $searchBackground;
+                    searchBackground.set("ni");
+                    searchBackground.set(ref);
+                  }}
+                >
+                  Refresh
+                </Button>
+              </div>
+            {/if}
+          </div>
+        {:else}
+          <div
+            transition:slide|local
+            style="display: flex; flex-direction: column; padding-top: 0.4rem;"
+          >
+            <p>Select a background color</p>
+            <div class="colors-showcase">
+              <div
+                class:selected-color={bgColor === "f2f2f2"}
+                on:click={() => {
+                  bgColor = "f2f2f2";
+                }}
+                class="color"
+                style="background-color: #f2f2f2;"
+              />
+              <div
+                class:selected-color={bgColor === "181818"}
+                on:click={() => {
+                  bgColor = "181818";
+                }}
+                class="color"
+                style="background-color: #181818;"
+              />
+              <div
+                class:selected-color={bgColor === "d7be69"}
+                on:click={() => {
+                  bgColor = "d7be69";
+                }}
+                class="color"
+                style="background-color: #d7be69;"
+              />
+            </div>
+
+            <div class="text" style="padding-top: 0.4rem;">
+              <label for="color">HEX Color Code:</label>
+              <div class="color-text-input">
+                <div class="color-preview" style="background-color: #{bgColor}">
+                  <p>#</p>
+                </div>
+                <input
+                  style="--color: #{bgColor}"
+                  name="color"
+                  maxlength="6"
+                  minlength="3"
+                  bind:value={bgColor}
+                  type="text"
+                />
+              </div>
+            </div>
+            <div style="align-self: flex-end;">
+              <Button
+                disableButton={bgColor === $backgroundColor}
+                buttonAction={() => {
+                  backgroundColor.set(bgColor);
+                  localStorage.setItem("bg-color", bgColor);
+                }}
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        {/if}
+      </section>
+    {/if}
+  </div>
+
+  <div>
+    <div class="option">
+      <h1>About</h1>
+      <div style="margin-left: auto;">
+        <Button
+          arrowButton={true}
+          buttonAction={() => {
+            if (currentOption != "about") {
+              currentOption = "about";
+            } else {
+              currentOption = "";
+            }
+          }}
+        >
+          <img
+            style="width: 22px;"
+            class:open={currentOption === "about"}
+            src="icons/chevron-down.svg"
+            alt="Left Arrow"
+          />
+        </Button>
+      </div>
+    </div>
+
+    {#if currentOption === "about"}
+      <section transition:slide class="options-content">
+        <div
+          class="information-links"
+          style="flex-direction: column; margin: 0.6rem 0 1rem 0;"
+        >
+          <p>Panorama Tab v1.0.4</p>
+          <a
+            style="margin: 0.56rem 0;"
+            href="https://panoramatab.netlify.app/privacy%20policy.html"
+            target="_blank"
+          >
+            Privacy Policy &#8599;&#xFE0E;
+          </a>
+          <a href="mailto:support@nabholz.work?subject=Panorama Tab">
+            support@nabholz.work &#128231;&#xFE0E;
+          </a>
+        </div>
+
+        <div class="information-links">
+          <span style="margin-top: 0.3rem;">
+            by
+            <a href="https://nabholz.work/" target="_blank">
+              nabholz.work &#8599;&#xFE0E;
+            </a>
+          </span>
+
+          <a
+            class="kofi-button"
+            href="https://ko-fi.com/Z8Z82TKAA"
+            target="_blank"
+          >
+            <img
+              height="36"
+              style="border:0px;height:36px;"
+              src="/icons/kofi3.png"
+              border="0"
+              alt="Buy Me a Coffee at ko-fi.com"
+            />
+          </a>
+        </div>
+      </section>
+    {/if}
+  </div>
+</div>
 
 <style>
   .modal-container {
@@ -268,409 +706,3 @@
     }
   }
 </style>
-
-<div class="modal-container">
-  <div class="header">
-    <h2 style="font-size: 1.1em; font-weight: 500;">Options</h2>
-  </div>
-
-  <div>
-    <div class="option">
-      <Checkbox
-        checkboxValue={weatherBind}
-        checkboxAction={() => {
-          if (weatherBind === true) {
-            weatherBind = false;
-            weather.set('false');
-          } else {
-            weatherBind = true;
-            weather.set('true');
-          }
-        }}>
-        <h1>Weather</h1>
-      </Checkbox>
-
-      <div style="margin-left: auto;">
-        <Button
-          arrowButton={true}
-          disableButton={!weatherBind}
-          buttonAction={() => {
-            if (currentOption != 'weather') {
-              currentOption = 'weather';
-            } else {
-              currentOption = '';
-            }
-          }}>
-          <img
-            style="width: 22px;"
-            class:open={currentOption === 'weather' && weatherBind}
-            src="icons/chevron-down.svg"
-            alt="Left Arrow" />
-        </Button>
-      </div>
-    </div>
-    {#if currentOption === 'weather' && weatherBind}
-      <section transition:slide class="options-content">
-        <p class="explanation">
-          Click the °C (or °F) to the side of the temperature to switch between
-          units.
-        </p>
-
-        <p class="explanation">
-          Check that your coordinates are correct to get the most accurate
-          weather data.
-        </p>
-        <div class="position-selector">
-          <div class="text">
-            <label for="lat">Latitude:</label>
-            <input bind:value={lat} type="text" />
-          </div>
-          <div class="text">
-            <label for="lon">Longitude:</label>
-            <input bind:value={lon} type="text" />
-          </div>
-        </div>
-        <div class="position-buttons">
-          {#if loadingCoords}
-            <div transition:fade style="margin-right: 10px;">
-              <LoadingIndicator />
-            </div>
-          {/if}
-          <Button
-            disableButton={loadingCoords}
-            buttonAction={() => {
-              loadingCoords = true;
-              requestCoordinates();
-            }}>
-            Get
-          </Button>
-          <div style="width: 0.2rem;" />
-          <Button
-            disableButton={lat === $latitude && lon === $longitude}
-            buttonAction={() => {
-              latitude.set(lat);
-              longitude.set(lon);
-            }}>
-            Save
-          </Button>
-        </div>
-      </section>
-    {/if}
-  </div>
-
-  <div>
-    <div class="option">
-      <Checkbox
-        checkboxValue={searchBind}
-        checkboxAction={() => {
-          if (searchBind === true) {
-            searchBind = false;
-            search.set('false');
-          } else {
-            searchBind = true;
-            search.set('true');
-          }
-        }}>
-        <h1>Search Bar</h1>
-      </Checkbox>
-      <div style="margin-left: auto;">
-        <Button
-          arrowButton={true}
-          disableButton={!searchBind}
-          buttonAction={() => {
-            if (currentOption != 'search') {
-              currentOption = 'search';
-            } else {
-              currentOption = '';
-            }
-          }}>
-          <img
-            style="width: 22px;"
-            class:open={currentOption === 'search' && searchBind}
-            src="icons/chevron-down.svg"
-            alt="Left Arrow" />
-        </Button>
-      </div>
-    </div>
-    {#if currentOption === 'search' && searchBind}
-      <section transition:slide class="options-content">
-        <p>Default Search Engine:</p>
-
-        <div class="search-engines">
-          <div
-            class:selected-engine={$defaultSearch === 'g'}
-            on:click={() => {
-              setDefaultSearch('g');
-            }}>
-            <img alt="Google Logo" src="/icons/google-ico.png" />
-            <p>Google</p>
-          </div>
-          <div
-            class:selected-engine={$defaultSearch === 'd'}
-            on:click={() => {
-              setDefaultSearch('d');
-            }}>
-            <img alt="Google Logo" src="/icons/duckduckgo-ico.png" />
-            <p>DuckDuckGo</p>
-          </div>
-          <div
-            class:selected-engine={$defaultSearch === 'e'}
-            on:click={() => {
-              setDefaultSearch('e');
-            }}>
-            <img alt="Google Logo" src="/icons/ecosia-ico.png" />
-            <p>Ecosia</p>
-          </div>
-          <div
-            class:selected-engine={$defaultSearch === 'w'}
-            on:click={() => {
-              setDefaultSearch('w');
-            }}>
-            <img alt="Google Logo" src="/icons/wikipedia-ico.png" />
-            <p>Wikipedia</p>
-          </div>
-        </div>
-      </section>
-    {/if}
-  </div>
-
-  <div class="option">
-    <Checkbox
-      checkboxValue={sitesBind}
-      checkboxAction={() => {
-        if (sitesBind === true) {
-          sitesBind = false;
-          sites.set('false');
-        } else {
-          sitesBind = true;
-          sites.set('true');
-        }
-      }}>
-      <h1>Top Sites</h1>
-    </Checkbox>
-  </div>
-
-  <div class="option">
-    <Checkbox
-      checkboxValue={redditBind}
-      checkboxAction={() => {
-        if (redditBind === true) {
-          redditBind = false;
-          reddit.set('false');
-        } else {
-          redditBind = true;
-          reddit.set('true');
-        }
-      }}>
-      <h1>Reddit Posts</h1>
-    </Checkbox>
-  </div>
-
-  <div>
-    <div class="option">
-      <h1>Background</h1>
-      <div style="margin-left: auto;">
-        <Button
-          arrowButton={true}
-          disableButton={false}
-          buttonAction={() => {
-            if (currentOption != 'background') {
-              currentOption = 'background';
-            } else {
-              currentOption = '';
-            }
-          }}>
-          <img
-            style="width: 22px;"
-            class:open={currentOption === 'background'}
-            src="icons/chevron-down.svg"
-            alt="Left Arrow" />
-        </Button>
-      </div>
-    </div>
-
-    {#if currentOption === 'background'}
-      <section transition:slide class="options-content">
-        <Checkbox
-          checkboxValue={backgroundBind}
-          checkboxAction={() => {
-            if (backgroundBind === true) {
-              backgroundBind = false;
-              background.set('false');
-            } else {
-              backgroundBind = true;
-              background.set('true');
-            }
-          }}>
-          Background Images
-        </Checkbox>
-        {#if backgroundBind}
-          <div
-            transition:slide|local
-            style="display: flex; flex-direction: column;">
-            <Checkbox
-              checkboxValue={bgRefresh}
-              checkboxAction={() => {
-                if (bgRefresh === true) {
-                  bgRefresh = false;
-                  localStorage.setItem('bg-refresh-toggle', 'false');
-                } else {
-                  bgRefresh = true;
-                  localStorage.setItem('bg-refresh-toggle', 'true');
-                }
-              }}>
-              Refresh background images hourly
-            </Checkbox>
-            <div class="text" style="padding-top: 0.4rem;">
-              <label for="cat">Category:</label>
-              <input name="cat" bind:value={bgCategory} type="text" />
-            </div>
-            <div style="align-self: flex-end;">
-              <Button
-                disableButton={bgCategory === $searchBackground}
-                buttonAction={() => {
-                  searchBackground.set(bgCategory);
-                }}>
-                Save
-              </Button>
-            </div>
-            {#if !bgRefresh && bgTimer + 6600000 < Date.now()}
-              <div transition:slide|local class="text">
-                <p>Refresh Background Now</p>
-                <Button
-                  disableButton={false}
-                  buttonAction={() => {
-                    bgTimer = Date.now();
-                    let ref = $searchBackground;
-                    searchBackground.set('ni');
-                    searchBackground.set(ref);
-                  }}>
-                  Refresh
-                </Button>
-              </div>
-            {/if}
-          </div>
-        {:else}
-          <div
-            transition:slide|local
-            style="display: flex; flex-direction: column; padding-top: 0.4rem;">
-            <p>Select a background color</p>
-            <div class="colors-showcase">
-              <div
-                class:selected-color={bgColor === 'f2f2f2'}
-                on:click={() => {
-                  bgColor = 'f2f2f2';
-                }}
-                class="color"
-                style="background-color: #f2f2f2;" />
-              <div
-                class:selected-color={bgColor === '181818'}
-                on:click={() => {
-                  bgColor = '181818';
-                }}
-                class="color"
-                style="background-color: #181818;" />
-              <div
-                class:selected-color={bgColor === 'd7be69'}
-                on:click={() => {
-                  bgColor = 'd7be69';
-                }}
-                class="color"
-                style="background-color: #d7be69;" />
-            </div>
-
-            <div class="text" style="padding-top: 0.4rem;">
-              <label for="color">HEX Color Code:</label>
-              <div class="color-text-input">
-                <div class="color-preview" style="background-color: #{bgColor}">
-                  <p>#</p>
-                </div>
-                <input
-                  style="--color: #{bgColor}"
-                  name="color"
-                  maxlength="6"
-                  minlength="3"
-                  bind:value={bgColor}
-                  type="text" />
-
-              </div>
-            </div>
-            <div style="align-self: flex-end;">
-              <Button
-                disableButton={bgColor === $backgroundColor}
-                buttonAction={() => {
-                  backgroundColor.set(bgColor);
-                  localStorage.setItem('bg-color', bgColor);
-                }}>
-                Save
-              </Button>
-            </div>
-          </div>
-        {/if}
-      </section>
-    {/if}
-  </div>
-
-  <div>
-    <div class="option">
-      <h1>About</h1>
-      <div style="margin-left: auto;">
-        <Button
-          arrowButton={true}
-          buttonAction={() => {
-            if (currentOption != 'about') {
-              currentOption = 'about';
-            } else {
-              currentOption = '';
-            }
-          }}>
-          <img
-            style="width: 22px;"
-            class:open={currentOption === 'about'}
-            src="icons/chevron-down.svg"
-            alt="Left Arrow" />
-        </Button>
-      </div>
-    </div>
-
-    {#if currentOption === 'about'}
-      <section transition:slide class="options-content">
-        <div
-          class="information-links"
-          style="flex-direction: column; margin: 0.6rem 0 1rem 0;">
-          <p>Panorama Tab v1.1.0</p>
-          <a
-            style="margin: 0.56rem 0;"
-            href="https://panoramatab.netlify.app/privacy%20policy.html"
-            target="_blank">
-            Privacy Policy &#8599;&#xFE0E;
-          </a>
-          <a href="mailto:support@nabholz.work?subject=Panorama Tab">
-            support@nabholz.work &#128231;&#xFE0E;
-          </a>
-        </div>
-
-        <div class="information-links">
-          <span style="margin-top: 0.3rem;">
-            by
-            <a href="https://nabholz.work/" target="_blank">
-              nabholz.work &#8599;&#xFE0E;
-            </a>
-          </span>
-
-          <a
-            class="kofi-button"
-            href="https://ko-fi.com/Z8Z82TKAA"
-            target="_blank">
-            <img
-              height="36"
-              style="border:0px;height:36px;"
-              src="/icons/kofi3.png"
-              border="0"
-              alt="Buy Me a Coffee at ko-fi.com" />
-          </a>
-        </div>
-      </section>
-    {/if}
-  </div>
-</div>

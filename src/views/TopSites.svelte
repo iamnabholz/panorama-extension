@@ -9,16 +9,16 @@
   onMount(() => {
     if (typeof browser !== "undefined") {
       let sites = browser.topSites.get({ includeFavicon: true });
-      sites.then(si => {
+      sites.then((si) => {
         result = si.slice(0, 10);
       });
     } else {
-      chrome.topSites.get(sites => {
+      chrome.topSites.get((sites) => {
         if (
           result.length == 0 ||
           JSON.stringify(result) != JSON.stringify(sites)
         ) {
-          result = sites.filter(data =>
+          result = sites.filter((data) =>
             /^((http|https|ftp):\/\/)/.test(data.url)
           );
           result = result.slice(0, 10);
@@ -29,6 +29,31 @@
     }
   });
 </script>
+
+<main>
+  {#if result.length == 0}
+    <p class="empty-list">You don't have any top sites yet.</p>
+  {/if}
+
+  {#each result as site, i}
+    {#if i > 0}
+      <div class="divider" />
+    {/if}
+    <a href={site.url}>
+      <section class="link-tile" title={site.title}>
+        {#if site.favicon != null}
+          <img alt="Favicon" src={site.favicon} />
+        {:else}
+          <img
+            alt="Favicon"
+            src={"https://www.google.com/s2/favicons?sz=48&domain=" +
+              new URL(site.url).hostname}
+          />
+        {/if}
+      </section>
+    </a>
+  {/each}
+</main>
 
 <style>
   main {
@@ -93,28 +118,3 @@
     }
   }
 </style>
-
-<main>
-  {#if result.length == 0}
-    <p class="empty-list">You don't have any top sites yet.</p>
-  {/if}
-
-  {#each result as site, i}
-    {#if i > 0}
-      <div class="divider" />
-    {/if}
-    <a href={site.url}>
-      <section class="link-tile" title={site.title}>
-
-        {#if site.favicon != null}
-          <img alt="Favicon" src={site.favicon} />
-        {:else}
-          <img
-            alt="Favicon"
-            src={'https://api.faviconkit.com/' + new URL(site.url).hostname + '/44'} />
-        {/if}
-
-      </section>
-    </a>
-  {/each}
-</main>

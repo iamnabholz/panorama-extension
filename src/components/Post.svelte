@@ -47,6 +47,46 @@
   }
 </script>
 
+<main transition:slide>
+  <a href={"https://www.reddit.com" + post.data.permalink} target="_blank">
+    <div title={post.data.title} class="post">
+      {#if post.data.thumbnail != "self" && post.data.thumbnail != "default" && post.data.thumbnail != ""}
+        <div class="img-container">
+          <img alt="img" src={post.data.thumbnail} />
+        </div>
+      {/if}
+      <div class="post-info-container">
+        <div class="info">
+          <h1 class="text">{post.data.title}</h1>
+
+          {#if post.data.is_self == false}
+            <p class="p-link text">{post.data.url}</p>
+          {/if}
+
+          {#if post.data.selftext !== ""}
+            <p class="p-self text">{parseMarkdown(post.data.selftext)}</p>
+          {/if}
+        </div>
+
+        <div class="post-details">
+          <div>
+            <img alt="Upvotes" src="icons/arrow.svg" />
+            <p>{shortenNumber(post.data.ups)}</p>
+          </div>
+          <div>
+            <img alt="Comments" src="icons/comments.svg" />
+            <p>{shortenNumber(post.data.num_comments)}</p>
+          </div>
+          <div>
+            <img alt="Time" src="icons/clock.svg" />
+            <p>{parseTime(post.data.created_utc)}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </a>
+</main>
+
 <style>
   .post {
     z-index: 1;
@@ -162,42 +202,3 @@
     }
   }
 </style>
-
-<main transition:slide>
-  <a href={'https://www.reddit.com' + post.data.permalink} target="_blank">
-    <div title={post.data.title} class="post">
-      {#if post.data.thumbnail != 'self' && post.data.thumbnail != 'default' && post.data.thumbnail != ''}
-        <div class="img-container">
-          <img alt="img" src={post.data.thumbnail} />
-        </div>
-      {/if}
-      <div class="post-info-container">
-        <div class="info">
-          <h1 class="text">{post.data.title}</h1>
-
-          {#if post.data.is_self == false}
-            <p class="p-link text">{post.data.url}</p>
-          {/if}
-
-          {#if post.data.selftext !== ''}
-            <p class="p-self text">{parseMarkdown(post.data.selftext)}</p>
-          {/if}
-        </div>
-        <div class="post-details">
-          <div>
-            <img alt="Upvotes" src="icons/arrow.svg" />
-            <p>{shortenNumber(post.data.ups)}</p>
-          </div>
-          <div>
-            <img alt="Comments" src="icons/comments.svg" />
-            <p>{shortenNumber(post.data.num_comments)}</p>
-          </div>
-          <div>
-            <img alt="Time" src="icons/clock.svg" />
-            <p>{parseTime(post.data.created_utc)}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </a>
-</main>

@@ -1,3 +1,12 @@
+const cleanLocalStorage = () => {
+  if (!localStorage.getItem("CLEANED")) {
+    localStorage.clear();
+    localStorage.setItem("CLEANED", "DONE")
+  }
+}
+
+cleanLocalStorage();
+
 export const attemptLocationRequest = () => {
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(

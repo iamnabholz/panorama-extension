@@ -1,6 +1,6 @@
 // background.js
-const openWeatherUrl = "https://worker-long-cake-1215.nabholz.workers.dev/?lat=";
-const unsplashUrl = "https://worker-odd-fire-0406.nabholz.workers.dev/?cat=";
+const openWeatherUrl = "https://weather-grab.nabholz.workers.dev/?lat=";
+const unsplashUrl = "https://background-grab.nabholz.workers.dev/?cat=";
 
 // @ts-ignore
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

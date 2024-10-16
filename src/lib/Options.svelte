@@ -14,6 +14,7 @@
   import OptionSection from "./components/OptionSection.svelte";
   import LoadingIndicator from "./components/LoadingIndicator.svelte";
   import { attemptLocationRequest, getColorForSubreddit } from "../utils.js";
+  import Browser from "webextension-polyfill";
 
   const closeOptionsPanel = () => {
     optionsPageOpened.set(false);
@@ -49,7 +50,7 @@
   let subredditInput = "";
 
   const addSubreddit = () => {
-    if (!checkInput(subredditInput)) {
+    if (!checkInput(subredditInput) && $subredditList.length < 10) {
       const updatedList = [subredditInput, ...$subredditList];
       subredditList.set(updatedList);
       subredditInput = "";
@@ -79,6 +80,8 @@
   const toggleSection = (sectionId) => {
     activeOption = activeOption === sectionId ? null : sectionId;
   };
+
+  const appVersion = Browser.runtime.getManifest().version;
 </script>
 
 <div
@@ -111,7 +114,7 @@
           updateSetting("date", !$settings.date);
         }}
       >
-        <p>Show your current day and date</p>
+        <p>Show the current date</p>
       </Checkbox>
     </span>
   </OptionSection>
@@ -129,7 +132,7 @@
           updateSetting("weather", !$settings.weather);
         }}
       >
-        <p>Show weather in your location</p>
+        <p>Show weather for your location</p>
       </Checkbox>
 
       {#if $settings.weather}
@@ -164,8 +167,8 @@
         </button>
         <br />
         <p>
-          Automatically get coordinates from your browser by giving access to
-          your location
+          Request coordinates from your browser, you might be prompted to give
+          location access
         </p>
         <button
           disabled={waitingForLocationRequest}
@@ -181,8 +184,7 @@
 
         <br />
 
-        <p>Change the temperature unit</p>
-        <div
+        <span
           role="button"
           aria-label="Temperature unit selector"
           tabindex="0"
@@ -190,11 +192,15 @@
             updateSetting("metric", !$settings.metric);
           }}
           on:keydown={(e) => {}}
-          class="multiple-choice"
+          class="row-wrapper"
+          style="align-items: center; justify-content: space-between;"
         >
-          <p class:selected={$settings.metric}>°C</p>
-          <p class:selected={!$settings.metric}>°F</p>
-        </div>
+          <label for="unit">Temperature unit</label>
+          <div id="unit" class="multiple-choice">
+            <p class:selected={$settings.metric}>°C</p>
+            <p class:selected={!$settings.metric}>°F</p>
+          </div>
+        </span>
       {/if}
     </span>
   </OptionSection>
@@ -234,8 +240,6 @@
       </Checkbox>
 
       {#if $settings.reddit}
-        <br />
-
         <label for="subreddit">Subreddit:</label>
         <span class="row-wrapper">
           <div
@@ -256,7 +260,10 @@
               }
             }}
           />
-          <button disabled={checkInput(subredditInput)} on:click={addSubreddit}>
+          <button
+            disabled={checkInput(subredditInput) || $subredditList.length > 10}
+            on:click={addSubreddit}
+          >
             Add
           </button>
         </span>
@@ -273,7 +280,7 @@
             {#each $subredditList as subreddit (subreddit)}
               <p
                 class="row-wrapper subreddit-pill"
-                style="background-color: {getColorForSubreddit(subreddit)};"
+                style="--color: {getColorForSubreddit(subreddit)};"
                 transition:slide={{ axis: "x" }}
               >
                 <button
@@ -382,19 +389,32 @@
     toggleOptions={() => toggleSection("about")}
   >
     <span slot="title">About</span>
-    <span
-      class="option-container"
-      slot="content"
-      style="text-align: center; gap: 16px;"
-    >
-      <p>Panorama Tab v2.0.0</p>
-      <a href="https://panoramatab.netlify.app/privacy%20policy.html">
-        Privacy Policy
-      </a>
+    <span class="option-container" slot="content">
+      <span class="column-wrapper credits">
+        <a href="https://www.buymeacoffee.com/nabholz" target="_blank">
+          <img
+            src="icons/ui/bmac-button.webp"
+            alt="Buy Me A Coffee"
+            style="height: 43px !important; width: 155px !important;"
+          />
+        </a>
 
-      <a href="mailto:support@nabholz.work">Support Email</a>
+        <p>
+          Panorama Tab v{appVersion} <br /> by
+          <a href="https://nabholz.work/">Lukas Nabholz</a>
+        </p>
 
-      <a href="https://nabholz.work/">by Lukas Nabholz</a>
+        <span
+          class="row-wrapper"
+          style="justify-content: space-between; width: 100%;"
+        >
+          <a href="https://panoramatab.netlify.app/privacy%20policy.html">
+            Privacy Policy
+          </a>
+
+          <a href="mailto:support@nabholz.work">support@nabholz.work</a>
+        </span>
+      </span>
     </span>
   </OptionSection>
 </div>
@@ -448,21 +468,22 @@
   }
 
   .subreddit-pill {
-    padding: 4px 8px;
-    border-radius: 6px;
-    color: var(--light-color);
+    padding: 4px 12px 4px 8px;
+    border-radius: 40px;
+    border: 2px solid var(--color);
+    color: var(--text-color);
+    font-weight: 600;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     cursor: default;
   }
 
   .subreddit-pill button {
     padding: 4px;
-    margin-top: 1px;
     border-radius: 50px;
-    color: var(--light-color);
+    color: var(--text-color);
     border: none;
-    background-color: transparent;
+    background-color: var(--background-color);
   }
 
   .subreddit-pill button:hover {
@@ -472,6 +493,12 @@
   input[type="color"] {
     height: auto;
     padding: 4px 8px;
+  }
+
+  .credits {
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
   }
 
   @media (prefers-color-scheme: light) {

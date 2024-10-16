@@ -6,9 +6,9 @@
   import {
     optionsPageOpened,
     backgroundQuery,
-    useBackgroundImage,
     backgroundColor,
     updateSetting,
+    settings,
   } from "../stores.js";
   import { fade, slide } from "svelte/transition";
 
@@ -26,11 +26,6 @@
     localStorage.getItem("bg-resp") != null
       ? JSON.parse(localStorage.getItem("bg-resp"))
       : null;
-
-  let autoRefreshBackground =
-    localStorage.getItem("bg-refresh-toggle") != null
-      ? JSON.parse(localStorage.getItem("bg-refresh-toggle"))
-      : true;
 
   let backgroundImageSrc = "";
   let user = "";
@@ -61,7 +56,7 @@
         } else {
           isLoadingImage = false;
           if (currentImage == null) {
-            useBackgroundImage.set(false);
+            updateSetting("backgroundActive");
           }
         }
         imageElement.onload = () => {
@@ -71,9 +66,9 @@
   };
 
   onMount(() => {
-    if ($useBackgroundImage) {
+    if ($settings.backgroundActive) {
       const d = parseInt(lastUpdateTime) + 3600000;
-      if (d < Date.now() && autoRefreshBackground) {
+      if (d < Date.now() && $settings.updateBackground) {
         getImage();
       }
 
@@ -119,7 +114,7 @@
     </svg>
   </button>
 
-  {#if $useBackgroundImage}
+  {#if $settings.backgroundActive}
     <a
       transition:slide
       href={"https://unsplash.com/@" + username}
@@ -137,7 +132,7 @@
 </div>
 
 <div class="background-container">
-  {#if $useBackgroundImage}
+  {#if $settings.backgroundActive}
     <img
       transition:fade
       bind:this={imageElement}
@@ -216,5 +211,9 @@
 
   .open {
     transform: rotateZ(160deg);
+  }
+
+  svg {
+    filter: drop-shadow(var(--image-shadow));
   }
 </style>

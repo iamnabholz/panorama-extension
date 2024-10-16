@@ -5,11 +5,17 @@ export const optionsPageOpened = writable(false);
 // FEATURES SHOW & HIDE
 const createSettingsStore = () => {
   const defaultSettings = {
-    topSites: true,
-    reddit: false,
-    weather: true,
-    metric: true,
-    date: true
+    dateActive: true,
+
+    backgroundActive: true,
+    updateBackground: true,
+
+    weatherActive: true,
+    usingMetric: true,
+
+    sitesActive: true,
+
+    redditActive: false,
   };
 
   // Load settings from localStorage or use default settings
@@ -29,11 +35,15 @@ const createSettingsStore = () => {
 
 export const settings = createSettingsStore();
 
-export const updateSetting = (key, value) => {
+export const updateSetting = (key, value = null) => {
   settings.update((settings) => {
+    if (value === null) {
+      value = !settings[key]
+    }
     return { ...settings, [key]: value };
   });
 };
+
 
 // WEATHER RELATED STORES
 const defaultWeatherCoordinates = { lat: -17.77, lon: -63.18 }
@@ -48,7 +58,7 @@ weatherCoordinates.subscribe(value => localStorage.setItem("coords", JSON.string
 export const subredditList = writable(
   localStorage.getItem("subr") != null
     ? JSON.parse(localStorage.getItem("subr"))
-    : ["nasa", "futurama", "nba"]
+    : ["nasa", "science", "UpliftingNews"]
 );
 subredditList.subscribe(value => localStorage.setItem("subr", JSON.stringify(value)));
 
@@ -56,13 +66,6 @@ subredditList.subscribe(value => localStorage.setItem("subr", JSON.stringify(val
 const defaultBackgroundQuery = "ocean waves";
 export const backgroundQuery = writable(localStorage.getItem("bg-queery") || defaultBackgroundQuery);
 backgroundQuery.subscribe(value => localStorage.setItem("bg-queery", value));
-
-export const useBackgroundImage = writable(
-  localStorage.getItem("use-bg") !== null
-    ? JSON.parse(localStorage.getItem("use-bg"))
-    : true
-);
-useBackgroundImage.subscribe(value => localStorage.setItem("use-bg", JSON.stringify(value)));
 
 export const backgroundColor = writable(localStorage.getItem("bg-color") || "#1fd0cd");
 backgroundColor.subscribe(value => localStorage.setItem("bg-color", value));

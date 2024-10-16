@@ -70,7 +70,7 @@
     </div>
 
     <div class="column-wrapper weather-info">
-      {#if $settings.metric}
+      {#if $settings.usingMetric}
         <h1>{Math.floor(temperature)}&deg;C</h1>
       {:else}
         <h1>{Math.floor((temperature * 9) / 5 + 32)}&deg;F</h1>

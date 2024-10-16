@@ -217,9 +217,12 @@
   @media screen and (max-width: 680px) {
     section {
       width: 100%;
+      padding-right: 0;
+      margin-right: 0;
     }
 
     .reddit-posts {
+      padding-bottom: 6rem;
       overflow-y: visible;
     }
   }

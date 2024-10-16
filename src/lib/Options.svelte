@@ -3,7 +3,6 @@
   import {
     optionsPageOpened,
     backgroundQuery,
-    useBackgroundImage,
     backgroundColor,
     weatherCoordinates,
     settings,
@@ -14,7 +13,7 @@
   import OptionSection from "./components/OptionSection.svelte";
   import LoadingIndicator from "./components/LoadingIndicator.svelte";
   import { attemptLocationRequest, getColorForSubreddit } from "../utils.js";
-  import Browser from "webextension-polyfill";
+  import browser from "webextension-polyfill";
 
   const closeOptionsPanel = () => {
     optionsPageOpened.set(false);
@@ -41,11 +40,6 @@
 
   let inputBackgroundQuery = $backgroundQuery;
   let inputBackgroundColor = $backgroundColor;
-
-  let autoRefreshBackground =
-    localStorage.getItem("bg-refresh-toggle") != null
-      ? JSON.parse(localStorage.getItem("bg-refresh-toggle"))
-      : true;
 
   let subredditInput = "";
 
@@ -81,7 +75,7 @@
     activeOption = activeOption === sectionId ? null : sectionId;
   };
 
-  const appVersion = Browser.runtime.getManifest().version;
+  const appVersion = browser.runtime.getManifest().version;
 </script>
 
 <div
@@ -109,9 +103,9 @@
     <span class="option-container" slot="content">
       <Checkbox
         id="date"
-        checkboxValue={$settings.date}
+        checkboxValue={$settings.dateActive}
         checkboxAction={() => {
-          updateSetting("date", !$settings.date);
+          updateSetting("dateActive");
         }}
       >
         <p>Show the current date</p>
@@ -127,15 +121,15 @@
     <span class="option-container" slot="content">
       <Checkbox
         id="weather"
-        checkboxValue={$settings.weather}
+        checkboxValue={$settings.weatherActive}
         checkboxAction={() => {
-          updateSetting("weather", !$settings.weather);
+          updateSetting("weatherActive");
         }}
       >
         <p>Show weather for your location</p>
       </Checkbox>
 
-      {#if $settings.weather}
+      {#if $settings.weatherActive}
         <span class="row-wrapper">
           <span class="column-wrapper">
             <label for="latitude">Latitude:</label>
@@ -189,7 +183,7 @@
           aria-label="Temperature unit selector"
           tabindex="0"
           on:click={() => {
-            updateSetting("metric", !$settings.metric);
+            updateSetting("usingMetric");
           }}
           on:keydown={(e) => {}}
           class="row-wrapper"
@@ -197,8 +191,8 @@
         >
           <label for="unit">Temperature unit</label>
           <div id="unit" class="multiple-choice">
-            <p class:selected={$settings.metric}>°C</p>
-            <p class:selected={!$settings.metric}>°F</p>
+            <p class:selected={$settings.usingMetric}>°C</p>
+            <p class:selected={!$settings.usingMetric}>°F</p>
           </div>
         </span>
       {/if}
@@ -213,9 +207,9 @@
     <span class="option-container" slot="content">
       <Checkbox
         id="sites"
-        checkboxValue={$settings.topSites}
+        checkboxValue={$settings.sitesActive}
         checkboxAction={() => {
-          updateSetting("topSites", !$settings.topSites);
+          updateSetting("sitesActive");
         }}
       >
         <p>Show your top sites</p>
@@ -231,15 +225,15 @@
     <span class="option-container" slot="content">
       <Checkbox
         id="reddit"
-        checkboxValue={$settings.reddit}
+        checkboxValue={$settings.redditActive}
         checkboxAction={() => {
-          updateSetting("reddit", !$settings.reddit);
+          updateSetting("redditActive");
         }}
       >
         <p>Show posts from your selected subreddits</p>
       </Checkbox>
 
-      {#if $settings.reddit}
+      {#if $settings.redditActive}
         <label for="subreddit">Subreddit:</label>
         <span class="row-wrapper">
           <div
@@ -317,25 +311,21 @@
     <span class="option-container" slot="content">
       <Checkbox
         id="bg"
-        checkboxValue={$useBackgroundImage}
+        checkboxValue={$settings.backgroundActive}
         checkboxAction={() => {
-          useBackgroundImage.set(!$useBackgroundImage);
+          updateSetting("backgroundActive");
         }}
       >
         <p>Enable background images</p>
       </Checkbox>
 
-      {#if $useBackgroundImage}
+      {#if $settings.backgroundActive}
         <span class="column-wrapper" transition:slide>
           <Checkbox
             id="auto"
-            checkboxValue={autoRefreshBackground}
+            checkboxValue={$settings.updateBackground}
             checkboxAction={() => {
-              autoRefreshBackground = !autoRefreshBackground;
-              localStorage.setItem(
-                "bg-refresh-toggle",
-                JSON.stringify(autoRefreshBackground),
-              );
+              updateSetting("updateBackground");
             }}
           >
             <p>Refresh background every hour</p>

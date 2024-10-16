@@ -4,5 +4,5 @@ import webExtension from "vite-plugin-web-extension";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [svelte(), webExtension({ browser: "firefox" })],
+  plugins: [svelte(), webExtension({ browser: "chrome" })],
 });

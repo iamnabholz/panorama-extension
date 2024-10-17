@@ -58,7 +58,7 @@ weatherCoordinates.subscribe(value => localStorage.setItem("coords", JSON.string
 export const subredditList = writable(
   localStorage.getItem("subr") != null
     ? JSON.parse(localStorage.getItem("subr"))
-    : ["nasa", "science", "UpliftingNews"]
+    : ["nasa", "todayilearned", "technology"]
 );
 subredditList.subscribe(value => localStorage.setItem("subr", JSON.stringify(value)));
 

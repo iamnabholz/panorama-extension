@@ -63,32 +63,28 @@
   onDestroy(unsubscribe);
 </script>
 
-<section class="column-wrapper">
-  <div class="row-wrapper" style="gap: 1rem; align-items: center">
-    <div title={description} class="weather-icon">
-      <img src={iconLink} alt={description} />
-    </div>
-
-    <div class="column-wrapper weather-info">
-      {#if $settings.usingMetric}
-        <h1>{Math.floor(temperature)}&deg;C</h1>
-      {:else}
-        <h1>{Math.floor((temperature * 9) / 5 + 32)}&deg;F</h1>
-      {/if}
-      <p>{description}</p>
-    </div>
-
-    {#if updatingWeather}
-      <LoadingIndicator></LoadingIndicator>
-    {/if}
+<section class="row-wrapper" style="gap: 1rem; align-items: center">
+  <div title={description} class="weather-icon">
+    <img src={iconLink} alt={description} />
   </div>
-  <!--<p>{location}</p>-->
+
+  <div class="column-wrapper weather-info">
+    {#if $settings.usingMetric}
+      <h1>{Math.floor(temperature)}&deg;C</h1>
+    {:else}
+      <h1>{Math.floor((temperature * 9) / 5 + 32)}&deg;F</h1>
+    {/if}
+    <p>{description}</p>
+  </div>
+
+  {#if updatingWeather}
+    <LoadingIndicator></LoadingIndicator>
+  {/if}
 </section>
 
 <style>
   section {
     cursor: default;
-    gap: 1rem;
     color: var(--light-color);
     text-shadow: var(--text-shadow);
   }
@@ -99,11 +95,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-left: -6px;
     filter: drop-shadow(var(--image-shadow));
   }
 
   .weather-info {
-    gap: 4px;
+    gap: 0px;
     justify-content: center;
   }
 
@@ -114,7 +111,7 @@
   }
 
   h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 600;
     line-height: 1;
   }

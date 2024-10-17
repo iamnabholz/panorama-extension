@@ -11,13 +11,14 @@
   } from "../stores.js";
   import Checkbox from "./components/Checkbox.svelte";
   import OptionSection from "./components/OptionSection.svelte";
-  import LoadingIndicator from "./components/LoadingIndicator.svelte";
   import { attemptLocationRequest, getColorForSubreddit } from "../utils.js";
   import browser from "webextension-polyfill";
 
   const closeOptionsPanel = () => {
     optionsPageOpened.set(false);
   };
+
+  const weatherInfo = JSON.parse(localStorage.getItem("weather-resp"));
 
   let inputLatitude = $weatherCoordinates.lat;
   let inputLongitude = $weatherCoordinates.lon;
@@ -108,7 +109,7 @@
           updateSetting("dateActive");
         }}
       >
-        <p>Show the current date</p>
+        <p>Show current date and national holiday if any</p>
       </Checkbox>
     </span>
   </OptionSection>
@@ -130,6 +131,7 @@
       </Checkbox>
 
       {#if $settings.weatherActive}
+        <!--
         <span class="row-wrapper">
           <span class="column-wrapper">
             <label for="latitude">Latitude:</label>
@@ -177,7 +179,8 @@
         </button>
 
         <br />
-
+      -->
+        <p>{weatherInfo.name}</p>
         <span
           role="button"
           aria-label="Temperature unit selector"
@@ -262,10 +265,7 @@
           </button>
         </span>
 
-        <span
-          class="row-wrapper"
-          style="flex-wrap: wrap; gap: 4px; min-height: 2rem;"
-        >
+        <span class="row-wrapper" style="flex-wrap: wrap;  min-height: 2rem;">
           {#if $subredditList.length <= 0}
             <p style="text-align: center; align-self: center;">
               Start adding your favorite subreddits.
@@ -458,22 +458,22 @@
   }
 
   .subreddit-pill {
-    padding: 4px 12px 4px 8px;
+    padding: 4px 14px 4px 8px;
     border-radius: 40px;
-    border: 2px solid var(--color);
-    color: var(--text-color);
+    color: var(--color);
+    background-color: var(--background-color);
     font-weight: 600;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
     cursor: default;
   }
 
   .subreddit-pill button {
     padding: 4px;
     border-radius: 50px;
-    color: var(--text-color);
+    color: var(--background-color);
     border: none;
-    background-color: var(--background-color);
+    background-color: var(--text-color);
   }
 
   .subreddit-pill button:hover {
@@ -489,6 +489,14 @@
     align-items: center;
     gap: 1rem;
     text-align: center;
+  }
+
+  @media screen and (max-width: 680px) {
+    .options {
+      left: 1rem;
+      right: 1rem;
+      width: auto;
+    }
   }
 
   @media (prefers-color-scheme: light) {

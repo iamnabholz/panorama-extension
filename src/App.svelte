@@ -36,7 +36,7 @@
 
 <style>
   main {
-    padding: 6rem 2rem;
+    padding: 6vh 2vh;
     height: 100vh;
     display: flex;
     align-items: flex-start;
@@ -52,7 +52,7 @@
   }
 
   .side-bar span {
-    padding-bottom: 2rem;
+    padding-bottom: 2vh;
   }
 
   @media screen and (max-width: 680px) {

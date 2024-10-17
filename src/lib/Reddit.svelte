@@ -77,6 +77,14 @@
       ? JSON.parse(localStorage.getItem("reddit-up"))
       : 0;
 
+  const checkThumbnailSource = (source) => {
+    try {
+      return new URL(source);
+    } catch {
+      return false;
+    }
+  };
+
   onMount(() => {
     const d = parseInt(lastUpdateTime) + 3600000;
     if (d < Date.now() || allPosts == []) {
@@ -107,7 +115,7 @@
             </p>
             <p class="title">{post.data.title}</p>
           </div>
-          {#if post.data.thumbnail != "self" && post.data.thumbnail != "default" && post.data.thumbnail != ""}
+          {#if checkThumbnailSource(post.data.thumbnail)}
             <div class="thumbnail-container">
               <img alt="Post thumbnail" src={post.data.thumbnail} />
             </div>
@@ -152,24 +160,21 @@
     cursor: pointer;
     padding: 8px;
     display: flex;
+    justify-content: space-between;
     width: 100%;
     color: var(--text-color);
     background-color: var(--background-color);
     border-radius: 6px;
-    box-shadow: 0px 1px 4px 1px rgba(88, 88, 88, 0.1);
 
     transition: all 350ms ease-out;
-
-    min-height: 4rem;
   }
 
   .post:hover .thumbnail-container img {
-    transform: scale(1.1);
+    transform: scale(1.06);
   }
 
   .text-container {
-    flex-grow: 1;
-    padding: 0 0 4px 4px;
+    padding: 4px 8px 4px 4px;
   }
 
   .subreddit {
@@ -182,18 +187,16 @@
 
   .title {
     line-height: 1.2;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-height: 4.2rem;
   }
 
   .thumbnail-container {
-    margin-left: 18px;
     flex-shrink: 0;
     width: 96px;
     height: 96px;
-    border-radius: 8px;
+    border-radius: 6px;
     overflow: hidden;
+    align-self: center;
+    background-color: grey;
   }
 
   .thumbnail-container img {
@@ -214,6 +217,10 @@
     text-shadow: var(--text-shadow);
   }
 
+  a:hover {
+    text-decoration: none;
+  }
+
   @media screen and (max-width: 680px) {
     section {
       width: 100%;
@@ -225,10 +232,6 @@
       padding-bottom: 6rem;
       overflow-y: visible;
     }
-  }
-
-  a:hover {
-    text-decoration: none;
   }
 
   @media (prefers-color-scheme: dark) {

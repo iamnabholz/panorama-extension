@@ -22,7 +22,6 @@
   "permissions": [
     "https://*/",
     "http://*/",
-    "topSites",
-    "geolocation"
+    "topSites"
   ]
 }

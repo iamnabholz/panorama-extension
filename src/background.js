@@ -1,15 +1,14 @@
 // background.js
-const openWeatherUrl = "https://weather-grab.nabholz.workers.dev/?lat=";
+const openWeatherUrl = "https://weather-grab.nabholz.workers.dev/";
 const unsplashUrl = "https://background-grab.nabholz.workers.dev/?cat=";
 
 // @ts-ignore
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message == 'fetch-weather') {
-    fetch(openWeatherUrl +
-      request.latitude +
-      "&lon=" +
-      request.longitude
-    ).then((response) => response.json()
+    fetch(
+      openWeatherUrl
+    ).then(
+      (response) => response.json()
     ).then((data) => {
       sendResponse({ response: data });
     }

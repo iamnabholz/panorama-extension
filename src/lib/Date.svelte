@@ -9,6 +9,8 @@
       : {};
 
   const getHolidays = async () => {
+    console.log("Grabing new holidays");
+
     let holidays = await fetch("https://holiday-grab.nabholz.workers.dev/");
 
     const json = await holidays.json();
@@ -21,7 +23,6 @@
       getHolidays();
     } else {
       if (holidays[0].year !== now.getFullYear()) {
-        console.log("getting new holidays");
         getHolidays();
       }
     }
@@ -37,8 +38,8 @@
 </p>
 
 {#each holidays as today}
-  {#if today.date === now}
-    <p style="padding-top: 8px;"><b>{today.name}</b></p>
+  {#if today.date === now.toISOString().split("T")[0]}
+    <p class="local-holiday">{today.name}</p>
   {/if}
 {/each}
 
@@ -48,5 +49,11 @@
     font-size: 1.4rem;
     color: var(--light-color);
     text-shadow: var(--text-shadow);
+  }
+
+  .local-holiday {
+    font-kerning: normal;
+    font-weight: 600;
+    padding-top: 6px;
   }
 </style>

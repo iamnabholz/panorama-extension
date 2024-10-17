@@ -86,7 +86,7 @@
   };
 
   onMount(() => {
-    const d = parseInt(lastUpdateTime) + 3600000;
+    const d = parseInt(lastUpdateTime) + 1000000;
     if (d < Date.now() || allPosts == []) {
       fetchEverything();
     }

@@ -11,7 +11,7 @@ npm install
 Wait for it to finish and then build the app...
 
 ```bash
-npm vite build
+npm run build
 ```
 
 After it's finished you can load the unpacked extension from the _Dist_ folder with the browser.
@@ -30,7 +30,7 @@ npm install
 Wait for it to finish and then run the app...
 
 ```bash
-npm vite
+npm run dev
 ```
 
 By default the extension will open Google Chrome for development, to use Firefox set the ```browser``` key to "firefox" in the vite.config.js file

@@ -3,23 +3,32 @@
 
   const now = new Date();
 
+  const formattedDate =
+    now.getFullYear() +
+    "-" +
+    String(now.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(now.getDate()).padStart(2, "0");
+
   let holidays =
     localStorage.getItem("holidayy") != null
       ? JSON.parse(localStorage.getItem("holidayy"))
       : {};
 
   const getHolidays = async () => {
-    console.log("Grabing new holidays");
-
-    let holidays = await fetch("https://holiday-grab.nabholz.workers.dev/");
-
-    const json = await holidays.json();
-    holidays = json;
-    localStorage.setItem("holidayy", JSON.stringify(json));
+    try {
+      const data = await fetch("https://holiday-grab.nabholz.workers.dev/");
+      const json = await data.json();
+      holidays = json;
+      localStorage.setItem("holidayy", JSON.stringify(json));
+    } catch (error) {
+      console.error("Failed to fetch holidays:", error);
+    }
   };
 
   onMount(() => {
     if (localStorage.getItem("holidayy") === null) {
+      //console.log("HOLIDAYS ARE DISABLED IN THE COMPONENT");
       getHolidays();
     } else {
       if (holidays[0].year !== now.getFullYear()) {
@@ -37,11 +46,13 @@
   })}
 </p>
 
-{#each holidays as today}
-  {#if today.date === now.toISOString().split("T")[0]}
-    <p class="local-holiday">{today.name}</p>
-  {/if}
-{/each}
+{#if holidays.length > 0}
+  {#each holidays as today}
+    {#if today.date === formattedDate}
+      <p class="local-holiday">{today.name}</p>
+    {/if}
+  {/each}
+{/if}
 
 <style>
   p {

@@ -1,7 +1,7 @@
 <script>
   import { onDestroy, onMount } from "svelte";
   import { subredditList } from "../stores";
-  import { getColorForSubreddit } from "../utils";
+  import { checkTimerDone, getColorForSubreddit } from "../utils";
   import LoadingIndicator from "./components/LoadingIndicator.svelte";
 
   let isLoadingPosts = false;
@@ -86,8 +86,7 @@
   };
 
   onMount(() => {
-    const d = parseInt(lastUpdateTime) + 1000000;
-    if (d < Date.now() || allPosts == []) {
+    if (checkTimerDone(lastUpdateTime, 0.5) || allPosts == []) {
       fetchEverything();
     }
   });
@@ -113,7 +112,16 @@
             >
               r/{post.data.subreddit}
             </p>
-            <p class="title">{post.data.title}</p>
+            <!--<p class="title">{post.data.title}</p>-->
+
+            <a
+              href={"https://www.reddit.com" + post.data.permalink}
+              target="_blank"
+              title={post.data.title}
+              class="title"
+            >
+              {post.data.title}
+            </a>
           </div>
           {#if checkThumbnailSource(post.data.thumbnail)}
             <div class="thumbnail-container">
@@ -128,7 +136,7 @@
   {#if isLoadingPosts}
     <div class="column-wrapper loading-information">
       <LoadingIndicator></LoadingIndicator>
-      <p>Loading new data...</p>
+      <p>Loading new information...</p>
     </div>
   {/if}
 </section>
@@ -141,7 +149,6 @@
     display: flex;
     flex-direction: column;
     padding-right: 18px;
-    margin-right: -18px;
 
     color: var(--text-color);
   }
@@ -221,6 +228,10 @@
     text-decoration: none;
   }
 
+  a:visited .post {
+    background-color: var(--lighter-color);
+  }
+
   @media screen and (max-width: 680px) {
     section {
       width: 100%;
@@ -237,6 +248,10 @@
   @media (prefers-color-scheme: dark) {
     .post {
       background-color: var(--darker-color);
+    }
+
+    a:visited .post {
+      background-color: var(--dark-color);
     }
   }
 </style>

@@ -9,10 +9,10 @@
     backgroundColor,
     updateSetting,
     settings,
+    getNewBackground,
   } from "../stores.js";
   import { fade, slide } from "svelte/transition";
-
-  let searchQuery = $backgroundQuery;
+  import { checkTimerDone } from "../utils";
 
   let imageElement;
   let isLoadingImage = false;
@@ -44,7 +44,7 @@
     browser.runtime
       .sendMessage({
         message: "fetch-background",
-        query: searchQuery,
+        query: $backgroundQuery,
       })
       // IF WE RECEIVE AN ERROR OR SOMETHING WHEN DOING THE REQUEST WE SHOULD'NT SAVE THIS INFORMATION OF COURSE
       .then((message) => {
@@ -67,8 +67,7 @@
 
   onMount(() => {
     if ($settings.backgroundActive) {
-      const d = parseInt(lastUpdateTime) + 3600000;
-      if (d < Date.now() && $settings.updateBackground) {
+      if (checkTimerDone(lastUpdateTime) && $settings.updateBackground) {
         getImage();
       }
 
@@ -78,9 +77,9 @@
     }
   });
 
-  const unsubscribe = backgroundQuery.subscribe((value) => {
-    if (value !== searchQuery) {
-      searchQuery = value;
+  const unsubscribe = getNewBackground.subscribe((value) => {
+    if (value === true) {
+      getNewBackground.set(false);
       getImage();
     }
   });
@@ -176,7 +175,7 @@
     z-index: 100;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
   }
 
   a {

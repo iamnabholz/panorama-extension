@@ -46,6 +46,7 @@
 
 <style>
   section {
+    padding-top: 1rem;
     padding-left: 4px;
     gap: 12px;
   }
@@ -64,7 +65,7 @@
   }
 
   a:hover img {
-    transform: scale(1.2);
+    transform: scale(1.1);
   }
 
   a:hover {
@@ -72,10 +73,8 @@
   }
 
   img {
-    min-height: 16px;
-    min-width: 16px;
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     filter: drop-shadow(var(--image-shadow));
     transition: all 150ms linear;
   }
@@ -87,13 +86,14 @@
 
   @media screen and (max-width: 680px) {
     img {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
     }
 
     section {
       padding: 0;
       flex-direction: row;
+      flex-wrap: wrap;
     }
 
     .shortcut-text {

@@ -63,8 +63,8 @@ export const subredditList = writable(
 subredditList.subscribe(value => localStorage.setItem("subr", JSON.stringify(value)));
 
 // BACKGROUND RELATED STORES
-const defaultBackgroundQuery = "ocean waves";
-export const backgroundQuery = writable(localStorage.getItem("bg-queery") || defaultBackgroundQuery);
+export const getNewBackground = writable(false);
+export const backgroundQuery = writable(localStorage.getItem("bg-queery") || "ocean waves");
 backgroundQuery.subscribe(value => localStorage.setItem("bg-queery", value));
 
 export const backgroundColor = writable(localStorage.getItem("bg-color") || "#1fd0cd");

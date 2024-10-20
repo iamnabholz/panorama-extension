@@ -5,14 +5,14 @@
   import Shorcuts from "./lib/Shorcuts.svelte";
   import { settings } from "./stores";
   import { fade, slide } from "svelte/transition";
-  import Date from "./lib/Date.svelte";
+  import Today from "./lib/Today.svelte";
 </script>
 
 <main>
   <div class="side-bar">
     {#if $settings.dateActive}
       <span transition:slide>
-        <Date />
+        <Today />
       </span>
     {/if}
     {#if $settings.weatherActive}
@@ -58,6 +58,10 @@
   @media screen and (max-width: 680px) {
     main {
       flex-direction: column;
+    }
+
+    .side-bar {
+      width: 100%;
     }
   }
 </style>

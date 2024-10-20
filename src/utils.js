@@ -7,6 +7,12 @@ const cleanLocalStorage = () => {
 
 cleanLocalStorage();
 
+export const checkTimerDone = (timeInMs, hoursForDone = 1) => {
+  const hoursInMs = (hoursForDone * 60 * 60 * 1000);
+  const timerEnd = timeInMs + hoursInMs;
+  return timerEnd < Date.now();
+}
+
 export const attemptLocationRequest = () => {
   return new Promise((resolve, reject) => {
     navigator.geolocation.getCurrentPosition(

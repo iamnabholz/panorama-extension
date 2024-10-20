@@ -3,6 +3,7 @@
   import browser from "webextension-polyfill";
   import { weatherCoordinates, settings } from "../stores";
   import LoadingIndicator from "./components/LoadingIndicator.svelte";
+  import { checkTimerDone } from "../utils";
 
   let updatingWeather = false;
 
@@ -24,7 +25,30 @@
   $: iconId =
     currentResponse.cod != null ? currentResponse.weather[0].icon : "02d";
 
-  $: iconLink = "https://openweathermap.org/img/wn/" + iconId + "@2x.png";
+  //$: iconLink = "https://openweathermap.org/img/wn/" + iconId + "@2x.png";
+
+  const weatherIconMap = {
+    sun: "01d",
+    moon: "01n",
+    clouds: ["02d", "02n", "03d", "03n", "04d", "04n"],
+    rain: ["09d", "09n", "10d", "10n"],
+    thunder: ["11d", "11n"],
+    mist: ["09d", "09n"],
+    snow: ["13d", "13n"],
+  };
+  const getWeatherIcon = (apiIcon) => {
+    // FOR TESTING PURPOSES
+    //return "snow";
+
+    for (let icon in weatherIconMap) {
+      if (weatherIconMap[icon].includes(apiIcon)) {
+        return icon;
+      }
+    }
+    return "clouds";
+  };
+
+  $: iconLink = getWeatherIcon(iconId);
 
   $: location =
     currentResponse.cod != null ? currentResponse.name : "Santa Cruz";
@@ -53,8 +77,7 @@
   };
 
   onMount(() => {
-    const d = parseInt(lastUpdateTime) + 3600000;
-    if (d < Date.now()) {
+    if (checkTimerDone(lastUpdateTime)) {
       getWeather();
     }
   });
@@ -65,7 +88,7 @@
 
 <section class="row-wrapper" style="gap: 1rem; align-items: center">
   <div title={description} class="weather-icon">
-    <img src={iconLink} alt={description} />
+    <img src={"icons/weather/" + iconLink + ".png"} alt={description} />
   </div>
 
   <div class="column-wrapper weather-info">
@@ -95,7 +118,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: -6px;
+    padding: 4px;
     filter: drop-shadow(var(--image-shadow));
   }
 

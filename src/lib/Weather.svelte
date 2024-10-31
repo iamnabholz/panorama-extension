@@ -1,9 +1,9 @@
 <script>
-  import { onDestroy, onMount } from "svelte";
+  import {onDestroy, onMount} from "svelte";
   import browser from "webextension-polyfill";
-  import { weatherCoordinates, settings } from "../stores";
+  import {weatherCoordinates, settings} from "../stores";
   import LoadingIndicator from "./components/LoadingIndicator.svelte";
-  import { checkTimerDone } from "../utils";
+  import {checkTimerDone} from "../utils";
 
   let updatingWeather = false;
 
@@ -25,7 +25,7 @@
   $: iconId =
     currentResponse.cod != null ? currentResponse.weather[0].icon : "02d";
 
-  //$: iconLink = "https://openweathermap.org/img/wn/" + iconId + "@2x.png";
+  $: iconLink = "https://openweathermap.org/img/wn/" + iconId + "@2x.png";
 
   const weatherIconMap = {
     sun: "01d",
@@ -38,7 +38,7 @@
   };
   const getWeatherIcon = (apiIcon) => {
     // FOR TESTING PURPOSES
-    //return "snow";
+    return "thunder";
 
     for (let icon in weatherIconMap) {
       if (weatherIconMap[icon].includes(apiIcon)) {
@@ -48,7 +48,7 @@
     return "clouds";
   };
 
-  $: iconLink = getWeatherIcon(iconId);
+  //$: iconLink = getWeatherIcon(iconId);
 
   $: location =
     currentResponse.cod != null ? currentResponse.name : "Santa Cruz";
@@ -88,7 +88,10 @@
 
 <section class="row-wrapper" style="gap: 1rem; align-items: center">
   <div title={description} class="weather-icon">
-    <img src={"icons/weather/" + iconLink + ".png"} alt={description} />
+    <!--
+    <img src={"icons/weather/" + iconLink + ".svg"} alt={description}/>
+    -->
+    <img src={iconLink} alt={description}/>
   </div>
 
   <div class="column-wrapper weather-info">
@@ -118,7 +121,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4px;
     filter: drop-shadow(var(--image-shadow));
   }
 

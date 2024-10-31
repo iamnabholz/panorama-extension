@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from "svelte";
+  import {onMount} from "svelte";
 
   const now = new Date();
 
@@ -28,8 +28,8 @@
 
   onMount(() => {
     if (localStorage.getItem("holidayy") === null) {
-      //console.log("HOLIDAYS ARE DISABLED IN THE COMPONENT");
-      getHolidays();
+      console.log("HOLIDAYS ARE DISABLED IN THE COMPONENT");
+      //getHolidays();
     } else {
       if (holidays[0].year !== now.getFullYear()) {
         getHolidays();
@@ -38,7 +38,7 @@
   });
 </script>
 
-<p>
+<p style="text-transform: capitalize;">
   {now.toLocaleDateString("default", {
     weekday: "long",
     day: "numeric",

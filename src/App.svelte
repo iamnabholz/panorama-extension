@@ -4,7 +4,7 @@
   import Weather from "./lib/Weather.svelte";
   import Shorcuts from "./lib/Shorcuts.svelte";
   import { settings } from "./stores";
-  import { fade, slide } from "svelte/transition";
+  import { slide } from "svelte/transition";
   import Today from "./lib/Today.svelte";
 </script>
 

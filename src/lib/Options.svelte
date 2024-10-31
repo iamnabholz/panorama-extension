@@ -90,10 +90,7 @@
     input = input.replace(/ /g, "");
     subredditInput = input;
 
-    if (input.length > 2 && !$subredditList.includes(input)) {
-      return false;
-    }
-    return true;
+    return !(input.length > 2 && !$subredditList.includes(input));
   }
 
   let activeOption = null;
@@ -236,10 +233,10 @@
           style="align-items: center; justify-content: space-between;"
         >
           <label for="unit">Temperature unit</label>
-          <div id="unit" class="multiple-choice">
+          <span id="unit" class="multiple-choice">
             <p class:selected={$settings.usingMetric}>°C</p>
             <p class:selected={!$settings.usingMetric}>°F</p>
-          </div>
+          </span>
         </span>
       {/if}
     </span>
@@ -282,11 +279,11 @@
       {#if $settings.redditActive}
         <label for="subreddit">Subreddit:</label>
         <span class="row-wrapper">
-          <div
+          <span
             style="position: absolute; padding-left: 10px; opacity: 0.4; top: 1rem;"
           >
             r/
-          </div>
+          </span>
           <input
             style="padding-left: 23px;"
             maxlength="21"

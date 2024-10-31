@@ -133,6 +133,7 @@
 <div class="background-container">
   {#if $settings.backgroundActive}
     <img
+      loading="eager"
       transition:fade
       bind:this={imageElement}
       src={backgroundImageSrc}

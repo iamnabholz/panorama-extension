@@ -1,13 +1,59 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>panorama-tab</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Panorama Tab</title>
+
+        <style>
+            html,
+            body {
+                margin: 0;
+                height: 100%;
+            }
+            body {
+                position: relative;
+            }
+            body::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                background-color: var(--bg-color);
+                background-image: var(--bg-url);
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                filter: blur(var(--bg-blur));
+                transform: scale(1.05);
+                z-index: -1;
+                transition: all 0.3s ease;
+            }
+        </style>
+
+        <script>
+            // Runs synchronously BEFORE body paints
+            (function () {
+                const cached = localStorage.getItem("background");
+                if (cached) {
+                    const background = JSON.parse(cached);
+                    if (background.type == "image") {
+                        document.documentElement.style.setProperty(
+                            "--bg-url",
+                            `url("${background.value}")`,
+                        );
+                    } else {
+                        document.documentElement.style.setProperty(
+                            "--bg-color",
+                            background.value,
+                        );
+                    }
+                }
+            })();
+        </script>
+    </head>
+    <body>
+        <div id="app" style="display: contents; overflow: hidden"></div>
+        <script type="module" src="/src/main.ts"></script>
+    </body>
 </html>

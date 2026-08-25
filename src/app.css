@@ -7,9 +7,11 @@
 :root {
     --color-black: #0c0c0c;
     --color-white: #e8e8e8;
+    --color-grey: #aaaaaa;
 
+    --bg-color: #aaaaaa;
+    --bg-image: none;
     --bg-blur: 0px;
-    --bg-color: #bac8e0;
 
     --background-color: var(--color-white);
     --foreground-color: var(--color-black);
@@ -50,7 +52,7 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --background-color: var(--color-black);
+        --background-color: #050505;
         --foreground-color: var(--color-white);
     }
 }
@@ -127,6 +129,11 @@ button.fragment:hover {
 button.fragment:active {
     transform: scale(0.95); /* quick "press" feedback on click */
     transition: transform 0.05s ease-out;
+}
+
+button.fragment:disabled {
+    transform: scale(1);
+    cursor: unset;
 }
 
 html,

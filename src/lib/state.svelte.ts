@@ -1,64 +1,71 @@
-// state.svelte.ts
-import { loadData, saveData } from "./storage";
-
-export const appState = $state({
-  useMetric: false,
-  use24Hour: false,
-  sentenceVisible: true,
-
-  backgroundType: "color",
-  bgQuery: "Ocean green",
-  bgColor: "#1e1e1e",
-  // not persisted
-  optionsOpen: false,
-});
-
-/** Fields NOT included when saving to storage. */
-const transientKeys: (keyof typeof appState)[] = ["optionsOpen"];
-
-function toPersisted(state: typeof appState) {
-  const clone = { ...state };
-  for (const key of transientKeys) delete clone[key];
-  return clone;
-}
-
-export async function hydrateState(): Promise<void> {
-  const savedState = await loadData("state");
-  if (savedState) Object.assign(appState, savedState);
-
-  const savedBackground = await loadData("background");
-  if (savedBackground) {
-    appState.backgroundType = savedBackground.type;
-  }
-
-  const savedColors = await loadData("color-cache");
-  if (savedColors) {
-    appState.bgColor = savedColors.startColor;
-  }
-}
+import type { BackgroundImage, WeatherData, HolidayData } from "./interfaces";
+import { loadData, saveKey } from "./storage/storage";
 
 /**
- * Single generic setter for any field in appState.
- * Automatically saves to storage unless the key is listed
- * in transientKeys above.
+ * Schema of everything this app stores.
+ * Add new keys here — this is the single source of truth
+ * for what's storable and what type each key holds.
  */
-export function setState<K extends keyof typeof appState>(
-  key: K,
-  value: (typeof appState)[K],
-  ignore = false,
-): void {
-  appState[key] = value;
-  if (!transientKeys.includes(key) && !ignore) {
-    saveData("state", toPersisted(appState));
-  }
+export interface StateSchema {
+  useMetric: boolean;
+  use24Hour: boolean;
+  sentenceVisible: boolean;
+
+  background: {
+    type: string;
+    value: string;
+  };
+  "color-cache": {
+    startColor: string;
+    endColor?: string;
+  };
+
+  "image-cache"?: BackgroundImage;
+  "weather-cache"?: WeatherData;
+  "holiday-cache"?: {
+    holidays: HolidayData[];
+    fetchedAt: number;
+  };
 }
 
-export function setBackground(type: string, value: string): void {
-  if (type == "color") {
-    saveData("color-cache", { startColor: value });
-    appState.bgColor = value;
-  }
+export const appState = $state<StateSchema>({
+  useMetric: true,
+  use24Hour: true,
+  sentenceVisible: true,
+  background: { type: "image", value: "" },
+  "color-cache": { startColor: "#aaaaaa" },
+});
 
-  appState.backgroundType = type;
-  saveData("background", { type: type, value: value });
+export const uiState = $state({
+  optionsOpen: false,
+  sentenceVisible: appState.sentenceVisible,
+});
+
+const keys: (keyof StateSchema)[] = [
+  "useMetric",
+  "use24Hour",
+  "sentenceVisible",
+  "background",
+  "color-cache",
+  "image-cache",
+  "weather-cache",
+  "holiday-cache",
+];
+
+/**
+ * Load storage values into the current app state
+ */
+export async function hydrateState() {
+  const stored = await loadData(keys);
+  Object.assign(appState, stored);
+
+  uiState.sentenceVisible = appState.sentenceVisible;
+  return stored;
+}
+
+export async function persist() {
+  const snapshot = $state.snapshot(appState);
+  for (const key of keys) {
+    await saveKey(key, snapshot[key]);
+  }
 }

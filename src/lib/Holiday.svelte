@@ -1,38 +1,29 @@
 <script lang="ts">
-    import { getTodaysHoliday } from "./holiday";
     import type { HolidayData } from "./holiday";
+    import { appState } from "./state.svelte";
 
-    let holiday = $state<HolidayData | null>(null);
-
-    $effect(() => {
-        getTodaysHoliday().then((result) => {
-            holiday = result;
-        });
+    let nextHoliday = $derived.by((): HolidayData | null => {
+        const todayIso = toLocalISODate(new Date());
+        return (
+            appState["holiday-cache"]?.holidays
+                .filter((h) => h.date >= todayIso)
+                .sort((a, b) => a.date.localeCompare(b.date))[0] ?? null
+        );
     });
 
-    import { getNextHoliday } from "./holiday";
-
-    let next = $state<Awaited<ReturnType<typeof getNextHoliday>> | null>(null);
-
-    $effect(() => {
-        getNextHoliday().then((result) => {
-            next = result;
-        });
-    });
-
-    // Recompute the formatter only when the format actually changes
-    let formatter = $derived(
-        new Intl.DateTimeFormat(undefined, {
-            weekday: "long",
-            day: "numeric",
-            month: "short",
-        }),
-    );
-
-    interface Props {
-        date: Date;
+    // Formats a Date as "YYYY-MM-DD" using LOCAL time
+    function toLocalISODate(date: Date): string {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
     }
-    let { date }: Props = $props();
+
+    let formatter = new Intl.DateTimeFormat(undefined, {
+        weekday: "long",
+        day: "numeric",
+        month: "short",
+    });
 
     let showTodayDate = $state(true);
 
@@ -50,32 +41,30 @@
 
 <button
     type="button"
-    class="pill"
     onclick={toggleTodayDate}
     onkeydown={handleKeydown}
-    title={holiday ? "See today's holiday" : "Nothing today"}
-    aria-label={holiday ? "See today's holiday" : "Nothing today"}
-    disabled={holiday == null}
+    title="See the next holiday in your country."
+    aria-label="See the next holiday in your country."
+    disabled={nextHoliday == null}
 >
     <svg
         xmlns="http://www.w3.org/2000/svg"
-        fill={holiday ? "var(--accent-color)" : "currentColor"}
+        fill="currentColor"
         viewBox="0 0 24 24"
-        style="filter: drop-shadow(var(--sentence-shadow));"
     >
         <path
             d="M19 22H5v-2h14v2ZM5 8h14V6h2v14h-2V10H5v10H3V6h2v2Zm4 10H7v-2h2v2Zm4 0h-2v-2h2v2Zm-4-4H7v-2h2v2Zm4 0h-2v-2h2v2Zm4 0h-2v-2h2v2ZM9 4h6V2h2v2h2v2H5V4h2V2h2v2Z"
         />
     </svg>
     {#if showTodayDate}
-        {formatter.format(date)}
+        {formatter.format(new Date())}
     {:else}
-        {holiday}
+        {nextHoliday?.name}
     {/if}
 </button>
 
 <style>
-    .pill {
+    button {
         cursor: pointer;
         padding: 4px 18px 4px 16px;
         border-radius: 200px;
@@ -94,15 +83,17 @@
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .pill svg {
+    button svg {
         width: 22px;
         height: 22px;
         flex-shrink: 0;
         position: relative;
         top: 5px;
+
+        filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.2));
     }
 
-    .pill:disabled {
+    button:disabled {
         cursor: default;
     }
 </style>

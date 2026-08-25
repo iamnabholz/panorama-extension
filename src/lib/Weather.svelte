@@ -1,21 +1,18 @@
 <script lang="ts">
-    import type { WeatherData } from "./weather";
+    import { appState } from "./state.svelte";
     import Widget from "./components/Widget.svelte";
 
-    interface Props {
-        weatherData: WeatherData | null;
-    }
-    let { weatherData }: Props = $props();
-
-    let description = $derived(weatherData?.description ?? "Cloudy");
+    let description = $derived(
+        appState["weather-cache"]?.description ?? "omnius",
+    );
     let iconLink = $derived(
-        `https://openweathermap.org/img/wn/${weatherData?.icon ?? "02d"}@2x.png`,
+        `https://openweathermap.org/img/wn/${appState["weather-cache"]?.icon ?? "50d"}@2x.png`,
     );
 </script>
 
 <span
-    title={weatherData
-        ? `Current weather information for ${weatherData.location}.`
+    title={appState["weather-cache"]
+        ? `Current weather information for ${appState["weather-cache"].location}.`
         : undefined}
 >
     <Widget

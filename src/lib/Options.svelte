@@ -1,52 +1,78 @@
 <script lang="ts">
+    import { appState, persist } from "./state.svelte";
     import pkg from "../../package.json" with { type: "json" };
+    import { fetchBackground } from "./background";
     import icon from "../assets/icon.svg?raw";
+
     import TextInput from "./components/TextInput.svelte";
     import ChoiceInput from "./components/ChoiceInput.svelte";
-    import { appState, setBackground, setState } from "./state.svelte";
     import ColorInput from "./components/ColorInput.svelte";
 
-    function updateBgColor() {
-        setBackground("color", appState.bgColor);
+    let queryBind = $state(appState["image-cache"]?.query ?? "");
+    let colorBind = $state(appState["color-cache"].startColor ?? "");
 
-        document.documentElement.style.setProperty(
-            "--bg-color",
-            appState.bgColor,
-        );
-        document.documentElement.style.setProperty("--bg-url", "");
+    function setImageQuery(newQuery: string) {
+        if (appState["image-cache"]) appState["image-cache"].query = newQuery;
+
+        fetchBackground(newQuery).then((result) => {
+            if (result?.url) {
+                appState.background.value = result.url;
+                persist();
+
+                document.documentElement.style.setProperty(
+                    "--bg-image",
+                    `url("${result.url}")`,
+                );
+            }
+        });
+    }
+
+    function setBackgroundColor(newColor: string) {
+        appState.background.value = newColor;
+        appState["color-cache"].startColor = newColor;
+        persist();
     }
 
     // save whenever it changes
-    function handleBgTypeChange(newValue: string) {
-        if (newValue == "image") {
-            const urlCache = localStorage.getItem("image-cache") ?? "";
-            setBackground("image", urlCache);
+    function changeBackgroundType(newType: string) {
+        let savedValue: string;
+
+        if (newType === "image") {
+            const cached = appState["image-cache"];
+
+            savedValue = cached?.url ?? "";
 
             document.documentElement.style.setProperty(
-                "--bg-url",
-                `url("${urlCache}")`,
+                "--bg-image",
+                `url("${savedValue}")`,
             );
         } else {
-            updateBgColor();
+            colorBind = appState["color-cache"].startColor;
+            savedValue = colorBind;
+            document.documentElement.style.setProperty(
+                "--bg-color",
+                savedValue,
+            );
+            document.documentElement.style.setProperty("--bg-image", "");
         }
+
+        appState.background = {
+            type: newType,
+            value: savedValue,
+        };
+        persist();
     }
-
-    function handleSubmit() {
-        if (appState.bgQuery.trim().length === 0) return;
-        // onSubmit(bgQuery.trim());
-
-        setState("bgQuery", appState.bgQuery.trim());
-    }
-
-    let hourlyUpdate = $state("false");
 </script>
 
 <div id="options-panel" class="basic-column">
     <div class="basic-column credits-column">
         <div class="basic-column">
-            <span style="width: 32px; height: 32px;">
+            <span
+                style="width: 64px; height: 64px; transform: translateX(-5px);"
+            >
                 {@html icon}
             </span>
+            <br />
             <span>
                 <b>Panorama Tab</b>
                 <span style="color: var(--foreground-60)">
@@ -60,34 +86,34 @@
                 </a>
             </span>
         </div>
-        <div class="basic-column">
-            <span class="basic-column" style="font-size: 0.6em; gap: 6px;">
-                <span>
-                    Icons by
-                    <a target="_blank" href="https://pixelarticons.com">
-                        PixelArtIcons
-                    </a>
-                </span>
-                <span>
-                    Font by
-                    <a target="_blank" href="https://pangrampangram.com">
-                        PangramPangram
-                    </a>
-                </span>
-                <span>
-                    Weather information from
-                    <a target="_blank" href="https://openweathermap.org">
-                        OpenWeatherMap
-                    </a>
-                </span>
-                <span>
-                    Background images from
-                    <a target="_blank" href="https://unsplash.com">
-                        Unsplash
-                    </a>
-                </span>
+        <span
+            class="basic-column"
+            style="font-size: 0.6em; gap: 6px; color: var(--foreground-60);"
+        >
+            <span style="font-weight: bold;"> Credits </span>
+            <span>
+                Icons by
+                <a target="_blank" href="https://pixelarticons.com">
+                    PixelArtIcons
+                </a>
             </span>
-        </div>
+            <span>
+                Font by
+                <a target="_blank" href="https://pangrampangram.com">
+                    PangramPangram
+                </a>
+            </span>
+            <span>
+                Weather information from
+                <a target="_blank" href="https://openweathermap.org">
+                    OpenWeatherMap
+                </a>
+            </span>
+            <span>
+                Background images from
+                <a target="_blank" href="https://unsplash.com"> Unsplash </a>
+            </span>
+        </span>
     </div>
 
     <div class="basic-column options-column">
@@ -110,19 +136,19 @@
                         "Set a solid color or gradient to use as background.",
                 },
             ]}
-            bind:value={appState.backgroundType}
-            onChange={handleBgTypeChange}
+            value={appState.background.type}
+            onChange={(v) => changeBackgroundType(v)}
         />
-        {#if appState.backgroundType == "image"}
+        {#if appState.background.type == "image"}
             <br />
             <TextInput
                 id="bg-query-input"
                 label="Image Topic"
-                bind:value={appState.bgQuery}
+                value={queryBind}
                 placeholder="What kind of background you'd like?"
                 buttonLabel="Search"
                 description="Set a topic related to the type of images you'd like to get as background."
-                onSubmit={handleSubmit}
+                onSubmit={(v) => setImageQuery(v)}
             />
             <br />
 
@@ -131,27 +157,19 @@
                 label="Image update frequency"
                 options={[
                     {
-                        value: "1",
-                        label: "1h",
+                        value: "0",
+                        label: "Never",
                     },
                     {
-                        value: "3",
-                        label: "3h",
-                    },
-                    {
-                        value: "8",
-                        label: "8h",
-                    },
-                    {
-                        value: "12",
-                        label: "12h",
+                        value: "60",
+                        label: "Hourly",
                     },
                     {
                         value: "24",
-                        label: "24h",
+                        label: "Daily",
                     },
                 ]}
-                bind:value={hourlyUpdate}
+                value="0"
                 onChange={() => {}}
             />
         {:else}
@@ -159,8 +177,8 @@
             <ColorInput
                 id="bg-color"
                 label="Pick Color"
-                bind:value={appState.bgColor}
-                onChange={updateBgColor}
+                value={colorBind}
+                onChange={(v) => setBackgroundColor(v)}
             />
         {/if}
     </div>
@@ -171,7 +189,7 @@
         background-color: var(--background-color);
         color: var(--foreground-color);
 
-        width: min(740px, 100%);
+        width: min(740px, 90%);
         height: min(460px, 80%);
         border-radius: 12px;
         display: grid;
@@ -183,7 +201,8 @@
     }
 
     .credits-column {
-        padding: 24px;
+        padding: min(24px, 8%);
+
         height: 100%;
         box-sizing: border-box;
         justify-content: space-between;
@@ -191,7 +210,7 @@
     }
 
     .options-column {
-        padding: 24px;
+        padding: min(24px, 6%);
         height: 100%;
         box-sizing: border-box;
         overflow-y: auto;
@@ -207,11 +226,11 @@
         box-sizing: border-box;
     }
 
-    .basic-row {
+    /*.basic-row {
         display: flex;
         align-items: center;
         gap: 4px;
-    }
+        }*/
 
     .separator {
         display: block;

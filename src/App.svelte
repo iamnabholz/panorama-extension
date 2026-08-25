@@ -1,8 +1,14 @@
 <script lang="ts">
     import { SvelteDate } from "svelte/reactivity";
     import { fade, fly } from "svelte/transition";
+    import { onMount } from "svelte";
 
-    import { appState, hydrateState } from "./lib/state.svelte";
+    import {
+        appState,
+        uiState,
+        hydrateState,
+        persist,
+    } from "./lib/state.svelte";
 
     import Holiday from "./lib/Holiday.svelte";
     import Clock from "./lib/Clock.svelte";
@@ -12,13 +18,33 @@
 
     import Options from "./lib/Options.svelte";
     import ActionBar from "./lib/ActionBar.svelte";
+    import { checkBackgroundImage } from "./lib/background";
+    import { fetchHolidays } from "./lib/holiday";
+    import { fetchWeather } from "./lib/weather";
 
-    import { fetchWeather, type WeatherData } from "./lib/weather";
-    let weatherData = $state<WeatherData | null>(null);
+    let mounted = $state(false);
 
-    $effect(() => {
-        fetchWeather().then((data) => {
-            weatherData = data;
+    onMount(() => {
+        hydrateState().then(() => {
+            // Fetch everything here for state
+            fetchHolidays();
+            fetchWeather();
+
+            if (
+                appState.background.type === "image" ||
+                !appState["image-cache"]
+            ) {
+                checkBackgroundImage().then((result) => {
+                    if (result?.url) {
+                        appState.background.value = result.url;
+                        persist();
+                    }
+                });
+            }
+        });
+
+        requestAnimationFrame(() => {
+            mounted = true;
         });
     });
 
@@ -33,50 +59,35 @@
             clearInterval(interval);
         };
     });
-
-    let mounted = $state(false);
-    let hydrated = $state(false);
-
-    $effect(() => {
-        requestAnimationFrame(() => {
-            mounted = true;
-        });
-    });
-
-    $effect(() => {
-        hydrateState().then(() => {
-            hydrated = true;
-        });
-    });
 </script>
 
 <div id="viewport">
-    <span class:fade={!appState.sentenceVisible || !mounted}>
-        <Holiday date={currentTime} />
+    <span class:fade={!uiState.sentenceVisible || !mounted}>
+        <Holiday />
     </span>
     <span
-        class:fade-slide={!appState.sentenceVisible || !mounted}
-        style="transition-delay: {!appState.sentenceVisible ? '60ms' : '0ms'}"
+        class:fade-slide={!uiState.sentenceVisible || !mounted}
+        style="transition-delay: {!uiState.sentenceVisible ? '60ms' : '0ms'}"
     >
         <Greeting {currentTime} />
     </span>
     <div
         class="sentence-row"
-        class:fade-slide={!appState.sentenceVisible || !mounted}
-        style="transition-delay: {!appState.sentenceVisible ? '0ms' : '60ms'}"
+        class:fade-slide={!uiState.sentenceVisible || !mounted}
+        style="transition-delay: {!uiState.sentenceVisible ? '0ms' : '60ms'}"
     >
         <p class="faint">It's</p>
         <Clock {currentTime} />
         <p class="faint">— currently</p>
-        <Temperature currentTemp={weatherData?.temperature || null} />
+        <Temperature />
         <p class="faint">and</p>
-        <Weather {weatherData} />
+        <Weather />
     </div>
 
     <br /> <br /> <br />
 </div>
 
-{#if appState.optionsOpen}
+{#if uiState.optionsOpen}
     <div class="options-overlay" transition:fly={{ y: "80" }}>
         <Options />
     </div>
@@ -130,6 +141,7 @@
         align-items: center;
         justify-content: center;
         gap: var(--sentence-gap);
+        row-gap: 0;
     }
 
     #viewport * {

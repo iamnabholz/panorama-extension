@@ -1,43 +1,5 @@
-import { loadData, saveData } from "./storage";
-
-export interface WeatherResponse {
-  coord: { lon: number; lat: number };
-  weather: { id: number; main: string; description: string; icon: string }[];
-  base: string;
-  main: {
-    temp: number;
-    feels_like: number;
-    temp_min: number;
-    temp_max: number;
-    pressure: number;
-    humidity: number;
-    sea_level?: number;
-    grnd_level?: number;
-  };
-  visibility: number;
-  wind: { speed: number; deg: number };
-  clouds: { all: number };
-  dt: number;
-  sys: {
-    type: number;
-    id: number;
-    country: string;
-    sunrise: number;
-    sunset: number;
-  };
-  timezone: number;
-  id: number;
-  name: string;
-  cod: number;
-}
-
-export interface WeatherData {
-  temperature: number; // Celsius, raw from API
-  description: string;
-  icon: string;
-  location: string;
-  fetchedAt: number;
-}
+import type { WeatherData, WeatherResponse } from "./interfaces";
+import { appState, persist } from "./state.svelte";
 
 const OPEN_WEATHER_URL = "https://weather-grab.nabholz.workers.dev/";
 const CACHE_DURATION_MS = 80 * 60 * 1000; // adjust as needed
@@ -45,8 +7,8 @@ const CACHE_DURATION_MS = 80 * 60 * 1000; // adjust as needed
 function toWeatherData(res: WeatherResponse): WeatherData {
   return {
     temperature: res.main.temp,
-    description: res.weather[0]?.description ?? "Cloud",
-    icon: res.weather[0]?.icon ?? "02d",
+    description: res.weather[0]?.description,
+    icon: res.weather[0]?.icon,
     location: res.name,
     fetchedAt: Date.now(),
   };
@@ -74,17 +36,15 @@ async function fetchFromApi(): Promise<WeatherData> {
  * from the worker, caches the result, and returns that instead.
  */
 export async function fetchWeather(): Promise<WeatherData> {
-  const cached = await loadData("weather-cache");
-
-  if (!isStale(cached)) {
-    return cached!;
+  const cached = appState["weather-cache"];
+  if (cached && !isStale(cached)) {
+    console.log("weather from cache");
+    return cached;
   }
 
   const fresh = await fetchFromApi();
-  await saveData("weather-cache", fresh);
-  return fresh;
-}
+  appState["weather-cache"] = fresh;
+  persist();
 
-export function celsiusToFahrenheit(celsius: number): number {
-  return (celsius * 9) / 5 + 32;
+  return fresh;
 }

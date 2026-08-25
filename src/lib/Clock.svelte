@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { appState, setState } from "./state.svelte";
+    import { appState, persist } from "./state.svelte";
     import ClockIcon from "./components/ClockIcon.svelte";
     import Widget from "./components/Widget.svelte";
 
@@ -20,7 +20,8 @@
     let formattedTime = $derived(formatter.format(currentTime));
 
     function toggleFormat() {
-        setState("use24Hour", !appState.use24Hour);
+        appState.use24Hour = !appState.use24Hour;
+        persist();
     }
 
     function handleKeydown(event: KeyboardEvent) {

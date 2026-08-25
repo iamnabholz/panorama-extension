@@ -1,23 +1,20 @@
 <script lang="ts">
-    import { celsiusToFahrenheit } from "./weather";
-    import { appState, setState } from "./state.svelte";
-
-    interface Props {
-        currentTemp: number | null;
-    }
-    let { currentTemp }: Props = $props();
+    import { appState, persist } from "./state.svelte";
 
     let displayTemp = $derived.by(() => {
-        if (currentTemp == null) return 20; // fallback default
+        const temp = appState["weather-cache"]?.temperature ?? null;
+
+        if (temp == null) return null; // fallback default
         return appState.useMetric
-            ? Math.floor(currentTemp)
-            : Math.floor(celsiusToFahrenheit(currentTemp));
+            ? Math.floor(temp)
+            : Math.floor(celsiusToFahrenheit(temp));
     });
 
     let unit = $derived(appState.useMetric ? "C" : "F");
 
     function toggleFormat() {
-        setState("useMetric", !appState.useMetric);
+        appState.useMetric = !appState.useMetric;
+        persist();
     }
 
     function handleKeydown(event: KeyboardEvent) {
@@ -26,6 +23,10 @@
             toggleFormat();
         }
     }
+
+    function celsiusToFahrenheit(celsius: number): number {
+        return (celsius * 9) / 5 + 32;
+    }
 </script>
 
 <button
@@ -33,8 +34,9 @@
     class="fragment"
     onclick={toggleFormat}
     onkeydown={handleKeydown}
+    disabled={displayTemp == null}
     title={`Press to switch to ${appState.useMetric ? "Fahrenheit" : "Celsius"}.`}
     aria-label={`Current temperature ${displayTemp} degrees ${unit === "C" ? "Celsius" : "Fahrenheit"}. Press to switch to ${appState.useMetric ? "Fahrenheit" : "Celsius"}.`}
 >
-    {`${displayTemp}°${unit}`}
+    {`${displayTemp ? displayTemp : "-"}°${unit}`}
 </button>

@@ -97,6 +97,7 @@
         color: var(--foreground-color);
         font: inherit;
         transition: 150ms linear;
+        width: 100%;
     }
 
     input:focus,

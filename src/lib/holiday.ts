@@ -1,40 +1,49 @@
+import { isStale } from "./cache";
 import type { HolidayCache, HolidayData } from "./interfaces";
-import { appState, persist } from "./state.svelte";
+import { appState, persist, startLoading, stopLoading } from "./state.svelte";
 
 const HOLIDAYS_URL = "https://holiday-grab.nabholz.workers.dev/";
-const CACHE_DURATION_MS = 14 * 24 * 60 * 60 * 1000; // 2 weeks
-
-function isStale(cache: HolidayCache | undefined): boolean {
-  if (!cache) return true;
-  return Date.now() - cache.fetchedAt > CACHE_DURATION_MS;
-}
+const CACHE_DURATION_MS = 6 * 4 * 7 * 24 * 60 * 60 * 1000; // 2 weeks
 
 async function fetchFromApi(): Promise<HolidayData[]> {
-  const response = await fetch(HOLIDAYS_URL);
-  if (!response.ok) {
-    throw new Error(`Holiday fetch failed: ${response.status}`);
+  const res = await fetch(HOLIDAYS_URL);
+
+  if (!res.ok) {
+    throw new Error(`Holiday fetch failed: ${res.status}`);
   }
-  return response.json();
+
+  return res.json();
 }
 
 /**
  * Returns cached holidays if the cache is under 2 weeks old;
  * otherwise fetches fresh data from the worker, caches it, and returns that.
  */
-export async function fetchHolidays(): Promise<HolidayData[]> {
+export async function fetchHolidays(): Promise<HolidayCache | null> {
   const cached = appState["holiday-cache"];
   if (cached && !isStale(cached)) {
     console.log("holidays from cache");
-    return cached.holidays;
+    return cached;
   }
 
-  const fresh = await fetchFromApi();
+  const loadId = startLoading();
+  try {
+    const fresh = await fetchFromApi();
+    const newCache = {
+      holidays: fresh,
+      fetchedAt: Date.now(),
+      cacheDuration: CACHE_DURATION_MS,
+    };
 
-  appState["holiday-cache"] = {
-    holidays: fresh,
-    fetchedAt: Date.now(),
-  };
-  persist();
+    appState["holiday-cache"] = newCache;
+    persist();
 
-  return fresh;
+    return newCache;
+  } catch (err) {
+    console.error("Holidays fetch failed:", err);
+
+    return cached ?? null; // fall back to stale cache if we have one, else null
+  } finally {
+    stopLoading(loadId);
+  }
 }

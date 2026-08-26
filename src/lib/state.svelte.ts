@@ -1,32 +1,5 @@
-import type { BackgroundImage, WeatherData, HolidayData } from "./interfaces";
+import type { StateSchema } from "./interfaces";
 import { loadData, saveKey } from "./storage/storage";
-
-/**
- * Schema of everything this app stores.
- * Add new keys here — this is the single source of truth
- * for what's storable and what type each key holds.
- */
-export interface StateSchema {
-  useMetric: boolean;
-  use24Hour: boolean;
-  sentenceVisible: boolean;
-
-  background: {
-    type: string;
-    value: string;
-  };
-  "color-cache": {
-    startColor: string;
-    endColor?: string;
-  };
-
-  "image-cache"?: BackgroundImage;
-  "weather-cache"?: WeatherData;
-  "holiday-cache"?: {
-    holidays: HolidayData[];
-    fetchedAt: number;
-  };
-}
 
 export const appState = $state<StateSchema>({
   useMetric: true,
@@ -39,7 +12,18 @@ export const appState = $state<StateSchema>({
 export const uiState = $state({
   optionsOpen: false,
   sentenceVisible: appState.sentenceVisible,
+  loadingData: [] as string[],
 });
+
+export function startLoading(): string {
+  const id = crypto.randomUUID();
+  uiState.loadingData = [...uiState.loadingData, id];
+  return id;
+}
+
+export function stopLoading(id: string) {
+  uiState.loadingData = uiState.loadingData.filter((item) => item !== id);
+}
 
 const keys: (keyof StateSchema)[] = [
   "useMetric",

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { appState, persist } from "./state.svelte";
+    import { appState, persist, uiState } from "./state.svelte";
     import pkg from "../../package.json" with { type: "json" };
     import { fetchBackground } from "./background";
     import icon from "../assets/icon.svg?raw";
@@ -12,8 +12,6 @@
     let colorBind = $state(appState["color-cache"].startColor ?? "");
 
     function setImageQuery(newQuery: string) {
-        if (appState["image-cache"]) appState["image-cache"].query = newQuery;
-
         fetchBackground(newQuery).then((result) => {
             if (result?.url) {
                 appState.background.value = result.url;
@@ -24,6 +22,8 @@
                     `url("${result.url}")`,
                 );
             }
+
+            uiState.loadingData.pop();
         });
     }
 
@@ -31,6 +31,9 @@
         appState.background.value = newColor;
         appState["color-cache"].startColor = newColor;
         persist();
+
+        document.documentElement.style.setProperty("--bg-color", newColor);
+        document.documentElement.style.setProperty("--bg-image", "");
     }
 
     // save whenever it changes
@@ -39,9 +42,12 @@
 
         if (newType === "image") {
             const cached = appState["image-cache"];
-
             savedValue = cached?.url ?? "";
 
+            document.documentElement.style.setProperty(
+                "--bg-color",
+                "var(--background-color)",
+            );
             document.documentElement.style.setProperty(
                 "--bg-image",
                 `url("${savedValue}")`,
@@ -61,6 +67,10 @@
             value: savedValue,
         };
         persist();
+    }
+
+    function changeUpdateFrequency(frequency: string) {
+        console.log(frequency);
     }
 </script>
 
@@ -158,7 +168,7 @@
                 options={[
                     {
                         value: "0",
-                        label: "Never",
+                        label: "Manually",
                     },
                     {
                         value: "60",
@@ -170,7 +180,9 @@
                     },
                 ]}
                 value="0"
-                onChange={() => {}}
+                onChange={(v) => {
+                    changeUpdateFrequency(v);
+                }}
             />
         {:else}
             <br />
@@ -198,6 +210,8 @@
 
         box-shadow: 0 2px 30px rgba(0, 0, 0, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.1);
+
+        z-index: 1;
     }
 
     .credits-column {

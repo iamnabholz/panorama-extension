@@ -1,3 +1,32 @@
+/**
+ * Schema of everything this app stores.
+ * Add new keys here — this is the single source of truth
+ * for what's storable and what type each key holds.
+ */
+export interface StateSchema {
+  useMetric: boolean;
+  use24Hour: boolean;
+  sentenceVisible: boolean;
+
+  background: {
+    type: string;
+    value: string;
+  };
+  "color-cache": {
+    startColor: string;
+    endColor?: string;
+  };
+
+  "image-cache"?: BackgroundImage;
+  "weather-cache"?: WeatherData;
+  "holiday-cache"?: {
+    holidays: HolidayData[];
+    fetchedAt: number;
+    cacheDuration: number;
+  };
+}
+
+// Weather information
 export interface WeatherResponse {
   coord: { lon: number; lat: number };
   weather: { id: number; main: string; description: string; icon: string }[];
@@ -35,6 +64,7 @@ export interface WeatherData {
   icon: string;
   location: string;
   fetchedAt: number;
+  cacheDuration: number;
 }
 
 // Background image
@@ -44,6 +74,7 @@ export interface BackgroundImage {
   author: string;
   link: string;
   fetchedAt: number;
+  cacheDuration: number;
 }
 
 //Holidays
@@ -59,4 +90,5 @@ export interface HolidayData {
 export interface HolidayCache {
   holidays: HolidayData[];
   fetchedAt: number;
+  cacheDuration: number;
 }

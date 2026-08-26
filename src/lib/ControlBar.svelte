@@ -1,4 +1,6 @@
 <script lang="ts">
+    import LoaderIndicator from "./components/LoaderIndicator.svelte";
+    import Options from "./Options.svelte";
     import { appState, persist, uiState } from "./state.svelte";
 
     $effect(() => {
@@ -8,27 +10,21 @@
         );
     });
 
-    let lastVisibilitySetting = appState.sentenceVisible;
-
     function toggleOptions() {
         if (uiState.optionsOpen) {
-            uiState.sentenceVisible = lastVisibilitySetting;
             uiState.optionsOpen = false;
+            uiState.sentenceVisible = appState.sentenceVisible;
         } else {
-            lastVisibilitySetting = uiState.sentenceVisible;
-
-            uiState.sentenceVisible = false;
             uiState.optionsOpen = true;
+            uiState.sentenceVisible = false;
         }
     }
 
     function toggleVisibility() {
-        if (uiState.optionsOpen) {
-            uiState.optionsOpen = false;
-        }
+        if (uiState.optionsOpen) uiState.optionsOpen = false;
 
-        appState.sentenceVisible = !appState.sentenceVisible;
-        uiState.sentenceVisible = appState.sentenceVisible;
+        uiState.sentenceVisible = !uiState.sentenceVisible;
+        appState.sentenceVisible = uiState.sentenceVisible;
         persist();
     }
 
@@ -41,13 +37,12 @@
 </script>
 
 <div id="control-bar">
-    {#if appState.background.type == "image" && appState["image-cache"]}
+    <LoaderIndicator />
+    {#if appState.background.type == "image" && appState["image-cache"]?.author}
         <a class="credits-anchor" href={appState["image-cache"]?.link}>
-            <span style="display: contents; ">
-                <span style="font-size: 0.8em; "
-                    >{appState["image-cache"]?.author}</span
-                >
-                <span style="font-size: 0.6em;">On Unsplash</span>
+            {appState["image-cache"].author}
+            <span style="font-size: 0.6em; font-weight: normal;">
+                On Unsplash
             </span>
         </a>
     {/if}
@@ -74,14 +69,14 @@
         type="button"
         onclick={toggleVisibility}
         onkeydown={(e) => handleKeydown(e, toggleVisibility)}
-        title={appState.sentenceVisible
+        title={uiState.sentenceVisible
             ? "Hide information."
             : "Show information."}
-        aria-label={appState.sentenceVisible
+        aria-label={uiState.sentenceVisible
             ? "Hide information"
             : "Show information"}
     >
-        {#if appState.sentenceVisible}
+        {#if uiState.sentenceVisible}
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="currentColor"
@@ -107,17 +102,17 @@
 
 <style>
     #control-bar {
+        border-radius: 100px;
         position: absolute;
         bottom: 4em;
         left: 50%;
         transform: translateX(-50%);
-        border-radius: 100px;
+
         display: flex;
         gap: 4px;
         padding: 4px;
         align-items: center;
         justify-content: center;
-        transition: 150ms ease-out;
 
         /* From https://css.glass */
         background: rgba(255, 255, 255, 0.05);
@@ -127,6 +122,8 @@
         border: 1px solid rgba(255, 255, 255, 0.1);
 
         color: white;
+        z-index: 2;
+        transition: 150ms ease-out;
     }
 
     #control-bar svg {
@@ -137,19 +134,11 @@
         filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.2));
     }
 
-    a {
-        all: unset;
-        border: none;
-    }
-
-    a:hover {
-        background-color: red;
-    }
-
     .credits-anchor {
+        font-size: 0.8em;
+        padding: 0px 16px 0px 12px;
+
         flex-direction: column;
-        line-height: 1.2;
-        padding: 0 16px 0 14px;
         align-items: flex-start;
     }
 
@@ -160,7 +149,7 @@
         align-items: center;
         justify-content: center;
         gap: 0px;
-        height: 40px;
+        height: 32px;
 
         padding: 0px 10px;
         border-radius: 100px;

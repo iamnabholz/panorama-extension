@@ -8,6 +8,8 @@
         uiState,
         hydrateState,
         persist,
+        startLoading,
+        stopLoading,
     } from "./lib/state.svelte";
 
     import Holiday from "./lib/Holiday.svelte";
@@ -17,30 +19,36 @@
     import Temperature from "./lib/Temperature.svelte";
 
     import Options from "./lib/Options.svelte";
-    import ActionBar from "./lib/ActionBar.svelte";
-    import { checkBackgroundImage } from "./lib/background";
+    import ControlBar from "./lib/ControlBar.svelte";
+    import { checkBackgroundCache } from "./lib/background";
     import { fetchHolidays } from "./lib/holiday";
     import { fetchWeather } from "./lib/weather";
 
     let mounted = $state(false);
 
     onMount(() => {
+        const loadId = startLoading();
+
         hydrateState().then(() => {
             // Fetch everything here for state
             fetchHolidays();
-            fetchWeather();
+            //fetchWeather();
 
-            if (
-                appState.background.type === "image" ||
-                !appState["image-cache"]
-            ) {
-                checkBackgroundImage().then((result) => {
+            if (appState.background.type === "image") {
+                checkBackgroundCache().then((result) => {
                     if (result?.url) {
                         appState.background.value = result.url;
                         persist();
+
+                        document.documentElement.style.setProperty(
+                            "--bg-image",
+                            `url("${result.url}")`,
+                        );
                     }
                 });
             }
+
+            stopLoading(loadId);
         });
 
         requestAnimationFrame(() => {
@@ -88,13 +96,13 @@
 </div>
 
 {#if uiState.optionsOpen}
-    <div class="options-overlay" transition:fly={{ y: "80" }}>
+    <div id="options-overlay" transition:fly={{ y: "80" }}>
         <Options />
     </div>
 {/if}
 
 <span transition:fade>
-    <ActionBar />
+    <ControlBar />
 </span>
 
 <style>
@@ -126,7 +134,7 @@
             transform 0.3s ease;
     }
 
-    .options-overlay {
+    #options-overlay {
         position: fixed;
         inset: 0;
         display: flex;

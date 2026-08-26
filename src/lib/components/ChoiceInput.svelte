@@ -1,4 +1,3 @@
-<!-- ChoiceInput.svelte -->
 <script lang="ts">
     interface ChoiceOption {
         value: string;

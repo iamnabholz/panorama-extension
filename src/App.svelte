@@ -32,7 +32,8 @@
         hydrateState().then(() => {
             // Fetch everything here for state
             fetchHolidays();
-            //fetchWeather();
+
+            fetchWeather();
 
             if (appState.background.type === "image") {
                 checkBackgroundCache().then((result) => {
@@ -118,6 +119,7 @@
 
         margin: 0 auto;
         width: min(640px, 100%);
+        padding: 0 12px;
 
         cursor: default;
         user-select: none;

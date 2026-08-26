@@ -3,22 +3,22 @@
     import type { HolidayData } from "./interfaces";
     import { appState } from "./state.svelte";
 
-    let nextHoliday = $derived.by((): HolidayData | null => {
-        const todayIso = toLocalISODate(new Date());
-        return (
-            appState["holiday-cache"]?.holidays
-                .filter((h) => h.date >= todayIso)
-                .sort((a, b) => a.date.localeCompare(b.date))[0] ?? null
-        );
+    // "YYYY-MM-DD" in local time (Intl avoids manual padStart plumbing)
+    const isoFormatter = new Intl.DateTimeFormat("en-CA"); // en-CA = YYYY-MM-DD
+    function toLocalISODate(date: Date): string {
+        return isoFormatter.format(date);
+    }
+
+    const todayIso = $derived(toLocalISODate(new Date()));
+
+    const sortedUpcoming = $derived.by((): HolidayData[] => {
+        return (appState["holiday-cache"]?.holidays ?? [])
+            .filter((h) => h.date >= todayIso)
+            .sort((a, b) => a.date.localeCompare(b.date));
     });
 
-    // Formats a Date as "YYYY-MM-DD" using LOCAL time
-    function toLocalISODate(date: Date): string {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
-    }
+    let nextHoliday = $derived(sortedUpcoming[0] ?? null);
+    let isTodayHoliday = $derived(nextHoliday?.date === todayIso);
 
     let formatter = new Intl.DateTimeFormat(undefined, {
         weekday: "long",
@@ -26,31 +26,29 @@
         month: "short",
     });
 
-    let showTodayDate = $state(true);
-
-    function toggleTodayDate() {
-        showTodayDate = !showTodayDate;
+    let dateExpanded = $state(false);
+    function toggleDateExpansion() {
+        dateExpanded = !dateExpanded;
     }
-
     function handleKeydown(event: KeyboardEvent) {
         if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
-            toggleTodayDate();
+            toggleDateExpansion();
         }
     }
 </script>
 
 <button
     type="button"
-    onclick={toggleTodayDate}
+    onclick={toggleDateExpansion}
     onkeydown={handleKeydown}
     title="See the next holiday in your country."
     aria-label="See the next holiday in your country."
     disabled={nextHoliday == null}
-    class:open={!showTodayDate}
+    class:open={dateExpanded}
 >
     <span class="basic-row">
-        <span class="icon-badge" class:showing-today={!showTodayDate}>
+        <span class="icon-badge" class:showing-today={isTodayHoliday}>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="currentColor"
@@ -62,22 +60,26 @@
             </svg>
         </span>
 
-        {formatter.format(new Date())}
+        <span style="padding-top: 1px;">
+            {formatter.format(new Date())}
+        </span>
     </span>
 
-    {#if !showTodayDate}
+    {#if dateExpanded}
         <span class="holiday-info" transition:slide>
             <span
                 style="font-size: 0.8em; font-weight: normal; color: var(--accent-color);"
             >
-                Next
+                {isTodayHoliday ? "TODAY" : "NEXT"}
             </span>
             <br />
             {nextHoliday?.name}
             <br />
-            <span style="font-size: 0.8em;  font-weight: normal;">
-                {formatter.format(new Date(nextHoliday?.date as string))}
-            </span>
+            {#if !isTodayHoliday}
+                <span style="font-size: 0.8em;  font-weight: normal;">
+                    {formatter.format(new Date(nextHoliday?.date as string))}
+                </span>
+            {/if}
         </span>
     {/if}
 </button>
@@ -85,12 +87,15 @@
 <style>
     .holiday-info {
         line-height: 1.2;
+        text-align: center;
     }
 
     .basic-row {
         display: flex;
         align-items: center;
         gap: 4px;
+
+        padding-right: 6px;
     }
 
     button {
@@ -100,6 +105,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        align-items: center;
         font-weight: bold;
         font-size: 1rem;
         line-height: 1.8;
@@ -120,7 +126,7 @@
         width: 22px;
         height: 22px;
         flex-shrink: 0;
-
+        margin-bottom: 1px;
         transform: translateX(-0.1px);
     }
 
@@ -144,7 +150,7 @@
     }
 
     button.open {
-        background: var(--background-color);
+        background: var(--color-black);
         height: 96px;
         border-radius: 20px;
         padding: 12px;

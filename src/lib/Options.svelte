@@ -205,7 +205,7 @@
                         label: "Daily",
                     },
                 ]}
-                value={appState.imageUpdateFrequency}
+                bind:value={appState.imageUpdateFrequency}
                 onChange={() => persist()}
             />
         {:else}

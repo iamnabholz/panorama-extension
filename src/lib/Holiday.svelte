@@ -65,7 +65,7 @@
         </span>
     </span>
 
-    {#if dateExpanded}
+    {#if dateExpanded && nextHoliday}
         <span class="holiday-info" transition:slide>
             <span
                 style="font-size: 0.8em; font-weight: normal; color: var(--accent-color);"
@@ -73,11 +73,11 @@
                 {isTodayHoliday ? "TODAY" : "NEXT"}
             </span>
             <br />
-            {nextHoliday?.name}
+            {nextHoliday.name}
             <br />
             {#if !isTodayHoliday}
                 <span style="font-size: 0.8em;  font-weight: normal;">
-                    {formatter.format(new Date(nextHoliday?.date as string))}
+                    {formatter.format(new Date(nextHoliday.date as string))}
                 </span>
             {/if}
         </span>

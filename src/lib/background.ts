@@ -1,16 +1,26 @@
-import { isStale } from "./cache";
 import type { BackgroundImage } from "./interfaces";
-import {
-  appState,
-  persist,
-  startLoading,
-  stopLoading,
-  uiState,
-} from "./state.svelte";
+import { appState, persist, startLoading, stopLoading } from "./state.svelte";
 
 const WORKER_URL = "https://background-grab.nabholz.workers.dev/";
-const CACHE_DURATION_MS = 1 * 24 * 60 * 60 * 1000; // adjust as needed
 const DEFAULT_QUERY = "Ocean view";
+
+const TIMER_HOURLY = 60 * 60 * 1000;
+const TIMER_DAILY = 24 * 60 * 60 * 1000;
+
+function isStale(data: BackgroundImage): boolean {
+  if (!data) return true;
+
+  let cacheTime: number;
+  if (appState.imageUpdateFrequency == "hourly") {
+    cacheTime = TIMER_HOURLY;
+  } else if (appState.imageUpdateFrequency == "daily") {
+    cacheTime = TIMER_DAILY;
+  } else {
+    return false;
+  }
+
+  return Date.now() - data.fetchedAt > cacheTime;
+}
 
 function toBackgroundImage(res: any, query: string): BackgroundImage {
   return {
@@ -19,7 +29,6 @@ function toBackgroundImage(res: any, query: string): BackgroundImage {
     author: res.user?.name ?? "",
     link: res.user?.links?.html ?? "",
     fetchedAt: Date.now(),
-    cacheDuration: CACHE_DURATION_MS,
   };
 }
 
@@ -66,10 +75,12 @@ export async function fetchBackground(
  */
 export async function checkBackgroundCache(): Promise<BackgroundImage | null> {
   const cached = appState["image-cache"];
+
   if (cached && !isStale(cached)) {
     console.log("image from cache");
     return cached;
   }
+
   const query = cached?.query ?? DEFAULT_QUERY;
   return (await fetchBackground(query)) ?? cached ?? null;
 }

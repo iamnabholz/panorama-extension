@@ -7,6 +7,11 @@ export interface StateSchema {
   useMetric: boolean;
   use24Hour: boolean;
   sentenceVisible: boolean;
+  imageUpdateFrequency: string;
+
+  displayGreeting: boolean;
+  displayTime: boolean;
+  displayWeather: boolean;
 
   background: {
     type: string;
@@ -74,7 +79,6 @@ export interface BackgroundImage {
   author: string;
   link: string;
   fetchedAt: number;
-  cacheDuration: number;
 }
 
 //Holidays

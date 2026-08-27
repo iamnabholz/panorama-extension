@@ -7,6 +7,7 @@
         placeholder?: string;
         buttonLabel?: string;
         hideLabel?: boolean;
+        disableButton?: boolean;
         description?: string;
         onSubmit: (value: string) => void;
     }
@@ -20,6 +21,7 @@
         hideLabel = false,
         description = "",
         onSubmit,
+        disableButton = false,
     }: Props = $props();
 
     function handleSubmit() {
@@ -51,7 +53,11 @@
                 ? `${id}-description`
                 : undefined}
         />
-        <button type="button" onclick={handleSubmit}>
+        <button
+            disabled={disableButton || value.trim().length == 0}
+            type="button"
+            onclick={handleSubmit}
+        >
             {buttonLabel}
         </button>
     </div>
@@ -122,7 +128,8 @@
     }
 
     button:disabled {
-        background-color: #00000080;
+        background-color: var(--foreground-60);
+        cursor: not-allowed;
     }
 
     .description {

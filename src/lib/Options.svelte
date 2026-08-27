@@ -7,6 +7,7 @@
     import TextInput from "./components/TextInput.svelte";
     import ChoiceInput from "./components/ChoiceInput.svelte";
     import ColorInput from "./components/ColorInput.svelte";
+    import CheckboxInput from "./components/CheckboxInput.svelte";
 
     let queryBind = $state(appState["image-cache"]?.query ?? "");
     let colorBind = $state(appState["color-cache"].startColor ?? "");
@@ -68,28 +69,25 @@
         };
         persist();
     }
-
-    function changeUpdateFrequency(frequency: string) {
-        console.log(frequency);
-    }
 </script>
 
 <div id="options-panel" class="basic-column">
     <div class="basic-column credits-column">
-        <div class="basic-column">
+        <div class="basic-column" style="font-size: 0.8em;">
             <span
                 style="width: 64px; height: 64px; transform: translateX(-5px);"
             >
                 {@html icon}
             </span>
             <br />
-            <span>
+            <span style="font-size: 1.5em;">
                 <b>Panorama Tab</b>
-                <span style="color: var(--foreground-60)">
+                <span style="color: var(--foreground-60);">
                     {pkg.version}
                 </span>
             </span>
-            <span style="font-size: 0.8em;">
+
+            <span>
                 Made by
                 <a target="_blank" href="https://nabholz.work">
                     Lukas Nabholz
@@ -100,7 +98,7 @@
             class="basic-column"
             style="font-size: 0.6em; gap: 6px; color: var(--foreground-60);"
         >
-            <span style="font-weight: bold;"> Credits </span>
+            <a target="_blank" href="https://nabholz.work"> Privacy Policy </a>
             <span>
                 Icons by
                 <a target="_blank" href="https://pixelarticons.com">
@@ -113,22 +111,50 @@
                     PangramPangram
                 </a>
             </span>
-            <span>
-                Weather information from
-                <a target="_blank" href="https://openweathermap.org">
-                    OpenWeatherMap
-                </a>
-            </span>
-            <span>
-                Background images from
-                <a target="_blank" href="https://unsplash.com"> Unsplash </a>
-            </span>
         </span>
     </div>
 
     <div class="basic-column options-column">
         <span style="font-size: 1.2em; font-weight: bold;">Options</span>
         <hr class="separator" style="margin-top: 6px;" />
+
+        <CheckboxInput
+            id="greeting-on"
+            label="Greeting"
+            text="Display a random greeting based on time of day"
+            bind:checked={appState.displayGreeting}
+            onChange={() => persist()}
+        />
+
+        <hr class="separator" />
+
+        <CheckboxInput
+            id="time-on"
+            label="Time"
+            text="Display a clock with the current time"
+            bind:checked={appState.displayTime}
+            onChange={() => persist()}
+        />
+        <p>
+            To switch between 24hour and AMPM format, click on the current time
+        </p>
+
+        <hr class="separator" />
+
+        <CheckboxInput
+            id="weather-on"
+            label="Weather"
+            text="Display current weather information for your location"
+            bind:checked={appState.displayWeather}
+            onChange={() => persist()}
+        />
+
+        <p>
+            To switch between celsius and farenheit, click on the current
+            temperature number
+        </p>
+
+        <hr class="separator" />
 
         <ChoiceInput
             id="bg-type"
@@ -156,7 +182,7 @@
                 label="Image Topic"
                 value={queryBind}
                 placeholder="What kind of background you'd like?"
-                buttonLabel="Search"
+                buttonLabel={colorBind ? "New Image" : "Search"}
                 description="Set a topic related to the type of images you'd like to get as background."
                 onSubmit={(v) => setImageQuery(v)}
             />
@@ -167,22 +193,20 @@
                 label="Image update frequency"
                 options={[
                     {
-                        value: "0",
+                        value: "never",
                         label: "Manually",
                     },
                     {
-                        value: "60",
+                        value: "hourly",
                         label: "Hourly",
                     },
                     {
-                        value: "24",
+                        value: "daily",
                         label: "Daily",
                     },
                 ]}
-                value="0"
-                onChange={(v) => {
-                    changeUpdateFrequency(v);
-                }}
+                value={appState.imageUpdateFrequency}
+                onChange={() => persist()}
             />
         {:else}
             <br />
@@ -255,7 +279,7 @@
         height: 1px;
         border: none;
         background-color: var(--foreground-10);
-        margin: 24px 0;
+        margin: 12px 0;
         box-sizing: border-box;
     }
 </style>

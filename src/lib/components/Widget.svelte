@@ -26,7 +26,6 @@
         align-items: center;
         gap: 0.3em;
         vertical-align: middle;
-        margin-left: 0.1em;
     }
 
     .icon-slot {

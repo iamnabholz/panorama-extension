@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { SvelteDate } from "svelte/reactivity";
     import { fade, fly } from "svelte/transition";
     import { onMount } from "svelte";
 
@@ -33,7 +32,9 @@
             // Fetch everything here for state
             fetchHolidays();
 
-            fetchWeather();
+            if (appState.displayWeather) {
+                fetchWeather();
+            }
 
             if (appState.background.type === "image") {
                 checkBackgroundCache().then((result) => {
@@ -56,44 +57,44 @@
             mounted = true;
         });
     });
-
-    const currentTime = new SvelteDate();
-
-    $effect(() => {
-        const interval = setInterval(() => {
-            currentTime.setTime(Date.now());
-        }, 1000);
-
-        return () => {
-            clearInterval(interval);
-        };
-    });
 </script>
 
 <div id="viewport">
     <span class:fade={!uiState.sentenceVisible || !mounted}>
         <Holiday />
     </span>
-    <span
-        class:fade-slide={!uiState.sentenceVisible || !mounted}
-        style="transition-delay: {!uiState.sentenceVisible ? '60ms' : '0ms'}"
-    >
-        <Greeting {currentTime} />
-    </span>
+    {#if appState.displayGreeting}
+        <span
+            class:fade-slide={!uiState.sentenceVisible || !mounted}
+            style="transition-delay: {!uiState.sentenceVisible
+                ? '60ms'
+                : '0ms'}"
+        >
+            <Greeting />
+        </span>
+    {/if}
+
     <div
         class="sentence-row"
         class:fade-slide={!uiState.sentenceVisible || !mounted}
         style="transition-delay: {!uiState.sentenceVisible ? '0ms' : '60ms'}"
     >
-        <p class="faint">It's</p>
-        <Clock {currentTime} />
-        <p class="faint">— currently</p>
-        <Temperature />
-        <p class="faint">and</p>
-        <Weather />
+        {#if appState.displayTime}
+            <p class="faint">It's</p>
+            <Clock />
+            {#if appState.displayWeather}
+                <p class="faint">—</p>
+            {/if}
+        {/if}
+        {#if appState.displayWeather}
+            <p class="faint">
+                {appState.displayTime ? "currently" : "Currently"}
+            </p>
+            <Temperature />
+            <p class="faint">and</p>
+            <Weather />
+        {/if}
     </div>
-
-    <br /> <br /> <br />
 </div>
 
 {#if uiState.optionsOpen}
@@ -108,13 +109,13 @@
 
 <style>
     #viewport {
-        height: 100%;
+        height: 90%;
         overflow: hidden;
 
         display: flex;
         flex-direction: column;
-        align-items: center;
         justify-content: center;
+        align-items: center;
         gap: var(--paragraph-gap);
 
         margin: 0 auto;
@@ -130,10 +131,6 @@
         text-shadow: var(--sentence-shadow);
 
         color: white;
-
-        transition:
-            opacity 0.3s ease,
-            transform 0.3s ease;
     }
 
     #options-overlay {

@@ -1,9 +1,13 @@
-import { isStale } from "./cache";
 import type { WeatherData, WeatherResponse } from "./interfaces";
 import { appState, persist, startLoading, stopLoading } from "./state.svelte";
 
 const OPEN_WEATHER_URL = "https://weather-grab.nabholz.workers.dev/";
-const CACHE_DURATION_MS = 80 * 60 * 1000; // adjust as needed
+const CACHE_DURATION_MS = 120 * 60 * 1000; // adjust as needed
+
+function isStale(cache: WeatherData): boolean {
+  if (!cache) return true;
+  return Date.now() - cache.fetchedAt > cache.cacheDuration;
+}
 
 function toWeatherData(res: WeatherResponse): WeatherData {
   return {

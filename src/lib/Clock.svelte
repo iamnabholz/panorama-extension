@@ -1,12 +1,21 @@
 <script lang="ts">
+    import { SvelteDate } from "svelte/reactivity";
     import { appState, persist } from "./state.svelte";
+
     import ClockIcon from "./components/ClockIcon.svelte";
     import Widget from "./components/Widget.svelte";
 
-    interface Props {
-        currentTime: Date;
-    }
-    let { currentTime }: Props = $props();
+    const currentTime = new SvelteDate();
+
+    $effect(() => {
+        const interval = setInterval(() => {
+            currentTime.setTime(Date.now());
+        }, 1000);
+
+        return () => {
+            clearInterval(interval);
+        };
+    });
 
     // Recompute the formatter only when the format actually changes
     let formatter = $derived(

@@ -104,7 +104,7 @@
     #control-bar {
         border-radius: 100px;
         position: absolute;
-        bottom: 4em;
+        bottom: min(6%, 4em);
         left: 50%;
         transform: translateX(-50%);
 

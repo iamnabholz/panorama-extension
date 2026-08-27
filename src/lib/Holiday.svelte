@@ -152,7 +152,7 @@
     button.open {
         background: var(--color-black);
         height: 96px;
-        border-radius: 20px;
+        border-radius: 24px;
         padding: 12px;
     }
 </style>

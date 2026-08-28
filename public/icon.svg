@@ -7,11 +7,11 @@
 >
     <style>
         path {
-            fill: black;
+            fill: #0c0c0c;
         }
         @media (prefers-color-scheme: dark) {
             path {
-                fill: white;
+                fill: #e8e8e8;
             }
         }
     </style>

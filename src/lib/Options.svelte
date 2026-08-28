@@ -9,23 +9,23 @@
     import ColorInput from "./components/ColorInput.svelte";
     import CheckboxInput from "./components/CheckboxInput.svelte";
 
+    const COOLDOWN_MS = 60 * 60 * 1000; // adjust to taste
+
     let queryBind = $state(appState["image-cache"]?.query ?? "");
     let colorBind = $state(appState["color-cache"].startColor ?? "");
 
+    let isSameAsCached = $derived(
+        queryBind.toLowerCase() ===
+            (appState["image-cache"]?.query ?? "").toLowerCase(),
+    );
+
+    let isCoolingDown = $derived(
+        Date.now() < (appState["image-cache"]?.fetchedAt ?? 0) + COOLDOWN_MS,
+    );
+    let disableFetchButton = $derived(isSameAsCached && isCoolingDown);
+
     function setImageQuery(newQuery: string) {
-        fetchBackground(newQuery).then((result) => {
-            if (result?.url) {
-                appState.background.value = result.url;
-                persist();
-
-                document.documentElement.style.setProperty(
-                    "--bg-image",
-                    `url("${result.url}")`,
-                );
-            }
-
-            uiState.loadingData.pop();
-        });
+        fetchBackground(newQuery);
     }
 
     function setBackgroundColor(newColor: string) {
@@ -180,9 +180,10 @@
             <TextInput
                 id="bg-query-input"
                 label="Image Topic"
-                value={queryBind}
+                bind:value={queryBind}
                 placeholder="What kind of background you'd like?"
-                buttonLabel={colorBind ? "New Image" : "Search"}
+                buttonLabel={isSameAsCached ? "New Image" : "Search"}
+                disableButton={disableFetchButton}
                 description="Set a topic related to the type of images you'd like to get as background."
                 onSubmit={(v) => setImageQuery(v)}
             />
@@ -213,7 +214,7 @@
             <ColorInput
                 id="bg-color"
                 label="Pick Color"
-                value={colorBind}
+                bind:value={colorBind}
                 onChange={(v) => setBackgroundColor(v)}
             />
         {/if}

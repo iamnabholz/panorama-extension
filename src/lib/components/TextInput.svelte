@@ -1,4 +1,3 @@
-<!-- TextInputWithButton.svelte -->
 <script lang="ts">
     interface Props {
         id: string;
@@ -21,7 +20,7 @@
         hideLabel = false,
         description = "",
         onSubmit,
-        disableButton = false,
+        disableButton = $bindable(false),
     }: Props = $props();
 
     function handleSubmit() {

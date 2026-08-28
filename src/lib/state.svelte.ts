@@ -16,7 +16,7 @@ export const appState = $state<StateSchema>({
 export const uiState = $state({
   optionsOpen: false,
   sentenceVisible: appState.sentenceVisible,
-  loadingData: [] as string[],
+  loadingData: [] as any[],
 });
 
 export function startLoading(): string {

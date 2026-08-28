@@ -1,12 +1,11 @@
 <script lang="ts">
-    import { fade, fly } from "svelte/transition";
+    import { fade, fly, slide } from "svelte/transition";
     import { onMount } from "svelte";
 
     import {
         appState,
         uiState,
         hydrateState,
-        persist,
         startLoading,
         stopLoading,
     } from "./lib/state.svelte";
@@ -23,8 +22,6 @@
     import { fetchHolidays } from "./lib/holiday";
     import { fetchWeather } from "./lib/weather";
 
-    let mounted = $state(false);
-
     onMount(() => {
         const loadId = startLoading();
 
@@ -37,68 +34,57 @@
             }
 
             if (appState.background.type === "image") {
-                checkBackgroundCache().then((result) => {
-                    if (result?.url) {
-                        appState.background.value = result.url;
-                        persist();
-
-                        document.documentElement.style.setProperty(
-                            "--bg-image",
-                            `url("${result.url}")`,
-                        );
-                    }
-                });
+                checkBackgroundCache();
             }
 
             stopLoading(loadId);
-        });
-
-        requestAnimationFrame(() => {
-            mounted = true;
         });
     });
 </script>
 
 <div id="viewport">
-    <span class:fade={!uiState.sentenceVisible || !mounted}>
-        <Holiday />
-    </span>
-    {#if appState.displayGreeting}
-        <span
-            class:fade-slide={!uiState.sentenceVisible || !mounted}
-            style="transition-delay: {!uiState.sentenceVisible
-                ? '60ms'
-                : '0ms'}"
-        >
+    {#if uiState.sentenceVisible}
+        <span in:fade out:fade={{ delay: 60 }}>
+            <Holiday />
+        </span>
+    {/if}
+    {#if uiState.sentenceVisible && appState.displayGreeting}
+        <span in:fly={{ y: 120 }} out:fly={{ delay: 60, y: 120 }}>
             <Greeting />
         </span>
     {/if}
 
-    <div
-        class="sentence-row"
-        class:fade-slide={!uiState.sentenceVisible || !mounted}
-        style="transition-delay: {!uiState.sentenceVisible ? '0ms' : '60ms'}"
-    >
-        {#if appState.displayTime}
-            <p class="faint">It's</p>
-            <Clock />
-            {#if appState.displayWeather}
-                <p class="faint">—</p>
+    {#if uiState.sentenceVisible}
+        <div
+            class="sentence-row"
+            in:fly={{ delay: 60, y: 120 }}
+            out:fly={{ y: 120 }}
+        >
+            {#if appState.displayTime}
+                <p class="faint">It's</p>
+                <Clock />
+                {#if appState.displayWeather}
+                    <p class="faint">—</p>
+                {/if}
             {/if}
-        {/if}
-        {#if appState.displayWeather}
-            <p class="faint">
-                {appState.displayTime ? "currently" : "Currently"}
-            </p>
-            <Temperature />
-            <p class="faint">and</p>
-            <Weather />
-        {/if}
-    </div>
+            {#if appState.displayWeather}
+                <p class="faint">
+                    {appState.displayTime ? "currently" : "Currently"}
+                </p>
+                <Temperature />
+                <p class="faint">and</p>
+                <Weather />
+            {/if}
+        </div>
+    {/if}
 </div>
 
 {#if uiState.optionsOpen}
-    <div id="options-overlay" transition:fly={{ y: "80" }}>
+    <div
+        id="options-overlay"
+        in:fly={{ delay: 60, y: 120 }}
+        out:fly={{ y: 120 }}
+    >
         <Options />
     </div>
 {/if}
@@ -114,13 +100,13 @@
 
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
         gap: var(--paragraph-gap);
 
         margin: 0 auto;
         width: min(640px, 100%);
         padding: 0 12px;
+        padding-top: 12%;
 
         cursor: default;
         user-select: none;
@@ -161,10 +147,6 @@
         opacity: 0;
         transform: translateY(110px);
         pointer-events: none;
-    }
-
-    :global(.fade) {
-        opacity: 0;
     }
 
     :global(.faint) {

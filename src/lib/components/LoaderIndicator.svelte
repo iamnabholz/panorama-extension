@@ -19,8 +19,8 @@
 
         margin-left: 4px;
         border-radius: 50%;
-        border: 6px solid transparent;
-        border-top-color: currentColor;
-        animation: spinner 600ms linear infinite;
+        border: 4px solid transparent;
+        border-bottom-color: currentColor;
+        animation: spinner 1s ease infinite;
     }
 </style>

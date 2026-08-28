@@ -100,7 +100,7 @@
 
     button {
         cursor: pointer;
-        padding: 8px;
+        padding: 4px 8px;
         border-radius: 100px;
         display: flex;
         flex-direction: column;

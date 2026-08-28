@@ -55,7 +55,18 @@ export async function fetchBackground(
 
   try {
     const fresh = await fetchFromApi(query);
+
+    const img = new Image();
+    img.src = fresh.url;
+    await img.decode();
+
+    document.documentElement.style.setProperty(
+      "--bg-image",
+      `url("${fresh.url}")`,
+    );
+
     appState["image-cache"] = fresh;
+    appState.background.value = fresh.url;
     persist();
 
     return fresh;

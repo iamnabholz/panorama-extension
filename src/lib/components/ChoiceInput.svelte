@@ -1,55 +1,63 @@
 <script lang="ts">
-    interface ChoiceOption {
-        value: string;
-        label: string;
-        description?: string;
-    }
+    import InputShell from "./InputShell.svelte";
 
+    interface Option {
+        label: string;
+        value: string;
+    }
     interface Props {
         id: string;
         label: string;
-        options: ChoiceOption[];
-        value: string;
         hideLabel?: boolean;
+        options: Option[];
+        value: string;
         onChange?: (value: string) => void;
     }
-
     let {
         id,
         label,
+        hideLabel = false,
         options,
         value = $bindable(),
-        hideLabel = false,
         onChange,
     }: Props = $props();
 
-    let selectedDescription = $derived(
-        options.find((opt) => opt.value === value)?.description ?? "",
-    );
-
-    function select(optionValue: string) {
-        value = optionValue;
-        onChange?.(optionValue);
+    function select(next: string) {
+        value = next;
+        onChange?.(next);
     }
 
     function handleKeydown(event: KeyboardEvent, optionValue: string) {
-        if (event.key === "Enter" || event.key === " ") {
+        const currentIndex = options.findIndex((o) => o.value === value);
+        let nextIndex: number | null = null;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+            nextIndex = (currentIndex + 1) % options.length;
+        } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+            nextIndex = (currentIndex - 1 + options.length) % options.length;
+        }
+        if (nextIndex !== null) {
             event.preventDefault();
-            select(optionValue);
+            select(options[nextIndex].value);
+            (event.currentTarget as HTMLElement)
+                .closest(".choice-row")
+                ?.querySelectorAll("button")
+                [nextIndex]?.focus();
         }
     }
 </script>
 
-<div class="field">
-    <span class="choice-label" class:visually-hidden={hideLabel}>
-        {label}
-    </span>
-    <div class="choice-row" role="radiogroup" aria-labelledby="{id}-label">
+<InputShell {id} {label} {hideLabel}>
+    <div
+        class="choice-row glass"
+        role="radiogroup"
+        aria-labelledby="{id}-label"
+    >
         {#each options as option (option.value)}
             <button
                 type="button"
                 role="radio"
                 aria-checked={value === option.value}
+                tabindex={value === option.value ? 0 : -1}
                 class:selected={value === option.value}
                 onclick={() => select(option.value)}
                 onkeydown={(e) => handleKeydown(e, option.value)}
@@ -58,84 +66,40 @@
             </button>
         {/each}
     </div>
-    {#if selectedDescription.trim().length > 0}
-        <p id="{id}-description" class="description">
-            {selectedDescription.trim()}
-        </p>
-    {/if}
-</div>
+</InputShell>
 
 <style>
-    .field {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .choice-label {
-        font-size: 0.8em;
-        font-weight: bold;
-        text-transform: capitalize;
-    }
-
-    .visually-hidden {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
-    }
-
     .choice-row {
         display: flex;
         gap: 4px;
         padding: 4px;
-        background-color: var(--foreground-10);
-        border-radius: 8px;
+        border-radius: var(--field-radius-lg);
         width: 100%;
         box-sizing: border-box;
-        transition: 150ms ease-out;
+        transition: var(--field-transition);
     }
-
     .choice-row button {
         flex: 1;
         cursor: pointer;
         padding: 6px 14px;
-        border: none;
-        border-radius: 6px;
+        border: 1px solid transparent;
+        border-radius: var(--field-radius-md);
         background: transparent;
         color: inherit;
         font: inherit;
         text-align: center;
-        border: 1px solid rgba(255, 255, 255, 0);
-
-        transition: 150ms ease-out;
+        transition: var(--field-transition);
     }
-
     .choice-row button.selected {
-        background-color: var(--foreground-color);
-        color: var(--background-color);
+        background-color: var(--color-white);
+        color: var(--color-black);
     }
-
     .choice-row button:not(.selected):hover {
-        background-color: var(--foreground-10);
-        border-color: rgba(255, 255, 255, 0.1);
+        background-color: var(--white-20);
     }
-
-    .description {
-        cursor: default;
-        font-size: 1em;
-        font-weight: normal;
-        margin: 0;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        margin-top: 6px;
-        color: var(--foreground-60);
+    .choice-row button:is(.selected):hover,
+    .choice-row button:focus-visible {
+        outline: 2px solid var(--color-white);
+        outline-offset: 2px;
     }
 </style>

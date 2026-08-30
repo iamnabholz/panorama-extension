@@ -1,4 +1,6 @@
 <script lang="ts">
+    import Widget from "./components/Widget.svelte";
+
     interface GreetingRule {
         startHour: number; // inclusive, 24h format
         labels: string[];
@@ -94,6 +96,6 @@
     });
 </script>
 
-<span>
-    {greeting}
+<span style="display: contents; text-align: center;">
+    <Widget text={greeting} />
 </span>

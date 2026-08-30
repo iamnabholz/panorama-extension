@@ -22,39 +22,39 @@
     import { fetchHolidays } from "./lib/holiday";
     import { fetchWeather } from "./lib/weather";
 
+    let mounted = $state(false);
+    let ready = $derived(mounted && uiState.sentenceVisible);
+
     onMount(() => {
         const loadId = startLoading();
-
-        hydrateState().then(() => {
-            // Fetch everything here for state
-            fetchHolidays();
-
-            if (appState.displayWeather) {
-                fetchWeather();
-            }
-
-            if (appState.background.type === "image") {
-                checkBackgroundCache();
-            }
-
-            stopLoading(loadId);
-        });
+        hydrateState()
+            .then(() => {
+                fetchHolidays();
+                if (appState.displayWeather) fetchWeather();
+                if (appState.background.type === "image")
+                    checkBackgroundCache();
+            })
+            .catch((err) => console.error("Startup hydration failed:", err))
+            .finally(() => {
+                stopLoading(loadId);
+                mounted = true;
+            });
     });
 </script>
 
 <div id="viewport">
-    {#if uiState.sentenceVisible}
-        <span in:fade out:fade={{ delay: 60 }}>
+    {#if ready}
+        <span transition:fade>
             <Holiday />
         </span>
     {/if}
-    {#if uiState.sentenceVisible && appState.displayGreeting}
+    {#if ready && appState.displayGreeting}
         <span in:fly={{ y: 120 }} out:fly={{ delay: 60, y: 120 }}>
             <Greeting />
         </span>
     {/if}
 
-    {#if uiState.sentenceVisible}
+    {#if ready}
         <div
             class="sentence-row"
             in:fly={{ delay: 60, y: 120 }}
@@ -89,9 +89,9 @@
     </div>
 {/if}
 
-<span transition:fade>
+<div transition:fade>
     <ControlBar />
-</span>
+</div>
 
 <style>
     #viewport {
@@ -100,13 +100,13 @@
 
         display: flex;
         flex-direction: column;
+        justify-content: center;
         align-items: center;
         gap: var(--paragraph-gap);
 
         margin: 0 auto;
         width: min(640px, 100%);
         padding: 0 12px;
-        padding-top: 12%;
 
         cursor: default;
         user-select: none;
@@ -135,22 +135,5 @@
         justify-content: center;
         gap: var(--sentence-gap);
         row-gap: 0;
-    }
-
-    #viewport * {
-        transition:
-            opacity 0.3s ease,
-            transform 0.3s ease;
-    }
-
-    :global(.fade-slide) {
-        opacity: 0;
-        transform: translateY(110px);
-        pointer-events: none;
-    }
-
-    :global(.faint) {
-        opacity: 0.6;
-        font-weight: normal;
     }
 </style>

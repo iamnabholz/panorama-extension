@@ -2,51 +2,35 @@
     interface Props {
         id: string;
         label: string;
-        text: string;
         checked: boolean;
-        hideLabel?: boolean;
+        disabled?: boolean;
         onChange?: (checked: boolean) => void;
     }
     let {
         id,
         label,
-        text,
         checked = $bindable(),
-        hideLabel = false,
+        disabled = false,
         onChange,
     }: Props = $props();
 
-    function toggle() {
-        checked = !checked;
+    function handleChange(event: Event) {
+        checked = (event.currentTarget as HTMLInputElement).checked;
         onChange?.(checked);
-    }
-
-    function handleKeydown(event: KeyboardEvent) {
-        if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            toggle();
-        }
     }
 </script>
 
-<div class="field">
-    <span
-        class="choice-label"
-        class:visually-hidden={hideLabel}
-        id="{id}-label"
-    >
-        {label}
-    </span>
-    <div
-        class="checkbox-row"
-        role="checkbox"
-        tabindex="0"
-        aria-checked={checked}
-        aria-labelledby="{id}-label"
-        onclick={toggle}
-        onkeydown={handleKeydown}
-    >
-        <span class="box" class:checked>
+<label class="checkbox-row" for={id}>
+    <span class="text">{label}</span>
+    <span class="box-wrapper">
+        <input
+            type="checkbox"
+            {id}
+            {checked}
+            {disabled}
+            onchange={handleChange}
+        />
+        <span class="box" class:checked aria-hidden="true">
             {#if checked}
                 <svg viewBox="0 0 16 16" width="12" height="12">
                     <path
@@ -60,45 +44,37 @@
                 </svg>
             {/if}
         </span>
-        <span class="text">{text}</span>
-    </div>
-</div>
+    </span>
+</label>
 
 <style>
-    .field {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    .choice-label {
-        font-size: 0.8em;
-        font-weight: bold;
-        text-transform: capitalize;
-    }
-    .visually-hidden {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
-    }
     .checkbox-row {
         display: flex;
         align-items: flex-start;
+        justify-content: space-between;
         gap: 8px;
         cursor: pointer;
-        padding: 6px 4px;
-        border-radius: 6px;
-        transition: 150ms ease-out;
+        padding: 8px 0px;
+        border-radius: var(--field-radius-md);
+        width: 100%;
     }
-    .checkbox-row:hover {
-        background-color: var(--foreground-10);
+    .checkbox-row:has(input:disabled) {
+        cursor: unset;
+        opacity: 0.5;
+    }
+    .box-wrapper {
+        position: relative;
+        display: inline-flex;
+        flex-shrink: 0;
+    }
+    input[type="checkbox"] {
+        position: absolute;
+        inset: 0;
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        opacity: 0;
+        cursor: pointer;
     }
     .box {
         display: flex;
@@ -108,17 +84,28 @@
         width: 18px;
         height: 18px;
         margin-top: 0.1em;
-        border-radius: 4px;
-        border: 1px solid var(--foreground-60);
-        color: var(--background-color);
-        transition: 150ms ease-out;
+        border-radius: 6px;
+        border: 2px solid var(--white-80);
+        background-color: transparent;
+        color: var(--color-black);
+        transition: var(--field-transition);
     }
     .box.checked {
-        background-color: var(--foreground-color);
-        border-color: var(--foreground-color);
+        background-color: var(--color-white);
+        border-color: var(--color-white);
+    }
+
+    .checkbox-row:focus-visible .box,
+    .checkbox-row:hover .box,
+    input[type="checkbox"]:focus-visible,
+    input[type="checkbox"]:hover {
+        outline: 2px solid var(--color-white);
+        outline-offset: 2px;
     }
     .text {
         font-size: 1em;
         line-height: 1.4;
+        text-transform: capitalize;
+        font-weight: bold;
     }
 </style>

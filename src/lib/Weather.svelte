@@ -8,16 +8,12 @@
     let iconLink = $derived(
         `https://openweathermap.org/img/wn/${appState["weather-cache"]?.icon ?? "50d"}@2x.png`,
     );
+    let location = $derived(appState["weather-cache"]?.location ?? "Unkown");
 </script>
 
-<span
-    title={appState["weather-cache"]
-        ? `Current weather information for ${appState["weather-cache"].location}.`
-        : undefined}
->
-    <Widget
-        text={description.charAt(0).toUpperCase() + description.slice(1)}
-        iconSrc={iconLink}
-        iconAlt={description}
-    />
-</span>
+<Widget
+    title={`Current weather information for ${location}`}
+    text={description.charAt(0).toUpperCase() + description.slice(1)}
+    iconSrc={iconLink}
+    iconAlt={description}
+/>

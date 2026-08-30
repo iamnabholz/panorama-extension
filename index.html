@@ -3,14 +3,18 @@
     <head>
         <meta charset="UTF-8" />
         <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Panorama Tab</title>
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
+
+        <title>New Tab</title>
 
         <style>
             html,
             body {
                 margin: 0;
-                height: 100%;
+                height: 100vh;
             }
             body {
                 position: relative;
@@ -19,41 +23,18 @@
                 content: "";
                 position: fixed;
                 inset: 0;
-
+                height: 100dvh;
                 background-color: var(--bg-color);
                 background-image: var(--bg-image);
                 background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
-
                 filter: blur(var(--bg-blur));
-                transform: scale(1.05);
+                transform: scale(var(--bg-scale));
                 z-index: -1;
-                transition: all 0.3s ease;
+                transition: all 0.3s ease-out;
             }
         </style>
-
-        <script>
-            // Runs synchronously BEFORE body paints
-            (function () {
-                const cached = localStorage.getItem("background");
-                if (cached) {
-                    const background = JSON.parse(cached);
-
-                    if (background.type == "image") {
-                        document.documentElement.style.setProperty(
-                            "--bg-image",
-                            `url("${background.value}")`,
-                        );
-                    } else {
-                        document.documentElement.style.setProperty(
-                            "--bg-color",
-                            background.value,
-                        );
-                    }
-                }
-            })();
-        </script>
     </head>
     <body>
         <div id="app" style="display: contents; overflow: hidden"></div>

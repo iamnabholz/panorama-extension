@@ -4,17 +4,47 @@
     initial-value: 0px;
 }
 
+@property --bg-scale {
+    syntax: "<length>";
+    inherits: true;
+    initial-value: 1;
+}
+
 :root {
     --color-black: #0c0c0c;
     --color-white: #e8e8e8;
     --color-grey: #aaaaaa;
 
+    --white-20: color-mix(in srgb, var(--color-white) 20%, transparent);
+    --white-60: color-mix(in srgb, var(--color-white) 60%, transparent);
+    --white-80: color-mix(in srgb, var(--color-white) 80%, transparent);
+    --black-20: color-mix(in srgb, var(--color-black) 20%, transparent);
+    --black-40: color-mix(in srgb, var(--color-black) 40%, transparent);
+    --black-60: color-mix(in srgb, var(--color-black) 60%, transparent);
+
     --bg-color: var(--background-color);
     --bg-image: none;
     --bg-blur: 0px;
+    --bg-scale: 1;
 
     --background-color: var(--color-white);
     --foreground-color: var(--color-black);
+
+    --background-10: color-mix(
+        in srgb,
+        var(--background-color) 10%,
+        transparent
+    );
+    --background-40: color-mix(
+        in srgb,
+        var(--background-color) 40%,
+        transparent
+    );
+    --background-60: color-mix(
+        in srgb,
+        var(--background-color) 60%,
+        transparent
+    );
 
     --foreground-10: color-mix(
         in srgb,
@@ -41,6 +71,11 @@
 
     --sentence-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
 
+    --field-radius-sm: 4px;
+    --field-radius-md: 6px;
+    --field-radius-lg: 8px;
+    --field-transition: 150ms ease-out;
+
     letter-spacing: 0.18px;
     color-scheme: light dark;
     color: var(--foreground-color);
@@ -55,23 +90,6 @@
         --background-color: #050505;
         --foreground-color: var(--color-white);
     }
-}
-
-@font-face {
-    font-family: "Bricolage Grotesque";
-    src: url("../fonts/BricolageGrotesque[opsz,wdth,wght].ttf")
-        format("truetype");
-    font-weight: 100 1000;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Libre Caslon Condensed";
-    src: url("../fonts/LibreCaslonCondensed[wght].ttf") format("truetype");
-    font-weight: 100 1000;
-    font-style: normal;
-    font-display: swap;
 }
 
 @font-face {
@@ -103,6 +121,11 @@
     box-sizing: border-box;
 }
 
+html,
+body {
+    overflow: hidden;
+}
+
 a {
     all: unset;
     text-decoration: none;
@@ -113,35 +136,22 @@ a {
 
 button {
     all: unset;
-}
-
-button.fragment {
-    all: unset;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    transition: transform 0.15s ease-out;
 }
 
-button.fragment:hover {
-    transform: scale(1.08);
+button:disabled {
+    cursor: not-allowed;
 }
 
-button.fragment:active {
-    transform: scale(0.95); /* quick "press" feedback on click */
-    transition: transform 0.05s ease-out;
+.glass {
+    background: rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.13);
 }
 
-button.fragment:disabled {
-    transform: scale(1);
-    cursor: unset;
-}
-
-html,
-body {
-    overflow: hidden;
-}
-
-body {
-    position: relative;
+.faint {
+    opacity: 0.6;
+    font-weight: normal;
 }

@@ -27,24 +27,18 @@
     });
 
     let dateExpanded = $state(false);
+
     function toggleDateExpansion() {
         dateExpanded = !dateExpanded;
-    }
-    function handleKeydown(event: KeyboardEvent) {
-        if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            toggleDateExpansion();
-        }
     }
 </script>
 
 <button
     type="button"
     onclick={toggleDateExpansion}
-    onkeydown={handleKeydown}
     title="See the next holiday in your country."
-    aria-label="See the next holiday in your country."
     disabled={nextHoliday == null}
+    class="glass"
     class:open={dateExpanded}
 >
     <span class="basic-row">
@@ -113,12 +107,6 @@
 
         height: 32px;
 
-        background: rgba(255, 255, 255, 0.15);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(2px);
-        -webkit-backdrop-filter: blur(2px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-
         transition: 150ms ease;
     }
 
@@ -127,6 +115,7 @@
         height: 22px;
         flex-shrink: 0;
         margin-bottom: 1px;
+        filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.3));
         transform: translateX(-0.1px);
     }
 
@@ -147,6 +136,11 @@
 
     button:disabled {
         cursor: default;
+    }
+
+    button:focus-within {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
     }
 
     button.open {

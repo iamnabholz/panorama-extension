@@ -32,26 +32,14 @@
         appState.use24Hour = !appState.use24Hour;
         persist();
     }
-
-    function handleKeydown(event: KeyboardEvent) {
-        if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            toggleFormat();
-        }
-    }
 </script>
 
-<button
-    type="button"
-    class="fragment"
-    onclick={toggleFormat}
-    onkeydown={handleKeydown}
+<Widget
     title={`Press to switch to ${appState.use24Hour ? "12" : "24"}-hour format.`}
-    aria-label={`Current time ${formattedTime}. Press to switch to ${appState.use24Hour ? "12" : "24"}-hour format.`}
+    text={formattedTime.toUpperCase()}
+    onclick={toggleFormat}
 >
-    <Widget text={formattedTime}>
-        {#snippet icon()}
-            <ClockIcon time={currentTime} />
-        {/snippet}
-    </Widget>
-</button>
+    {#snippet icon()}
+        <ClockIcon time={currentTime} />
+    {/snippet}
+</Widget>

@@ -1,10 +1,11 @@
 {
-  "manifest_version": 2,
+  "{{chrome}}.manifest_version": 3,
+  "{{firefox}}.manifest_version": 2,
   "name": "Panorama Tab",
-  "version": "3.0",
+  "version": "1.0.0",
   "description": "A dynamic new tab page with custom backgrounds, weather, holidays, and more — fast, private, and fully local.",
 
-  "browser_specific_settings": {
+  "{{firefox}}.browser_specific_settings": {
     "gecko": {
       "id": "panorama-tab@nabholz.work",
       "strict_min_version": "78.0"
@@ -20,7 +21,5 @@
     "48": "icons/icon48.png",
     "96": "icons/icon96.png",
     "128": "icons/icon128.png"
-  },
-
-  "permissions": ["storage"]
+  }
 }

@@ -1,145 +1,89 @@
 <script lang="ts">
+    import InputShell from "./InputShell.svelte";
     interface Props {
         id: string;
         label: string;
+        hideLabel?: boolean;
         value: string;
         placeholder?: string;
-        buttonLabel?: string;
-        hideLabel?: boolean;
+        buttonLabel: string;
         disableButton?: boolean;
-        description?: string;
-        onSubmit: (value: string) => void;
+        onSubmit?: (value: string) => void;
     }
-
     let {
         id,
         label,
-        value = $bindable(""),
-        placeholder = "",
-        buttonLabel = "Submit",
         hideLabel = false,
-        description = "",
+        value = $bindable(),
+        placeholder,
+        buttonLabel,
+        disableButton = false,
         onSubmit,
-        disableButton = $bindable(false),
     }: Props = $props();
 
-    function handleSubmit() {
-        const trimmed = value.trim();
-        if (trimmed.length === 0) return;
-        onSubmit(trimmed);
-    }
-
-    function handleKeydown(event: KeyboardEvent) {
-        if (event.key === "Enter") {
-            handleSubmit();
-        }
+    function handleSubmit(event: SubmitEvent) {
+        event.preventDefault();
+        if (disableButton || value.trim().length === 0) return;
+        onSubmit?.(value);
     }
 </script>
 
-<div class="field">
-    <label for={id} class:visually-hidden={hideLabel}>
-        {label}
-    </label>
-    <div class="input-row">
+<InputShell {id} {label} {hideLabel}>
+    <form class="input-row" onsubmit={handleSubmit}>
         <input
             {id}
             type="text"
             bind:value
             {placeholder}
-            onkeydown={handleKeydown}
             autocomplete="off"
-            aria-describedby={description.trim().length > 0
-                ? `${id}-description`
-                : undefined}
+            aria-labelledby="{id}-label"
+            class="glass"
         />
         <button
-            disabled={disableButton || value.trim().length == 0}
-            type="button"
-            onclick={handleSubmit}
+            disabled={disableButton || value.trim().length === 0}
+            type="submit"
         >
             {buttonLabel}
         </button>
-    </div>
-    {#if description.trim().length > 0}
-        <p id="{id}-description" class="description">{description.trim()}</p>
-    {/if}
-</div>
+    </form>
+</InputShell>
 
 <style>
-    .field {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    label {
-        font-size: 0.8em;
-        font-weight: bold;
-    }
-
-    .visually-hidden {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
-    }
-
     .input-row {
         display: flex;
         gap: 8px;
     }
-
     input {
         flex: 1;
-        padding: 0;
-        border-bottom: 1px solid var(--foreground-20);
-        background: transparent;
-        color: var(--foreground-color);
+        padding: 8px 6px;
+        border-radius: var(--field-radius-md);
+        color: var(--color-white);
         font: inherit;
-        transition: 150ms linear;
+        transition: var(--field-transition);
         width: 100%;
     }
-
-    input:focus,
-    input:focus-visible {
-        border-bottom: 1px solid var(--foreground-color);
+    button:hover:not(:disabled),
+    button:focus-visible:not(:disabled),
+    input:hover:not(:focus) {
+        outline: 2px solid var(--color-white);
+        outline-offset: 2px;
     }
-
+    input:focus-visible {
+        border-color: var(--color-white);
+    }
     button {
         cursor: pointer;
         padding: 8px 16px;
         border: none;
         color: inherit;
         font: inherit;
-        background-color: var(--foreground-color);
-        color: var(--background-color);
-        border-radius: 6px;
-        transition: 150ms linear;
+        background-color: var(--color-white);
+        color: var(--color-black);
+        border-radius: var(--field-radius-md);
+        transition: var(--field-transition);
     }
-
-    button:hover {
-        background-color: var(--foreground-color);
-    }
-
     button:disabled {
-        background-color: var(--foreground-60);
+        background-color: var(--white-60);
         cursor: not-allowed;
-    }
-
-    .description {
-        cursor: default;
-        font-size: 1em;
-        font-weight: normal;
-        margin: 0;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        margin-top: 8px;
-
-        color: var(--foreground-60);
     }
 </style>

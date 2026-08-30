@@ -22,13 +22,13 @@
     --black-40: color-mix(in srgb, var(--color-black) 40%, transparent);
     --black-60: color-mix(in srgb, var(--color-black) 60%, transparent);
 
+    --background-color: var(--color-white);
+    --foreground-color: var(--color-black);
+
     --bg-color: var(--background-color);
     --bg-image: none;
     --bg-blur: 0px;
     --bg-scale: 1;
-
-    --background-color: var(--color-white);
-    --foreground-color: var(--color-black);
 
     --background-10: color-mix(
         in srgb,

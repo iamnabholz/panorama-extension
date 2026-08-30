@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { fade, fly, slide } from "svelte/transition";
+    import { fade, fly } from "svelte/transition";
     import { onMount } from "svelte";
 
     import {
@@ -57,8 +57,8 @@
     {#if ready}
         <div
             class="sentence-row"
-            in:fly={{ delay: 60, y: 120 }}
-            out:fly={{ y: 120 }}
+            in:fly|local={{ delay: 60, y: 120 }}
+            out:fly|local={{ y: 120 }}
         >
             {#if appState.displayTime}
                 <p class="faint">It's</p>

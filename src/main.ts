@@ -3,7 +3,6 @@ import "./app.css";
 import App from "./App.svelte";
 
 function getCache() {
-  console.log("hello");
   const cached = localStorage.getItem("background");
   if (cached) {
     const background = JSON.parse(cached);

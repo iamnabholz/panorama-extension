@@ -1,13 +1,14 @@
 <script lang="ts">
     interface Props {
-        time: Date;
+        currentTime: Date;
     }
-    let { time }: Props = $props();
+    let { currentTime }: Props = $props();
+
     let hourAngle = $derived(
-        (time.getHours() % 12) * 30 + time.getMinutes() * 0.5,
+        (currentTime.getHours() % 12) * 30 + currentTime.getMinutes() * 0.5,
     );
-    let minuteAngle = $derived(time.getMinutes() * 6);
-    let secondsAngle = $derived(time.getSeconds() * 6);
+    let minuteAngle = $derived(currentTime.getMinutes() * 6);
+    let secondsAngle = $derived(currentTime.getSeconds() * 6);
 </script>
 
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

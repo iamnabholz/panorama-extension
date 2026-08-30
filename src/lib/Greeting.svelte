@@ -88,10 +88,13 @@
     let greeting = $derived(getGreeting(hour));
 
     $effect(() => {
-        const interval = setInterval(() => {
-            const now = new Date().getHours();
-            if (now !== hour) hour = now;
-        }, 60 * 1000); // check once a minute is enough for an hourly-granularity greeting
+        const interval = setInterval(
+            () => {
+                const now = new Date().getHours();
+                if (now !== hour) hour = now;
+            },
+            10 * 60 * 1000,
+        ); // check once a minute is enough for an hourly-granularity greeting
         return () => clearInterval(interval);
     });
 </script>

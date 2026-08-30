@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { SvelteDate } from "svelte/reactivity";
     import { appState, persist } from "./state.svelte";
 
     import ClockIcon from "./components/ClockIcon.svelte";
     import Widget from "./components/Widget.svelte";
+    import { SvelteDate } from "svelte/reactivity";
 
     const currentTime = new SvelteDate();
 
@@ -40,6 +40,6 @@
     onclick={toggleFormat}
 >
     {#snippet icon()}
-        <ClockIcon time={currentTime} />
+        <ClockIcon {currentTime} />
     {/snippet}
 </Widget>

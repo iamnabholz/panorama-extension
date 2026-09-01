@@ -206,31 +206,28 @@
 
     <div class="section-header" style="padding-top: 24px;">About</div>
     <div class="basic-column about-links">
-        <a target="_blank" href="mailto:support@nabholz.work">
-            support@nabholz.work
+        <a href="mailto:support@nabholz.work"> support@nabholz.work </a>
+        <a
+            target="_blank"
+            href="https://nabholz.notion.site/Panorama-Tab-Privacy-Policy-3cc1169905be80589a79cdba1840f806"
+        >
+            Privacy Policy
         </a>
-        <a target="_blank" href="https://nabholz.work"> Privacy Policy </a>
         <span>
             Icons by
-            <a target="_blank" href="https://pixelarticons.com">
-                PixelArtIcons
-            </a>
+            <a href="https://pixelarticons.com"> PixelArtIcons </a>
         </span>
         <span>
             Font by
-            <a target="_blank" href="https://pangrampangram.com">
-                PangramPangram
-            </a>
+            <a href="https://pangrampangram.com"> PangramPangram </a>
         </span>
         <span>
             Weather information from
-            <a target="_blank" href="https://openweathermap.org">
-                OpenWeatherMap
-            </a>
+            <a href="https://openweathermap.org"> OpenWeatherMap </a>
         </span>
         <span>
             Images from
-            <a target="_blank" href="https://unsplash.com"> Unsplash </a>
+            <a href="https://unsplash.com"> Unsplash </a>
         </span>
     </div>
 

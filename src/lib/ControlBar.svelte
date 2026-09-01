@@ -11,7 +11,7 @@
 
         document.documentElement.style.setProperty(
             "--bg-scale",
-            appState.sentenceVisible || uiState.optionsOpen ? "1.02" : "1",
+            appState.sentenceVisible || uiState.optionsOpen ? "1.04" : "1",
         );
     });
 
@@ -56,7 +56,6 @@
             <a
                 class="credits-anchor"
                 href={imageCredit.link}
-                target="_blank"
                 rel="noopener noreferrer"
                 transition:fade={{ duration: 150 }}
             >

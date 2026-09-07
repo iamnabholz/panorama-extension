@@ -2,6 +2,8 @@
 
 Panorama Tab swaps your browser's new tab for a simple glanceable summary laid over a background you choose, in a beautiful glass-panel UI. No widgets to arrange, nothing competing for your attention or time.
 
+![Panorama Tab Screenshot](/src/assets/app_screenshot.png)
+
 ## Features
 
 - **One-line summary** — time, weather, in a single readable line
@@ -10,12 +12,6 @@ Panorama Tab swaps your browser's new tab for a simple glanceable summary laid o
 - **Easy to customize** — click the clock to switch 12h/24h, click the temperature to switch °F/°C
 - **Local-only** — no accounts, no cloud sync, nothing sent anywhere except the data fetches you'd expect (weather, holidays)
 - **Free** — no premium tier
-
-## Tech stack
-
-- [Svelte 5](https://svelte.dev/) (runes)
-- Vite — dual build targets (`dist/web`, `dist/extension`) from a single project
-- TypeScript
 
 ## Development
 

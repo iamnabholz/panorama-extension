@@ -61,7 +61,7 @@ export async function fetchBackground(
     await img.decode();
 
     document.documentElement.style.setProperty(
-      "--bg-image",
+      "--background-value",
       `url("${fresh.url}")`,
     );
 

@@ -5,7 +5,7 @@
 }
 
 @property --bg-scale {
-    syntax: "<length>";
+    syntax: "<number>";
     inherits: true;
     initial-value: 1;
 }
@@ -22,10 +22,15 @@
     --black-40: color-mix(in srgb, var(--color-black) 40%, transparent);
     --black-60: color-mix(in srgb, var(--color-black) 60%, transparent);
 
-    --background-color: var(--color-white);
-    --foreground-color: var(--color-black);
+    --background-value: none;
+    --background-color: light-dark(var(--color-white), var(--color-black));
+    --foreground-color: light-dark(var(--color-black), var(--color-white));
 
-    --bg-color: var(--background-color);
+    --bg-color: linear-gradient(
+        128deg,
+        var(--background-color) 0%,
+        var(--background-color) 100%
+    );
     --bg-image: none;
     --bg-blur: 0px;
     --bg-scale: 1;
@@ -83,13 +88,6 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background-color: #050505;
-        --foreground-color: var(--color-white);
-    }
 }
 
 @font-face {
@@ -154,4 +152,40 @@ button:disabled {
 .faint {
     opacity: 0.6;
     font-weight: normal;
+}
+
+#float-panel {
+    color: var(--color-white);
+
+    width: min(500px, 90%);
+    height: min(460px, 80%);
+    padding: 16px;
+
+    border-radius: 12px;
+
+    overflow: hidden; /* clips both columns to the panel's rounded corners */
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    background-color: var(--black-40);
+    z-index: 1;
+}
+
+.basic-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.basic-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }

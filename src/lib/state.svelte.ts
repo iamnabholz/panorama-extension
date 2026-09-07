@@ -10,13 +10,14 @@ export const appState = $state<StateSchema>({
   displayTime: true,
   displayWeather: true,
   background: { type: "image", value: "" },
-  "color-cache": { startColor: "#aaaaaa" },
+  "color-cache": { gradient: false, startColor: "#aaaaaa" },
 });
 
 export const uiState = $state({
   optionsOpen: false,
   sentenceVisible: appState.sentenceVisible,
   loadingData: [] as any[],
+  showOnboardAtLaunch: false,
 });
 
 export function startLoading(): string {

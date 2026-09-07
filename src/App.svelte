@@ -21,6 +21,7 @@
     import { checkBackgroundCache } from "./lib/background";
     import { fetchHolidays } from "./lib/holiday";
     import { fetchWeather } from "./lib/weather";
+    import Onboard from "./lib/Onboard.svelte";
 
     let mounted = $state(false);
     let ready = $derived(mounted && uiState.sentenceVisible);
@@ -80,11 +81,7 @@
 </div>
 
 {#if uiState.optionsOpen}
-    <div
-        id="options-overlay"
-        in:fly={{ delay: 60, y: 120 }}
-        out:fly={{ y: 120 }}
-    >
+    <div id="float-overlay" in:fly={{ delay: 60, y: 120 }} out:fly={{ y: 120 }}>
         <Options />
     </div>
 {/if}
@@ -92,6 +89,12 @@
 <div transition:fade>
     <ControlBar />
 </div>
+
+{#if uiState.showOnboardAtLaunch}
+    <div id="float-overlay" style="margin: 0;">
+        <Onboard />
+    </div>
+{/if}
 
 <style>
     #viewport {
@@ -119,7 +122,7 @@
         color: white;
     }
 
-    #options-overlay {
+    #float-overlay {
         position: fixed;
         inset: 0;
         display: flex;

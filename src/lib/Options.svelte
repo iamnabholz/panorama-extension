@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { appState, persist, uiState } from "./state.svelte";
+    import { appState, persist } from "./state.svelte";
     import pkg from "../../package.json" with { type: "json" };
     import { fetchBackground } from "./background";
     import icon from "../assets/icon.svg?raw";
@@ -8,77 +8,76 @@
     import ChoiceInput from "./components/ChoiceInput.svelte";
     import ColorInput from "./components/ColorInput.svelte";
     import CheckboxInput from "./components/CheckboxInput.svelte";
-    import { slide } from "svelte/transition";
 
     const COOLDOWN_MS = 60 * 60 * 1000; // adjust to taste
 
     let queryBind = $state(appState["image-cache"]?.query ?? "");
     let colorBind = $state(appState["color-cache"].startColor ?? "");
+    let colorBindSecondary = $derived(
+        appState["color-cache"].endColor ?? colorBind,
+    );
 
     let isSameAsCached = $derived(
         queryBind.toLowerCase() ===
             (appState["image-cache"]?.query ?? "").toLowerCase(),
     );
-
     let isCoolingDown = $derived(
         Date.now() < (appState["image-cache"]?.fetchedAt ?? 0) + COOLDOWN_MS,
     );
-
     let waitingResponse = $state(false);
-
     let disableFetchButton = $derived(
         (isSameAsCached && isCoolingDown) || waitingResponse,
     );
 
-    function setImageQuery(newQuery: string) {
+    function applyBackgroundToDOM(type: string, value: string) {
+        document.documentElement.style.setProperty(
+            "--background-value",
+            type === "image" ? `url("${value}")` : value,
+        );
+    }
+
+    function buildColorProperty(startColor: string, endColor: string) {
+        return `linear-gradient(33deg, ${startColor} 0%, ${endColor} 100%)`;
+    }
+
+    function currentColorValue() {
+        const start = colorBind;
+        const end = appState["color-cache"].gradient
+            ? colorBindSecondary
+            : colorBind;
+        return buildColorProperty(start, end);
+    }
+
+    function saveImageQuery(newQuery: string) {
         waitingResponse = true;
         fetchBackground(newQuery).finally(() => (waitingResponse = false));
     }
 
-    function setBackgroundColor(newColor: string) {
-        appState.background.value = newColor;
-        appState["color-cache"].startColor = newColor;
-        persist();
-
-        document.documentElement.style.setProperty("--bg-color", newColor);
-        document.documentElement.style.setProperty("--bg-image", "");
-    }
-
-    // save whenever it changes
-    function changeBackgroundType(newType: string) {
-        let savedValue: string;
-
-        if (newType === "image") {
-            const cached = appState["image-cache"];
-            savedValue = cached?.url ?? "";
-
-            document.documentElement.style.setProperty(
-                "--bg-color",
-                "var(--background-color)",
-            );
-            document.documentElement.style.setProperty(
-                "--bg-image",
-                `url("${savedValue}")`,
-            );
-        } else {
-            colorBind = appState["color-cache"].startColor;
-            savedValue = colorBind;
-            document.documentElement.style.setProperty(
-                "--bg-color",
-                savedValue,
-            );
-            document.documentElement.style.setProperty("--bg-image", "");
+    function saveColorCache() {
+        appState["color-cache"].startColor = colorBind;
+        if (appState["color-cache"].gradient) {
+            appState["color-cache"].endColor = colorBindSecondary;
         }
 
-        appState.background = {
-            type: newType,
-            value: savedValue,
-        };
+        const newColor = currentColorValue();
+        appState.background = { type: "color", value: newColor };
+        applyBackgroundToDOM("color", newColor);
+        persist();
+    }
+
+    function changeBackgroundType(newType: string) {
+        const savedValue =
+            newType === "image"
+                ? (appState["image-cache"]?.url ?? "")
+                : currentColorValue();
+
+        appState.background = { type: newType, value: savedValue };
+        applyBackgroundToDOM(newType, savedValue);
         persist();
     }
 </script>
 
-<div id="options-panel" class="glass">
+<div id="float-panel" class="glass">
     <div class="basic-row" style="font-size: 0.8em; padding: 28px 0 16px 0;">
         <span style="width: 56px; height: auto;">
             {@html icon}
@@ -172,7 +171,7 @@
             placeholder="e.g. ocean, sunset, city at night"
             buttonLabel={isSameAsCached ? "New Image" : "Search"}
             disableButton={disableFetchButton}
-            onSubmit={(v) => setImageQuery(v)}
+            onSubmit={(v) => saveImageQuery(v)}
         />
 
         <ChoiceInput
@@ -196,16 +195,35 @@
             onChange={() => persist()}
         />
     {:else}
-        <ColorInput
-            id="bg-color"
-            label="Pick Color"
-            bind:value={colorBind}
-            onChange={(v) => setBackgroundColor(v)}
+        <CheckboxInput
+            id="gradient-color"
+            label="Make it gradient"
+            bind:checked={appState["color-cache"].gradient}
+            onChange={() => saveColorCache()}
         />
+
+        <ColorInput
+            id="start-color"
+            label={appState["color-cache"].gradient
+                ? "Start Color"
+                : "Pick Color"}
+            bind:value={colorBind}
+            onChange={() => saveColorCache()}
+        />
+
+        {#if appState["color-cache"].gradient}
+            <ColorInput
+                id="end-color"
+                label="End Color"
+                bind:value={colorBindSecondary}
+                onChange={() => saveColorCache()}
+            />
+        {/if}
     {/if}
 
     <div class="section-header" style="padding-top: 24px;">About</div>
     <div class="basic-column about-links">
+        <span>{pkg.name} v{pkg.version}</span>
         <a href="mailto:support@nabholz.work"> support@nabholz.work </a>
         <a
             target="_blank"
@@ -235,47 +253,12 @@
 </div>
 
 <style>
-    #options-panel {
-        color: var(--color-white);
-
-        width: min(500px, 90%);
-        height: min(460px, 80%);
-        padding: 16px;
-
-        border-radius: 12px;
-
-        overflow: hidden; /* clips both columns to the panel's rounded corners */
-        overflow-y: auto;
-        scrollbar-gutter: stable;
-
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-
-        background-color: var(--black-40);
-        z-index: 1;
-    }
     .section-header {
         font-size: 0.8em;
         font-weight: bold;
         border-bottom: 1px solid var(--white-20);
         width: 100%;
         padding-bottom: 8px;
-    }
-
-    .basic-column {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 4px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .basic-row {
-        display: flex;
-        align-items: center;
-        gap: 4px;
     }
 
     :global(.hint) {
@@ -286,6 +269,7 @@
     }
 
     a {
+        cursor: pointer;
         width: fit-content;
     }
 

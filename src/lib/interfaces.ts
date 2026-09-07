@@ -18,6 +18,7 @@ export interface StateSchema {
     value: string;
   };
   "color-cache": {
+    gradient: boolean;
     startColor: string;
     endColor?: string;
   };

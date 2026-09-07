@@ -3,7 +3,7 @@
   "{{firefox}}.manifest_version": 2,
   "name": "Panorama Tab",
   "version": "3.0.0",
-  "description": "A dynamic new tab page with custom backgrounds, weather, holidays, and more — fast, private, and fully local.",
+  "description": "Playful new tab page with a glanceable summary of the day, and beautiful backgrounds — simple, private, and fully local.",
 
   "{{firefox}}.browser_specific_settings": {
     "gecko": {
@@ -16,8 +16,15 @@
     "newtab": "index.html"
   },
 
-  "icons": {
+  "{{chrome}}.icons": {
     "48": "icons/icon-192.png",
     "128": "icons/icon-192.png"
+  },
+
+  "{{firefox}}.icons": {
+    "32": "favicon.svg",
+    "64": "favicon.svg",
+    "96": "favicon.svg",
+    "128": "favicon.svg"
   }
 }

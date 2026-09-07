@@ -139,7 +139,6 @@
         justify-content: center;
 
         color: white;
-        z-index: 2;
         transition: 150ms ease-out;
     }
 

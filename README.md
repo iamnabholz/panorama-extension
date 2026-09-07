@@ -26,7 +26,7 @@ npm run dev
 npm run build
 ```
 
-To load the extension build locally: open your browser's extensions page, enable developer mode, and load `dist/extension` as an unpacked extension.
+To load the extension build locally: open your browser's extensions page, enable developer mode, and load `dist` as an unpacked extension.
 
 ## Privacy
 

@@ -7,8 +7,10 @@
 
   "{{firefox}}.browser_specific_settings": {
     "gecko": {
-      "id": "panorama-tab@nabholz.work",
-      "strict_min_version": "78.0"
+      "id": "{0e13dd33-a693-4c63-aaed-8061a417426c}",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
     }
   },
 

@@ -8,7 +8,7 @@ const target = process.env.TARGET || "chrome";
 export default defineConfig({
   plugins: [
     svelte(),
-    webExtension({
+    /*webExtension({
       // ...
       browser: target,
       manifest: () => {
@@ -20,6 +20,6 @@ export default defineConfig({
           version: pkg.version,
         };
       },
-    }),
+      }),*/
   ],
 });

@@ -58,8 +58,8 @@
     {#if ready}
         <div
             class="sentence-row"
-            in:fly|local={{ delay: 60, y: 120 }}
-            out:fly|local={{ y: 120 }}
+            in:fly={{ delay: 60, y: 120 }}
+            out:fly={{ y: 120 }}
         >
             {#if appState.displayTime}
                 <p class="faint">It's</p>
@@ -91,7 +91,7 @@
 </div>
 
 {#if uiState.showOnboardAtLaunch}
-    <div id="float-overlay" style="margin: 0;">
+    <div id="float-overlay" style="margin: 0;" transition:fade>
         <Onboard />
     </div>
 {/if}

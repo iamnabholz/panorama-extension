@@ -4,14 +4,9 @@
     import { appState, persist, uiState } from "./state.svelte";
 
     $effect(() => {
-        document.documentElement.style.setProperty(
-            "--bg-blur",
-            appState.sentenceVisible || uiState.optionsOpen ? "4px" : "0px",
-        );
-
-        document.documentElement.style.setProperty(
-            "--bg-scale",
-            appState.sentenceVisible || uiState.optionsOpen ? "1.04" : "1",
+        document.body.classList.toggle(
+            "focused",
+            appState.sentenceVisible || uiState.optionsOpen,
         );
     });
 
@@ -42,10 +37,7 @@
 
 <div id="control-bar" class="glass">
     {#if uiState.loadingData.length > 0}
-        <span
-            transition:slide={{ axis: "x", duration: 200 }}
-            style="margin-right: 4px;"
-        >
+        <span transition:slide={{ axis: "x", duration: 200 }}>
             <span transition:fade={{ duration: 150 }}>
                 <LoaderIndicator />
             </span>
@@ -138,6 +130,8 @@
         align-items: center;
         justify-content: center;
 
+        line-height: 1;
+
         color: white;
         transition: 150ms ease-out;
     }
@@ -152,7 +146,6 @@
 
     .credits-anchor {
         font-size: 0.8em;
-        padding: 0px 16px 0px 12px;
         border: none;
         flex-direction: column;
         align-items: flex-start;
@@ -166,6 +159,7 @@
     .credits-source {
         font-size: 0.75em;
         opacity: 0.6;
+        margin-bottom: -2px;
     }
 
     a,

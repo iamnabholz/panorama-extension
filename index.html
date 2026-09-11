@@ -20,7 +20,9 @@
             body {
                 position: relative;
             }
-            body::before {
+
+            body::before,
+            body::after {
                 content: "";
                 position: fixed;
                 inset: 0;
@@ -30,10 +32,25 @@
                 background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
-                filter: blur(var(--bg-blur));
-                transform: scale(var(--bg-scale));
                 z-index: -1;
-                transition: all 0.3s ease-out;
+                transition: opacity 0.3s ease-out;
+                will-change: opacity;
+            }
+
+            body::before {
+                /* sharp layer */
+                transform: scale(1);
+            }
+
+            body::after {
+                /* pre-blurred layer */
+                filter: blur(4px);
+                transform: scale(1.04);
+                opacity: 0;
+            }
+
+            body.focused::after {
+                opacity: 1;
             }
         </style>
     </head>

@@ -38,7 +38,7 @@
     onclick={toggleDateExpansion}
     title="See the next holiday in your country."
     disabled={nextHoliday == null}
-    class="glass"
+    class="glass stack"
     class:open={dateExpanded}
 >
     <span class="basic-row">
@@ -145,7 +145,7 @@
 
     button.open {
         background: var(--color-black);
-        height: 96px;
+        height: 106px;
         border-radius: 24px;
         padding: 12px;
     }

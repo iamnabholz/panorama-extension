@@ -224,32 +224,27 @@
     <div class="section-header" style="padding-top: 24px;">About</div>
     <div class="basic-column about-links">
         <span>{pkg.name} v{pkg.version}</span>
-        <a href="mailto:support@nabholz.work"> support@nabholz.work </a>
-        <a
-            target="_blank"
-            href="https://nabholz.notion.site/Panorama-Tab-Privacy-Policy-3cc1169905be80589a79cdba1840f806"
-        >
-            Privacy Policy
-        </a>
-        <span>
-            Icons by
-            <a href="https://pixelarticons.com"> PixelArtIcons </a>
-        </span>
-        <span>
-            Font by
-            <a href="https://pangrampangram.com"> PangramPangram </a>
-        </span>
-        <span>
-            Weather information from
-            <a href="https://openweathermap.org"> OpenWeatherMap </a>
-        </span>
-        <span>
-            Images from
-            <a href="https://unsplash.com"> Unsplash </a>
-        </span>
-    </div>
 
-    <br />
+        <div class="link-row">
+            <a href="mailto:support@nabholz.work">Support</a>
+            <a target="_blank" href="https://github.com/YOUR_ORG/panorama-tab">
+                GitHub
+            </a>
+            <a
+                target="_blank"
+                href="https://nabholz.notion.site/Panorama-Tab-Privacy-Policy-3cc1169905be80589a79cdba1840f806"
+            >
+                Privacy Policy
+            </a>
+        </div>
+
+        <p class="credits">
+            Credits: <a href="https://pixelarticons.com">PixelArtIcons</a>,
+            <a href="https://pangrampangram.com">PangramPangram</a>,
+            <a href="https://openweathermap.org">OpenWeatherMap</a>,
+            <a href="https://unsplash.com">Unsplash</a>.
+        </p>
+    </div>
 </div>
 
 <style>
@@ -274,8 +269,25 @@
     }
 
     .about-links {
-        font-size: 0.6em;
+        font-size: var(--panel-text-xs, 0.7em);
         gap: 8px;
+        margin-bottom: 4vh;
+    }
+
+    .link-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .credits {
+        color: var(--white-80);
+        line-height: 1.4;
+    }
+
+    .credits a {
+        color: inherit;
+        border-bottom-color: var(--white-60, currentColor);
     }
 
     .image-link {

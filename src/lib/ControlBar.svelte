@@ -35,95 +35,98 @@
     );
 </script>
 
-<div id="control-bar" class="glass">
-    {#if uiState.loadingData.length > 0}
-        <span transition:slide={{ axis: "x", duration: 200 }}>
-            <span transition:fade={{ duration: 150 }}>
-                <LoaderIndicator />
+<div id="control-bar">
+    <LoaderIndicator />
+    <div class="glass controls">
+        {#if imageCredit?.author && imageCredit?.link}
+            <span transition:slide={{ axis: "x", duration: 200 }}>
+                <a
+                    class="credits-anchor"
+                    href={imageCredit.link}
+                    rel="noopener noreferrer"
+                    transition:fade={{ duration: 150 }}
+                >
+                    <span class="credits-author">{imageCredit.author}</span>
+                    <span class="credits-source">On Unsplash</span>
+                </a>
             </span>
-        </span>
-    {/if}
-    {#if imageCredit?.author && imageCredit?.link}
-        <span transition:slide={{ axis: "x", duration: 200 }}>
-            <a
-                class="credits-anchor"
-                href={imageCredit.link}
-                rel="noopener noreferrer"
-                transition:fade={{ duration: 150 }}
-            >
-                <span class="credits-author">{imageCredit.author}</span>
-                <span class="credits-source">On Unsplash</span>
-            </a>
-        </span>
-    {/if}
-    <button
-        id="options-toggle"
-        type="button"
-        class:active={uiState.optionsOpen}
-        onclick={toggleOptions}
-        aria-expanded={uiState.optionsOpen}
-        aria-label={uiState.optionsOpen ? "Hide options" : "Show options"}
-        title={uiState.optionsOpen ? "Hide options" : "Show options"}
-    >
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-            focusable="false"
-        >
-            <path
-                d="M10 22H6v-2h4v2Zm-4-2H4v-2H2v-2h2v-2h2v6Zm6-4h10v2H12v2h-2v-6h2v2Zm-2-2H6v-2h4v2Zm8-2h-4v-2h4v2Zm-6-4H2V6h10V4h2v6h-2V8Zm8-2h2v2h-2v2h-2V4h2v2Zm-2-2h-4V2h4v2Z"
-            />
-        </svg>
-    </button>
-    <button
-        type="button"
-        onclick={toggleVisibility}
-        aria-pressed={uiState.sentenceVisible}
-        aria-label={uiState.sentenceVisible
-            ? "Hide information"
-            : "Show information"}
-        title={uiState.sentenceVisible
-            ? "Hide information."
-            : "Show information."}
-    >
-        {#if uiState.sentenceVisible}
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                focusable="false"
-            >
-                <path
-                    d="M22 22h-2v-2h2v2Zm-6-2H8v-2h8v2Zm4 0h-2v-2h2v2ZM8 18H4v-2h4v2Zm10 0h-2v-2h2v2ZM4 16H2v-2h2v2Zm6-6h2v2h2v2h2v2h-6v-2H8V8h2v2Zm12 6h-2v-2h2v2ZM2 14H0v-4h2v4Zm22 0h-2v-4h2v4Zm-8-2h-2v-2h2v2ZM4 10H2V8h2v2Zm10 0h-2V8h2v2Zm8 0h-2V8h2v2ZM6 6h2v2H4V4h2v2Zm14 2h-4V6h4v2Zm-4-2h-6V4h6v2ZM4 4H2V2h2v2Z"
-                />
-            </svg>
-        {:else}
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                focusable="false"
-            >
-                <path
-                    d="M16 20H8v-2h8v2Zm-8-2H4v-2h4v2Zm12 0h-4v-2h4v2ZM4 16H2v-2h2v2Zm10-6h-2v2h2v-2h2v4h-2v2h-4v-2H8v-4h2V8h4v2Zm8 6h-2v-2h2v2ZM2 14H0v-4h2v4Zm22 0h-2v-4h2v4ZM4 10H2V8h2v2Zm18 0h-2V8h2v2ZM8 8H4V6h4v2Zm12 0h-4V6h4v2Zm-4-2H8V4h8v2Z"
-                />
-            </svg>
         {/if}
-    </button>
+        <button
+            id="options-toggle"
+            type="button"
+            class:active={uiState.optionsOpen}
+            onclick={toggleOptions}
+            aria-expanded={uiState.optionsOpen}
+            aria-label={uiState.optionsOpen ? "Hide options" : "Show options"}
+            title={uiState.optionsOpen ? "Hide options" : "Show options"}
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                focusable="false"
+            >
+                <path
+                    d="M10 22H6v-2h4v2Zm-4-2H4v-2H2v-2h2v-2h2v6Zm6-4h10v2H12v2h-2v-6h2v2Zm-2-2H6v-2h4v2Zm8-2h-4v-2h4v2Zm-6-4H2V6h10V4h2v6h-2V8Zm8-2h2v2h-2v2h-2V4h2v2Zm-2-2h-4V2h4v2Z"
+                />
+            </svg>
+        </button>
+        <button
+            type="button"
+            onclick={toggleVisibility}
+            aria-pressed={uiState.sentenceVisible}
+            aria-label={uiState.sentenceVisible
+                ? "Hide information"
+                : "Show information"}
+            title={uiState.sentenceVisible
+                ? "Hide information."
+                : "Show information."}
+        >
+            {#if uiState.sentenceVisible}
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <path
+                        d="M22 22h-2v-2h2v2Zm-6-2H8v-2h8v2Zm4 0h-2v-2h2v2ZM8 18H4v-2h4v2Zm10 0h-2v-2h2v2ZM4 16H2v-2h2v2Zm6-6h2v2h2v2h2v2h-6v-2H8V8h2v2Zm12 6h-2v-2h2v2ZM2 14H0v-4h2v4Zm22 0h-2v-4h2v4Zm-8-2h-2v-2h2v2ZM4 10H2V8h2v2Zm10 0h-2V8h2v2Zm8 0h-2V8h2v2ZM6 6h2v2H4V4h2v2Zm14 2h-4V6h4v2Zm-4-2h-6V4h6v2ZM4 4H2V2h2v2Z"
+                    />
+                </svg>
+            {:else}
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <path
+                        d="M16 20H8v-2h8v2Zm-8-2H4v-2h4v2Zm12 0h-4v-2h4v2ZM4 16H2v-2h2v2Zm10-6h-2v2h2v-2h2v4h-2v2h-4v-2H8v-4h2V8h4v2Zm8 6h-2v-2h2v2ZM2 14H0v-4h2v4Zm22 0h-2v-4h2v4ZM4 10H2V8h2v2Zm18 0h-2V8h2v2ZM8 8H4V6h4v2Zm12 0h-4V6h4v2Zm-4-2H8V4h8v2Z"
+                    />
+                </svg>
+            {/if}
+        </button>
+    </div>
 </div>
 
 <style>
     #control-bar {
-        border-radius: 100px;
         position: absolute;
         bottom: min(6%, 4em);
         left: 50%;
         transform: translateX(-50%);
 
+        display: flex;
+        gap: 8px;
+        align-items: center;
+
+        color: white;
+    }
+
+    .controls {
         display: flex;
         gap: 4px;
         padding: 4px;
@@ -132,8 +135,8 @@
 
         line-height: 1;
 
-        color: white;
         transition: 150ms ease-out;
+        border-radius: 100px;
     }
 
     #control-bar svg {
@@ -150,6 +153,8 @@
         flex-direction: column;
         align-items: flex-start;
         white-space: nowrap;
+        padding: 0 18px 0 14px;
+        margin-bottom: -2px;
     }
 
     .credits-author {
@@ -159,7 +164,6 @@
     .credits-source {
         font-size: 0.75em;
         opacity: 0.6;
-        margin-bottom: -2px;
     }
 
     a,

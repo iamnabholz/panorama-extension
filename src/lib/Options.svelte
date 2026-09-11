@@ -223,26 +223,27 @@
 
     <div class="section-header" style="padding-top: 24px;">About</div>
     <div class="basic-column about-links">
-        <span>{pkg.name} v{pkg.version}</span>
-
         <div class="link-row">
-            <a href="mailto:support@nabholz.work">Support</a>
-            <a target="_blank" href="https://github.com/YOUR_ORG/panorama-tab">
-                GitHub
-            </a>
+            <span>{pkg.name} v{pkg.version}</span>
             <a
                 target="_blank"
                 href="https://nabholz.notion.site/Panorama-Tab-Privacy-Policy-3cc1169905be80589a79cdba1840f806"
             >
                 Privacy Policy
             </a>
+            <a
+                target="_blank"
+                href="https://github.com/iamnabholz/panorama-extension"
+            >
+                GitHub
+            </a>
         </div>
-
         <p class="credits">
-            Credits: <a href="https://pixelarticons.com">PixelArtIcons</a>,
-            <a href="https://pangrampangram.com">PangramPangram</a>,
-            <a href="https://openweathermap.org">OpenWeatherMap</a>,
-            <a href="https://unsplash.com">Unsplash</a>.
+            Icons from <a href="https://pixelarticons.com">PixelArtIcons</a>,
+            font from <a href="https://pangrampangram.com">PangramPangram</a>,
+            weather from
+            <a href="https://openweathermap.org">OpenWeatherMap</a>, and
+            backgrounds from <a href="https://unsplash.com">Unsplash</a>.
         </p>
     </div>
 </div>
@@ -281,8 +282,9 @@
     }
 
     .credits {
+        margin-top: 12px;
         color: var(--white-80);
-        line-height: 1.4;
+        line-height: 1.8;
     }
 
     .credits a {

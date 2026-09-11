@@ -17,7 +17,7 @@
         };
     });
 
-    // Recompute the formatter only when the format actually changes
+    // Recompute the formatter when the format actually changes
     let formatter = $derived(
         new Intl.DateTimeFormat(undefined, {
             hour: "2-digit",

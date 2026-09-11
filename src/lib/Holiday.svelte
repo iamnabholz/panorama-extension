@@ -60,7 +60,7 @@
     </span>
 
     {#if dateExpanded && nextHoliday}
-        <span class="holiday-info" transition:slide>
+        <span class="holiday-info" transition:slide|local>
             <span
                 style="font-size: 0.8em; font-weight: normal; color: var(--accent-color);"
             >

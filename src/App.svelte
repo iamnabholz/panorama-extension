@@ -80,15 +80,15 @@
     {/if}
 </div>
 
+<div transition:fade>
+    <ControlBar />
+</div>
+
 {#if uiState.optionsOpen}
     <div id="float-overlay" in:fly={{ delay: 60, y: 120 }} out:fly={{ y: 120 }}>
         <Options />
     </div>
 {/if}
-
-<div transition:fade>
-    <ControlBar />
-</div>
 
 {#if uiState.showOnboardAtLaunch}
     <div id="float-overlay" style="margin: 0;" transition:fade>
@@ -120,15 +120,6 @@
         text-shadow: var(--sentence-shadow);
 
         color: white;
-    }
-
-    #float-overlay {
-        position: fixed;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 8%;
     }
 
     .sentence-row {

@@ -78,173 +78,177 @@
 </script>
 
 <div id="float-panel" class="glass">
-    <div class="basic-row" style="font-size: 0.8em; padding: 28px 0 16px 0;">
-        <span style="width: 56px; height: auto;">
-            {@html icon}
-        </span>
-        <div class="basic-column" style="gap: 0;">
-            <span>
-                <b style="font-size: 1rem;">Panorama Tab</b>
-                <span style="color: var(--options-text-mix);">
-                    {pkg.version}
+    <div id="float-panel__scroll">
+        <div class="basic-row">
+            <span style="width: 56px; height: auto;">
+                {@html icon}
+            </span>
+            <div class="basic-column" style="gap: 0;">
+                <span>
+                    <b style="font-size: 1rem;">Panorama Tab</b>
+                    <span style="color: var(--options-text-mix);">
+                        {pkg.version}
+                    </span>
                 </span>
-            </span>
 
-            <span>
-                Made by
-                <a target="_blank" href="https://nabholz.work">
-                    Lukas Nabholz
-                </a>
-            </span>
+                <span>
+                    Made by
+                    <a target="_blank" href="https://nabholz.work">
+                        Lukas Nabholz
+                    </a>
+                </span>
+            </div>
+            <a
+                class="image-link"
+                href="https://www.buymeacoffee.com/nabholz"
+                target="_blank"
+            >
+                <img
+                    src="/media/bmac-button.webp"
+                    alt="Buy Me A Coffee"
+                    style="width: 140px !important;"
+                />
+            </a>
         </div>
-        <a
-            class="image-link"
-            href="https://www.buymeacoffee.com/nabholz"
-            target="_blank"
-        >
-            <img
-                src="/icons/ui/bmac-button.webp"
-                alt="Buy Me A Coffee"
-                style="width: 140px !important;"
+
+        <div class="section-header">Options</div>
+
+        <CheckboxInput
+            id="greeting-on"
+            label="Show greeting"
+            bind:checked={appState.displayGreeting}
+            onChange={() => persist()}
+        />
+
+        <div class="basic-column">
+            <CheckboxInput
+                id="time-on"
+                label="Show current time"
+                bind:checked={appState.displayTime}
+                onChange={() => persist()}
             />
-        </a>
-    </div>
+            <p class="hint">
+                Click the clock widget to switch between 12-hour and 24-hour
+                format.
+            </p>
+        </div>
 
-    <div class="section-header">Options</div>
+        <div class="basic-column">
+            <CheckboxInput
+                id="weather-on"
+                label="Show weather"
+                bind:checked={appState.displayWeather}
+                onChange={() => persist()}
+            />
 
-    <CheckboxInput
-        id="greeting-on"
-        label="Show greeting"
-        bind:checked={appState.displayGreeting}
-        onChange={() => persist()}
-    />
-
-    <div class="basic-column">
-        <CheckboxInput
-            id="time-on"
-            label="Show current time"
-            bind:checked={appState.displayTime}
-            onChange={() => persist()}
-        />
-        <p class="hint">
-            Click the clock widget to switch between 12-hour and 24-hour format.
-        </p>
-    </div>
-
-    <div class="basic-column">
-        <CheckboxInput
-            id="weather-on"
-            label="Show weather"
-            bind:checked={appState.displayWeather}
-            onChange={() => persist()}
-        />
-
-        <p class="hint">
-            Click the temperature widget to switch between Celsius and
-            Fahrenheit.
-        </p>
-    </div>
-
-    <ChoiceInput
-        id="bg-type"
-        label="Background"
-        options={[
-            {
-                value: "image",
-                label: "Image",
-            },
-            {
-                value: "color",
-                label: "Color",
-            },
-        ]}
-        value={appState.background.type}
-        onChange={(v) => changeBackgroundType(v)}
-    />
-    {#if appState.background.type == "image"}
-        <p class="hint">Use an image from Unsplash as background.</p>
-
-        <TextInput
-            id="bg-query-input"
-            label="image Topic"
-            bind:value={queryBind}
-            placeholder="e.g. ocean, sunset, city at night"
-            buttonLabel={isSameAsCached ? "New Image" : "Search"}
-            disableButton={disableFetchButton}
-            onSubmit={(v) => saveImageQuery(v)}
-        />
+            <p class="hint">
+                Click the temperature widget to switch between Celsius and
+                Fahrenheit.
+            </p>
+        </div>
 
         <ChoiceInput
-            id="bg-update"
-            label="image update frequency"
+            id="bg-type"
+            label="Background"
             options={[
                 {
-                    value: "never",
-                    label: "Manually",
+                    value: "image",
+                    label: "Image",
                 },
                 {
-                    value: "hourly",
-                    label: "Hourly",
-                },
-                {
-                    value: "daily",
-                    label: "Daily",
+                    value: "color",
+                    label: "Color",
                 },
             ]}
-            bind:value={appState.imageUpdateFrequency}
-            onChange={() => persist()}
+            value={appState.background.type}
+            onChange={(v) => changeBackgroundType(v)}
         />
-    {:else}
-        <CheckboxInput
-            id="gradient-color"
-            label="Make it gradient"
-            bind:checked={appState["color-cache"].gradient}
-            onChange={() => saveColorCache()}
-        />
+        {#if appState.background.type == "image"}
+            <p class="hint">Use an image from Unsplash as background.</p>
 
-        <ColorInput
-            id="start-color"
-            label={appState["color-cache"].gradient
-                ? "Start Color"
-                : "Pick Color"}
-            bind:value={colorBind}
-            onChange={() => saveColorCache()}
-        />
+            <TextInput
+                id="bg-query-input"
+                label="image Topic"
+                bind:value={queryBind}
+                placeholder="e.g. ocean, sunset, city at night"
+                buttonLabel={isSameAsCached ? "New Image" : "Search"}
+                disableButton={disableFetchButton}
+                onSubmit={(v) => saveImageQuery(v)}
+            />
 
-        {#if appState["color-cache"].gradient}
-            <ColorInput
-                id="end-color"
-                label="End Color"
-                bind:value={colorBindSecondary}
+            <ChoiceInput
+                id="bg-update"
+                label="image update frequency"
+                options={[
+                    {
+                        value: "never",
+                        label: "Manually",
+                    },
+                    {
+                        value: "hourly",
+                        label: "Hourly",
+                    },
+                    {
+                        value: "daily",
+                        label: "Daily",
+                    },
+                ]}
+                bind:value={appState.imageUpdateFrequency}
+                onChange={() => persist()}
+            />
+        {:else}
+            <CheckboxInput
+                id="gradient-color"
+                label="Make it gradient"
+                bind:checked={appState["color-cache"].gradient}
                 onChange={() => saveColorCache()}
             />
-        {/if}
-    {/if}
 
-    <div class="section-header" style="padding-top: 24px;">About</div>
-    <div class="basic-column about-links">
-        <div class="link-row">
-            <span>{pkg.name} v{pkg.version}</span>
-            <a
-                target="_blank"
-                href="https://nabholz.notion.site/Panorama-Tab-Privacy-Policy-3cc1169905be80589a79cdba1840f806"
-            >
-                Privacy Policy
-            </a>
-            <a
-                target="_blank"
-                href="https://github.com/iamnabholz/panorama-extension"
-            >
-                GitHub
-            </a>
+            <ColorInput
+                id="start-color"
+                label={appState["color-cache"].gradient
+                    ? "Start Color"
+                    : "Pick Color"}
+                bind:value={colorBind}
+                onChange={() => saveColorCache()}
+            />
+
+            {#if appState["color-cache"].gradient}
+                <ColorInput
+                    id="end-color"
+                    label="End Color"
+                    bind:value={colorBindSecondary}
+                    onChange={() => saveColorCache()}
+                />
+            {/if}
+        {/if}
+
+        <div class="section-header" style="padding-top: 24px;">About</div>
+        <div class="basic-column about-links">
+            <div class="link-row">
+                <span>{pkg.name} v{pkg.version}</span>
+                <a
+                    target="_blank"
+                    href="https://nabholz.notion.site/Panorama-Tab-Privacy-Policy-3cc1169905be80589a79cdba1840f806"
+                >
+                    Privacy Policy
+                </a>
+                <a
+                    target="_blank"
+                    href="https://github.com/iamnabholz/panorama-extension"
+                >
+                    GitHub
+                </a>
+            </div>
+            <p class="credits">
+                Icons from <a href="https://pixelarticons.com">PixelArtIcons</a
+                >, font from
+                <a href="https://pangrampangram.com">PangramPangram</a>, weather
+                from
+                <a href="https://openweathermap.org">OpenWeatherMap</a>, and
+                backgrounds from <a href="https://unsplash.com">Unsplash</a>.
+            </p>
         </div>
-        <p class="credits">
-            Icons from <a href="https://pixelarticons.com">PixelArtIcons</a>,
-            font from <a href="https://pangrampangram.com">PangramPangram</a>,
-            weather from
-            <a href="https://openweathermap.org">OpenWeatherMap</a>, and
-            backgrounds from <a href="https://unsplash.com">Unsplash</a>.
-        </p>
     </div>
 </div>
 

@@ -1,36 +1,65 @@
-<script>
-    import { fade } from "svelte/transition";
+<script lang="ts">
+    import { slide } from "svelte/transition";
     import { uiState } from "../state.svelte";
 </script>
 
 {#if uiState.loadingData.length > 0}
-    <div
-        transition:fade
-        class="glass"
-        aria-label="Loading Information"
-        title="Loading Information"
-    >
-        <div class="spinner"></div>
+    <div class="loader-wrapper" transition:slide={{ axis: "x", duration: 200 }}>
+        <div class="glass loader">
+            <div
+                class="spinner"
+                role="status"
+                aria-label="Loading information"
+            ></div>
+        </div>
     </div>
 {/if}
 
 <style>
-    .glass {
-        border-radius: 100px;
-        padding: 6px;
+    .loader-wrapper {
+        height: 100%;
+        width: var(--space-08);
+
+        flex-shrink: 0;
+        overflow: hidden;
     }
+
+    .loader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: var(--space-08);
+        height: 100%;
+
+        padding: var(--space-03);
+        border-radius: var(--radius-full);
+
+        flex-shrink: 0;
+    }
+
     .spinner {
-        width: 22px;
-        height: 22px;
+        width: 100%;
+        height: 100%;
+
+        flex-shrink: 0;
+
+        border: 3px solid transparent;
+        border-left-color: var(--color-text-secondary);
         border-radius: 50%;
-        border: 4px solid transparent;
-        border-bottom-color: currentColor;
+
         animation: spinner 1s linear infinite;
     }
 
     @keyframes spinner {
         to {
-            transform: rotateZ(360deg);
+            transform: rotate(360deg);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .spinner {
+            animation-duration: 4s;
         }
     }
 </style>

@@ -37,20 +37,26 @@
 
 <div id="control-bar">
     <LoaderIndicator />
+
     <div class="glass controls">
         {#if imageCredit?.author && imageCredit?.link}
-            <span transition:slide={{ axis: "x", duration: 200 }}>
+            <div
+                class="credits-wrapper"
+                transition:slide={{ axis: "x", duration: 200 }}
+            >
                 <a
                     class="credits-anchor"
                     href={imageCredit.link}
+                    target="_blank"
                     rel="noopener noreferrer"
                     transition:fade={{ duration: 150 }}
                 >
-                    <span class="credits-author">{imageCredit.author}</span>
-                    <span class="credits-source">On Unsplash</span>
+                    <b>{imageCredit.author}</b>
+                    <span>On Unsplash</span>
                 </a>
-            </span>
+            </div>
         {/if}
+
         <button
             id="options-toggle"
             type="button"
@@ -114,88 +120,96 @@
 
 <style>
     #control-bar {
-        position: absolute;
-        bottom: min(6%, 4em);
+        position: fixed;
+        bottom: min(8svh, 4em);
         left: 50%;
         transform: translateX(-50%);
 
         display: flex;
-        gap: 8px;
         align-items: center;
+        gap: var(--space-02);
 
-        color: white;
+        height: var(--space-08);
+
+        z-index: 10;
     }
 
     .controls {
         display: flex;
-        gap: 4px;
-        padding: 4px;
+        align-items: stretch;
+
+        height: 100%;
+        gap: var(--space-02);
+        padding: var(--space-02);
+
+        border-radius: var(--radius-full);
+
+        flex-shrink: 0;
+    }
+
+    .credits-wrapper {
+        display: flex;
         align-items: center;
         justify-content: center;
 
-        line-height: 1;
-
-        transition: 150ms ease-out;
-        border-radius: 100px;
-    }
-
-    #control-bar svg {
-        height: 20px;
-        width: 20px;
-        display: block;
-
-        filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.2));
+        overflow: hidden;
+        flex-shrink: 0;
     }
 
     .credits-anchor {
-        font-size: 0.8em;
-        border: none;
+        display: flex;
         flex-direction: column;
-        align-items: flex-start;
+        justify-content: center;
+
+        width: max-content;
+        height: 100%;
+
+        flex-shrink: 0;
         white-space: nowrap;
-        padding: 0 18px 0 14px;
-        margin-bottom: -2px;
+
+        padding-top: 3px;
+        padding-inline: var(--space-04) var(--space-05);
+
+        color: var(--color-text-secondary);
+        font-weight: var(--font-weight-regular);
+        font-size: var(--font-size-xs);
+        line-height: 1;
     }
 
-    .credits-author {
-        font-weight: normal;
+    .credits-anchor b {
+        color: var(--color-text);
+        font-weight: var(--font-weight-bold);
     }
 
-    .credits-source {
-        font-size: 0.75em;
-        opacity: 0.6;
+    .credits-anchor span {
+        font-size: 0.85em;
+    }
+
+    #control-bar svg {
+        height: 90%;
+        width: max-content;
+        display: block;
     }
 
     a,
     button {
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0px;
-        height: 32px;
 
-        padding: 0px 10px;
-        border-radius: 100px;
+        border-radius: var(--radius-full);
         color: inherit;
+        text-decoration: none;
 
         background: transparent;
-        transition:
-            background-color 150ms ease-out,
-            outline-color 150ms ease-out;
+        transition: background-color 150ms ease-out;
+    }
+
+    button {
+        padding: var(--space-02) var(--space-03);
     }
 
     a:hover,
-    a:focus-visible,
     button.active,
-    button:hover,
-    button:focus-visible {
+    button:hover {
         background: rgba(255, 255, 255, 0.15);
-    }
-
-    a:focus-visible,
-    button:focus-visible {
-        outline: 2px solid var(--color-white);
-        outline-offset: 2px;
     }
 </style>

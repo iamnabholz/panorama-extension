@@ -1,5 +1,5 @@
 import { mount } from "svelte";
-import "./app.css";
+import "./styles/styles.css";
 import App from "./App.svelte";
 import { uiState } from "./lib/state.svelte";
 

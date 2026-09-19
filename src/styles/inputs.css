@@ -1,0 +1,237 @@
+/* --- DIRECT-TARGETED INPUT STYLES --- */
+
+/* The tray holding a group of inputs */
+.input-tray {
+    background: light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.04));
+    border-radius: var(--radius-lg);
+    padding: var(--space-04);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-04);
+    border: 1px solid light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.1));
+}
+
+/* 1. Direct Target: Buttons */
+button {
+    all: unset;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-sans);
+    user-select: none;
+    transition: all var(--duration-fast) var(--ease-standard);
+}
+
+button.primary {
+    background: var(--color-accent);
+    color: white;
+    padding: var(--space-03) var(--space-05);
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-sm);
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+button.primary:hover:not(:disabled) {
+    background: var(--color-accent-hover);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+button.primary:active:not(:disabled) {
+    filter: brightness(0.9);
+}
+
+button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* 2. Direct Target: Text Input */
+input[type="text"] {
+    all: unset;
+    box-sizing: border-box;
+    background: light-dark(rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0.2));
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-03) var(--space-04);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    width: 100%;
+    transition: all var(--duration-fast) var(--ease-standard);
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    background: light-dark(#ffffff, rgba(0, 0, 0, 0.3));
+    box-shadow: 0 0 0 3px
+        color-mix(in oklab, var(--color-accent) 20%, transparent);
+}
+
+input[type="text"]:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 3. Direct Target: Checkbox & Toggle Switch */
+.toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    padding-block: var(--space-01);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-md);
+}
+
+input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+    pointer-events: none;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 48px;
+    height: 28px;
+    background: light-dark(rgba(0, 0, 0, 0.15), rgba(255, 255, 255, 0.1));
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border);
+    transition: all var(--duration-moderate) var(--ease-standard);
+}
+
+.toggle-switch::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--duration-moderate) var(--ease-standard);
+}
+
+input[type="checkbox"]:checked + .toggle-switch {
+    background: var(--color-accent);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+input[type="checkbox"]:checked + .toggle-switch::after {
+    transform: translateX(20px);
+}
+/* 4. Choice Group (Segmented Control) */
+.choice-group {
+    display: flex;
+    background: light-dark(rgba(0, 0, 0, 0.06), rgba(255, 255, 255, 0.04));
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.choice-group button {
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: var(--space-05) var(--space-02);
+    border-radius: calc(var(--radius-md) - 2px);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 800;
+    color: var(--color-text);
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.choice-group button svg {
+    width: 20px;
+    height: 20px;
+    opacity: 0.6;
+    transition: opacity var(--duration-fast);
+}
+
+.choice-group button.selected {
+    background: var(--color-accent);
+    color: var(--color-text);
+    box-shadow: var(--shadow-sm);
+    border: none;
+}
+
+.choice-group button.selected svg {
+    opacity: 1;
+}
+
+.choice-group.small {
+    border-radius: var(--radius-full);
+}
+
+.choice-group.small button {
+    border-radius: var(--radius-full);
+    padding: var(--space-04) var(--space-03);
+    flex-direction: row;
+    text-transform: capitalize;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+}
+
+/* 5. Direct Target: Horizontal Rule Divider */
+hr {
+    border: none;
+    border-top: 1px solid
+        light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.05));
+    margin: 0;
+}
+
+/* 6. Direct Target: Color Input */
+input[type="color"] {
+    all: unset;
+    box-sizing: border-box;
+    cursor: pointer;
+    width: 100%;
+    height: 4rem;
+    background: light-dark(rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0.2));
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    transition: all var(--duration-fast) var(--ease-standard);
+}
+
+input[type="color"]:hover {
+    border-color: var(--color-accent);
+}
+
+input[type="color"]:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px
+        color-mix(in oklab, var(--color-accent) 20%, transparent);
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: 0.5px solid rgba(0, 0, 0, 0.15);
+    border-radius: calc(var(--radius-md) - 4px);
+}
+
+input[type="color"]::-moz-color-swatch {
+    border: 0.5px solid rgba(0, 0, 0, 0.15);
+    border-radius: calc(var(--radius-md) - 4px);
+}

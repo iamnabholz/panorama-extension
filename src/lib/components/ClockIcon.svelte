@@ -86,10 +86,10 @@
         y1="14"
         x2="12"
         y2="3"
-        stroke="var(--accent-color)"
+        stroke="red"
         stroke-width="0.8"
         stroke-linecap="square"
         transform="rotate({secondsAngle} 12 12)"
     />
-    <circle cx="12" cy="12" r="1" fill="var(--accent-color)" />
+    <circle cx="12" cy="12" r="1" fill="red" />
 </svg>

@@ -99,6 +99,4 @@
     });
 </script>
 
-<span style="display: contents; text-align: center;">
-    <Widget text={greeting} />
-</span>
+<Widget text={greeting} />

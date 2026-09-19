@@ -5,7 +5,7 @@
 
 {#if uiState.loadingData.length > 0}
     <div class="loader-wrapper" transition:slide={{ axis: "x", duration: 200 }}>
-        <div class="glass loader">
+        <div class="glassy loader">
             <div
                 class="spinner"
                 role="status"
@@ -17,11 +17,10 @@
 
 <style>
     .loader-wrapper {
-        height: 100%;
-        width: var(--space-08);
+        height: 2.6rem;
+        width: 2.6rem;
 
         flex-shrink: 0;
-        overflow: hidden;
     }
 
     .loader {
@@ -29,10 +28,11 @@
         align-items: center;
         justify-content: center;
 
-        width: var(--space-08);
+        width: 2.6em;
         height: 100%;
 
-        padding: var(--space-03);
+        padding: 0.6rem;
+        box-sizing: border-box;
         border-radius: var(--radius-full);
 
         flex-shrink: 0;
@@ -45,8 +45,9 @@
         flex-shrink: 0;
 
         border: 3px solid transparent;
-        border-left-color: var(--color-text-secondary);
+        border-left-color: var(--color-text);
         border-radius: 50%;
+        opacity: 0.8;
 
         animation: spinner 1s linear infinite;
     }

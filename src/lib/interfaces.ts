@@ -9,6 +9,7 @@ export interface StateSchema {
   sentenceVisible: boolean;
   imageUpdateFrequency: string;
 
+  displayDate: boolean;
   displayGreeting: boolean;
   displayTime: boolean;
   displayWeather: boolean;
@@ -23,6 +24,7 @@ export interface StateSchema {
     endColor?: string;
   };
 
+  userName?: string;
   "image-cache"?: BackgroundImage;
   "weather-cache"?: WeatherData;
   "holiday-cache"?: {

@@ -1,41 +1,39 @@
 @import "./reset.css";
 
+@property --mix-color {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: blue;
+}
+
 :root {
     color-scheme: light dark;
 
+    /* body::before background values, basically what the web extension uses to remember what to display */
+    --background-value: none;
+    --background-color: var(--color-html-background);
+
+    --mix-color: var(--background-color);
+
     /* Color — surfaces */
-    --color-html-background: light-dark(#f5f5f7, #1c1c1e);
-    --color-background: #1c1c1e;
-    --color-surface: #2c2c2e;
+    --color-background: light-dark(#f5f5f7, #1c1c1e);
+    --color-surface: light-dark(#ffffff, #2c2c2e);
 
     /* Color — text */
-    --color-text: #f5f5f7;
-    --color-text-secondary: #98989f;
+    --color-text: light-dark(#1d1d1f, #f5f5f7);
+    --color-text-secondary: light-dark(#ffffff80, #ffffff80);
+    --color-text-summary: #ffffff;
+    --color-text-summary-muted: #ffffff80;
 
     /* Color — borders */
     --color-border: #48484a;
     --color-border-strong: #6e6e73;
 
     /* Color — accent / interactive */
-    --color-accent: #0a84ff;
-    --color-accent-hover: #409cff;
+    --color-accent: #30d158;
+    --color-accent-hover: #34c759;
     --color-accent-active: #2f8fff;
     --color-focus: var(--color-accent);
-
-    --color-black: #0c0c0c;
-    --color-white: #e8e8e8;
-    --color-grey: #aaaaaa;
-
-    --white-20: color-mix(in srgb, var(--color-white) 20%, transparent);
-    --white-60: color-mix(in srgb, var(--color-white) 60%, transparent);
-    --white-80: color-mix(in srgb, var(--color-white) 80%, transparent);
-    --black-20: color-mix(in srgb, var(--color-black) 20%, transparent);
-    --black-40: color-mix(in srgb, var(--color-black) 40%, transparent);
-    --black-60: color-mix(in srgb, var(--color-black) 60%, transparent);
-
-    /* body::before background values, basically what the web extension uses to remember what to display */
-    --background-value: none;
-    --background-color: var(--color-html-background);
 
     --bg-color: linear-gradient(
         128deg,
@@ -44,41 +42,8 @@
     );
     --bg-image: none;
 
-    --background-10: color-mix(
-        in srgb,
-        var(--background-color) 10%,
-        transparent
-    );
-    --background-40: color-mix(
-        in srgb,
-        var(--background-color) 40%,
-        transparent
-    );
-    --background-60: color-mix(
-        in srgb,
-        var(--background-color) 60%,
-        transparent
-    );
-
-    --foreground-10: color-mix(
-        in srgb,
-        var(--foreground-color) 10%,
-        transparent
-    );
-    --foreground-20: color-mix(
-        in srgb,
-        var(--foreground-color) 20%,
-        transparent
-    );
-    --foreground-60: color-mix(
-        in srgb,
-        var(--foreground-color) 60%,
-        transparent
-    );
-
     /* Typography */
     --font-sans: "PP Sans Rounded", sans-serif;
-    --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
 
     --font-size-xs: 0.75rem; /* 12px */
     --font-size-sm: 0.875rem; /* 14px */
@@ -88,6 +53,8 @@
     --font-size-2xl: 1.5rem; /* 24px */
     --font-size-3xl: 2rem; /* 32px */
     --font-size-4xl: 2.5rem; /* 40px */
+
+    --font-size-summary: 3rem;
 
     --line-height-tight: 1.1;
     --line-height-normal: 1.5;
@@ -113,11 +80,6 @@
     --radius-lg: 1rem; /* 16px */
     --radius-xl: 1.5rem; /* 24px */
     --radius-full: 999px;
-
-    --sentence-font-size: 3rem;
-    --sentence-icon-size: 1em; /* relative, so it scales with font-size automatically */
-    --sentence-gap: 0.4ch;
-    --paragraph-gap: 0.8ch;
 
     --sentence-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
 
@@ -159,7 +121,7 @@
 }
 
 html {
-    background: var(--color-html-background);
+    background: var(--color-background);
 }
 
 body {
@@ -197,7 +159,6 @@ h4 {
 }
 
 p {
-    color: var(--color-text-secondary);
     line-height: var(--line-height-relaxed);
 }
 
@@ -211,6 +172,13 @@ a {
     color: var(--color-text);
     font-weight: var(--font-weight-bold);
     text-decoration: underline;
+    text-decoration-color: var(--color-text-secondary);
+
+    transition: text-decoration-color var(--duration-fast) var(--ease-standard);
+}
+
+a:hover {
+    text-decoration-color: currentColor;
 }
 
 button {
@@ -222,54 +190,58 @@ button:disabled {
     cursor: not-allowed;
 }
 
-.glass {
-    background: rgba(35, 35, 35, 0.3);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    border: 1px solid rgba(35, 35, 35, 0.3);
-    box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5),
-        inset 0 -1px 0 rgba(255, 255, 255, 0.1),
-        inset 0 0 2px 1px rgba(255, 255, 255, 0.1);
+.glassy {
     position: relative;
-    overflow: hidden;
+    background: light-dark(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.15));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+
+    border: 0.5px solid rgba(255, 255, 255, 0.2);
+
+    box-shadow:
+        inset 0 1px 4px rgba(0, 0, 0, 0.1),
+        0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.glass::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(75, 75, 75, 0.8),
-        transparent
-    );
+.surface-elevated {
+    background: light-dark(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-full);
+
+    /* Subtle highlight on the top edge of the pill */
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
+    border: 0.5px solid rgba(255, 255, 255, 0.1);
+    transition: all var(--duration-moderate) var(--ease-standard);
 }
 
-.glass::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 1px;
-    height: 100%;
-    background: linear-gradient(
-        180deg,
-        rgba(35, 35, 35, 0.6),
-        transparent,
-        rgba(35, 35, 35, 0.3)
-    );
+.surface-highlight {
+    cursor: pointer;
+    border-radius: var(--radius-full);
+    transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.surface-highlight:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.surface-highlight:active {
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(0.98);
+}
+
+.glassy::before,
+.glassy::after {
+    display: none;
 }
 
 #float-overlay {
     position: fixed;
     inset: 0;
-    display: flex;
+    display: grid;
+    padding-bottom: 6rem;
     align-items: center;
     justify-content: center;
     z-index: 1;
@@ -277,19 +249,21 @@ button:disabled {
 
 #float-panel {
     width: min(500px, 90vw);
-    max-height: min(460px, 80vh);
+    max-height: min(520px, 80vh);
 
     border-radius: var(--radius-lg);
     overflow: hidden;
 
     display: flex;
     flex-direction: column;
+
+    transform: translateY(-2svh);
 }
 
 #float-panel__scroll {
     overflow-y: auto;
     scrollbar-gutter: stable;
-    padding: var(--space-04);
+    padding: var(--space-05);
 
     display: flex;
     flex-direction: column;
@@ -324,4 +298,15 @@ button:disabled {
     display: flex;
     align-items: center;
     gap: var(--space-04);
+}
+
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-02);
+}
+
+.small {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
 }

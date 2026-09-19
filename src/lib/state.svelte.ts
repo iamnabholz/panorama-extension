@@ -6,6 +6,7 @@ export const appState = $state<StateSchema>({
   use24Hour: true,
   sentenceVisible: true,
   imageUpdateFrequency: "never",
+  displayDate: true,
   displayGreeting: true,
   displayTime: true,
   displayWeather: true,

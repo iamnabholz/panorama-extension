@@ -38,20 +38,20 @@
 <div id="control-bar">
     <LoaderIndicator />
 
-    <div class="glass controls">
+    <div class="controls glassy">
         {#if imageCredit?.author && imageCredit?.link}
             <div
                 class="credits-wrapper"
                 transition:slide={{ axis: "x", duration: 200 }}
             >
                 <a
-                    class="credits-anchor"
+                    class="credits-anchor surface-highlight"
                     href={imageCredit.link}
                     target="_blank"
                     rel="noopener noreferrer"
                     transition:fade={{ duration: 150 }}
                 >
-                    <b>{imageCredit.author}</b>
+                    {imageCredit.author}
                     <span>On Unsplash</span>
                 </a>
             </div>
@@ -61,6 +61,8 @@
             id="options-toggle"
             type="button"
             class:active={uiState.optionsOpen}
+            class="surface-highlight"
+            class:surface-elevated={uiState.optionsOpen}
             onclick={toggleOptions}
             aria-expanded={uiState.optionsOpen}
             aria-label={uiState.optionsOpen ? "Hide options" : "Show options"}
@@ -68,18 +70,64 @@
         >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
+                width="1em"
+                height="1em"
                 viewBox="0 0 24 24"
                 aria-hidden="true"
                 focusable="false"
             >
-                <path
-                    d="M10 22H6v-2h4v2Zm-4-2H4v-2H2v-2h2v-2h2v6Zm6-4h10v2H12v2h-2v-6h2v2Zm-2-2H6v-2h4v2Zm8-2h-4v-2h4v2Zm-6-4H2V6h10V4h2v6h-2V8Zm8-2h2v2h-2v2h-2V4h2v2Zm-2-2h-4V2h4v2Z"
-                />
+                {#if uiState.optionsOpen}
+                    <path
+                        fill="currentColor"
+                        fill-rule="evenodd"
+                        d="M4 7h8.17a3.001 3.001 0 0 1 5.66 0H20a1 1 0 1 1 0 2h-2.17a3.001 3.001 0 0 1-5.66 0H4a1 1 0 0 1 0-2m0 8h2.17a3.001 3.001 0 0 1 5.66 0H20a1 1 0 1 1 0 2h-8.17a3.001 3.001 0 0 1-5.66 0H4a1 1 0 1 1 0-2"
+                        clip-rule="evenodd"
+                    />
+                {:else}
+                    <g fill="none">
+                        <circle
+                            cx="9"
+                            cy="16"
+                            r="2"
+                            fill="currentColor"
+                            opacity=".16"
+                        />
+                        <circle
+                            cx="15"
+                            cy="8"
+                            r="2"
+                            fill="currentColor"
+                            opacity=".16"
+                        />
+                        <path
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 8h9m4 0h3m-9 8h9M4 16h3"
+                        />
+                        <circle
+                            cx="9"
+                            cy="16"
+                            r="2"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        />
+                        <circle
+                            cx="15"
+                            cy="8"
+                            r="2"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        />
+                    </g>
+                {/if}
             </svg>
         </button>
         <button
             type="button"
+            class="surface-highlight"
+            class:surface-elevated={uiState.sentenceVisible}
             onclick={toggleVisibility}
             aria-pressed={uiState.sentenceVisible}
             aria-label={uiState.sentenceVisible
@@ -89,31 +137,45 @@
                 ? "Hide information."
                 : "Show information."}
         >
-            {#if uiState.sentenceVisible}
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    focusable="false"
-                >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="1em"
+                height="1em"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                focusable="false"
+            >
+                {#if uiState.sentenceVisible}
                     <path
-                        d="M22 22h-2v-2h2v2Zm-6-2H8v-2h8v2Zm4 0h-2v-2h2v2ZM8 18H4v-2h4v2Zm10 0h-2v-2h2v2ZM4 16H2v-2h2v2Zm6-6h2v2h2v2h2v2h-6v-2H8V8h2v2Zm12 6h-2v-2h2v2ZM2 14H0v-4h2v4Zm22 0h-2v-4h2v4Zm-8-2h-2v-2h2v2ZM4 10H2V8h2v2Zm10 0h-2V8h2v2Zm8 0h-2V8h2v2ZM6 6h2v2H4V4h2v2Zm14 2h-4V6h4v2Zm-4-2h-6V4h6v2ZM4 4H2V2h2v2Z"
+                        fill="currentColor"
+                        fill-rule="evenodd"
+                        d="M18 4v3h3a1 1 0 0 1 1 1v10a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1m2 14a1 1 0 1 1-2 0V9h2zM6 8a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H7a1 1 0 0 1-1-1m2 4a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1"
+                        clip-rule="evenodd"
                     />
-                </svg>
-            {:else}
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    focusable="false"
-                >
-                    <path
-                        d="M16 20H8v-2h8v2Zm-8-2H4v-2h4v2Zm12 0h-4v-2h4v2ZM4 16H2v-2h2v2Zm10-6h-2v2h2v-2h2v4h-2v2h-4v-2H8v-4h2V8h4v2Zm8 6h-2v-2h2v2ZM2 14H0v-4h2v4Zm22 0h-2v-4h2v4ZM4 10H2V8h2v2Zm18 0h-2V8h2v2ZM8 8H4V6h4v2Zm12 0h-4V6h4v2Zm-4-2H8V4h8v2Z"
-                    />
-                </svg>
-            {/if}
+                {:else}
+                    <g fill="none">
+                        <path
+                            fill="currentColor"
+                            d="M3 4h14v16H5a2 2 0 0 1-2-2z"
+                            opacity=".16"
+                        />
+                        <path
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M3 4v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8h-4"
+                        />
+                        <path
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M3 4h14v14a2 2 0 0 0 2 2v0M13 8H7m6 4H9"
+                        />
+                    </g>
+                {/if}
+            </svg>
         </button>
     </div>
 </div>
@@ -129,8 +191,6 @@
         align-items: center;
         gap: var(--space-02);
 
-        height: var(--space-08);
-
         z-index: 10;
     }
 
@@ -138,7 +198,7 @@
         display: flex;
         align-items: stretch;
 
-        height: 100%;
+        height: 2.6rem;
         gap: var(--space-02);
         padding: var(--space-02);
 
@@ -167,26 +227,22 @@
         flex-shrink: 0;
         white-space: nowrap;
 
-        padding-top: 3px;
-        padding-inline: var(--space-04) var(--space-05);
+        /* slight adjustment so it looks centered to the eye */
+        padding-block-start: 3px;
+        padding-inline-start: var(--space-04);
+        padding-inline-end: var(--space-06);
 
-        color: var(--color-text-secondary);
-        font-weight: var(--font-weight-regular);
         font-size: var(--font-size-xs);
-        line-height: 1;
-    }
-
-    .credits-anchor b {
-        color: var(--color-text);
-        font-weight: var(--font-weight-bold);
+        line-height: 1.2;
     }
 
     .credits-anchor span {
+        color: var(--color-text-secondary);
         font-size: 0.85em;
     }
 
-    #control-bar svg {
-        height: 90%;
+    .controls svg {
+        height: 1.2em;
         width: max-content;
         display: block;
     }
@@ -199,17 +255,17 @@
         color: inherit;
         text-decoration: none;
 
-        background: transparent;
-        transition: background-color 150ms ease-out;
+        box-shadow: none;
+        transition:
+            box-shadow var(--duration-fast) var(--ease-standard),
+            backdrop-filter var(--duration-fast) var(--ease-standard);
     }
 
     button {
-        padding: var(--space-02) var(--space-03);
+        padding-inline: var(--space-04);
     }
 
-    a:hover,
-    button.active,
-    button:hover {
-        background: rgba(255, 255, 255, 0.15);
+    button:active {
+        transform: scale(1.1);
     }
 </style>

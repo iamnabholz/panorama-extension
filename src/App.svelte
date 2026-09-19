@@ -43,42 +43,37 @@
     });
 </script>
 
-<div id="viewport">
-    {#if ready}
-        <span transition:fade>
-            <Holiday />
-        </span>
-    {/if}
-    {#if ready && appState.displayGreeting}
-        <span in:fly={{ y: 120 }} out:fly={{ delay: 60, y: 120 }}>
-            <Greeting />
-        </span>
-    {/if}
+<main>
+    <div class="summary-wrapper">
+        {#if ready}
+            <span transition:fade>
+                <Holiday />
+            </span>
+        {/if}
+        {#if ready && appState.displayGreeting}
+            <span in:fly={{ y: 120 }} out:fly={{ delay: 60, y: 120 }}>
+                <Greeting />
+            </span>
+        {/if}
 
-    {#if ready}
-        <div
-            class="sentence-row"
-            in:fly={{ delay: 60, y: 120 }}
-            out:fly={{ y: 120 }}
-        >
-            {#if appState.displayTime}
-                <p class="faint">It's</p>
-                <Clock />
-                {#if appState.displayWeather}
-                    <p class="faint">—</p>
+        {#if ready}
+            <p
+                class="summary-row"
+                in:fly={{ delay: 60, y: 120 }}
+                out:fly={{ y: 120 }}
+            >
+                {#if appState.displayTime}
+                    It's <Clock />
+                    {#if appState.displayWeather}—{/if}
                 {/if}
-            {/if}
-            {#if appState.displayWeather}
-                <p class="faint">
+                {#if appState.displayWeather}
                     {appState.displayTime ? "currently" : "Currently"}
-                </p>
-                <Temperature />
-                <p class="faint">and</p>
-                <Weather />
-            {/if}
-        </div>
-    {/if}
-</div>
+                    <Temperature /> and <Weather />
+                {/if}
+            </p>
+        {/if}
+    </div>
+</main>
 
 <div transition:fade>
     <ControlBar />
@@ -97,37 +92,47 @@
 {/if}
 
 <style>
-    #viewport {
-        height: 90%;
+    main {
+        height: 100svh;
         overflow: hidden;
 
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        display: grid;
         align-items: center;
-        gap: var(--paragraph-gap);
+        justify-content: center;
 
+        padding-bottom: 12svh;
         margin: 0 auto;
-        width: min(640px, 100%);
-        padding: 0 12px;
+    }
 
+    .summary-wrapper {
         cursor: default;
         user-select: none;
         -webkit-user-select: none;
 
-        font-size: var(--sentence-font-size);
-        font-weight: bold;
+        color: var(--color-text-summary-muted);
+        font-size: var(--font-size-summary);
         text-shadow: var(--sentence-shadow);
 
-        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.2em; /* em-based so it scales with --font-size-summary */
+        text-align: center;
+
+        /* Max width control with safety breathing room for scale animations */
+        width: 100%;
+        max-width: min(900px, 92vw);
+        padding-inline: 2rem;
+        box-sizing: border-box;
     }
 
-    .sentence-row {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: center;
-        gap: var(--sentence-gap);
-        row-gap: 0;
+    .summary-row {
+        display: block;
+        text-align: center;
+        text-wrap: balance;
+        /* even line lengths, nicely centered */
+        line-height: 1.4;
+        font-weight: var(--font-weight-regular);
+        width: 100%;
     }
 </style>

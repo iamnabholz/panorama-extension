@@ -19,14 +19,14 @@
   },
 
   "{{chrome}}.icons": {
-    "48": "icons/icon-192.png",
-    "128": "icons/icon-192.png"
+    "48": "media/icon-512.png",
+    "128": "media/icon-512.png"
   },
 
   "{{firefox}}.icons": {
-    "32": "favicon.svg",
-    "64": "favicon.svg",
-    "96": "favicon.svg",
-    "128": "favicon.svg"
+    "32": "icon.svg",
+    "64": "icon.svg",
+    "96": "icon.svg",
+    "128": "icon.svg"
   }
 }

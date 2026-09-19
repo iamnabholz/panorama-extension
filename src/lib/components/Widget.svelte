@@ -39,88 +39,99 @@
 {#if isButton}
     <button
         type="button"
-        class="icon-text"
+        class="widget"
         onclick={handleClick}
         {title}
         aria-disabled={disabled}
         class:is-disabled={disabled}
     >
-        {#if hasIcon}
-            {@render iconSlot()}
-        {/if}
-        <span class="label">{text}</span>
+        <span class="visual">
+            {#if hasIcon}
+                {@render iconSlot()}
+            {/if}
+            <span class="label">{text}</span>
+        </span>
     </button>
 {:else}
-    <span class="icon-text">
-        {#if hasIcon}
-            {@render iconSlot()}
-        {/if}
-        <span class="label">{text}</span>
+    <span class="widget">
+        <span class="visual">
+            {#if hasIcon}
+                {@render iconSlot()}
+            {/if}
+            <span class="label">{text}</span>
+        </span>
     </span>
 {/if}
 
 <style>
-    .icon-text {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        border-radius: 8px;
-        transform-origin: center;
+    .widget {
+        display: inline;
+        vertical-align: baseline;
+        background: none;
+        margin: 0px;
+        border: 0;
+        font: inherit;
+        color: inherit;
+        white-space: nowrap;
         cursor: default;
-        margin: 0px 0px;
-        transition:
-            transform 0.4s cubic-bezier(0.34, 1.85, 0.64, 1),
-            margin 0.4s cubic-bezier(0.34, 1.85, 0.64, 1),
-            gap 0.4s cubic-bezier(0.34, 1.85, 0.64, 1);
     }
-
-    .icon-text:focus-visible {
-        outline: 4px solid currentColor;
-        outline-offset: 6px;
-    }
-
-    button.icon-text {
+    button.widget {
         cursor: pointer;
     }
-
-    button.icon-text.is-disabled {
+    button.widget.is-disabled {
         cursor: default;
     }
 
-    .icon-text:hover {
-        transform: scale(1.1);
-        gap: 14px;
-        margin: 0px 8px;
+    .widget:focus-visible {
+        outline: 4px solid currentColor;
+        outline-offset: 2px;
+        border-radius: 8px;
     }
 
-    .icon-text:active {
-        transform: scale(0.88);
-        transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+    .visual {
+        display: inline-flex;
+        align-items: baseline; /* Key: aligns icon and text baselines together */
+        gap: 0.2em;
+        font-weight: var(--font-weight-bold);
+        color: var(--color-text-summary);
+        transform-origin: center;
+        transition: transform 110ms cubic-bezier(0.34, 1.85, 0.64, 1);
+        will-change: transform;
+    }
+    .widget:hover {
+        margin-left: 0.4em;
+        margin-right: 0.2em;
+    }
+    .widget:hover .visual {
+        transform: scale(1.1);
+    }
+    .widget:active .visual {
+        transform: scale(0.92);
+        transition-duration: 0.1s;
     }
 
     .icon-slot {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: var(--sentence-icon-size);
-        height: var(--sentence-icon-size);
+        display: inline-block;
+        scale: 1.2;
+        width: 0.9em;
+        height: 0.9em;
         flex-shrink: 0;
         fill: currentColor;
+        /* Optical baseline alignment for SVG/Images inside inline-flex baseline */
+        position: relative;
+        top: 0.1em;
         filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.2));
-        transform-origin: center;
         transition:
             transform 0.45s cubic-bezier(0.34, 1.85, 0.64, 1),
             filter 0.3s ease-out;
     }
-
-    .icon-text:hover .icon-slot {
-        transform: scale(1.16) rotate(-10deg);
+    .widget:hover .icon-slot {
+        transform: scale(1.2) rotate(-8deg);
         filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.3));
     }
-
-    .icon-text:active .icon-slot {
-        transform: scale(0.85) rotate(6deg);
-        transition: transform 0.1s ease-out;
+    .widget:active .icon-slot {
+        transform: scale(0.9) rotate(4deg);
+        transition-duration: 0.1s;
     }
 
     .icon-slot :global(svg),
@@ -129,19 +140,12 @@
         height: 100%;
         display: block;
     }
-
     .icon-slot img {
+        transform: translateY(-2px);
         scale: 1.8;
     }
 
     .label {
-        line-height: 1;
-        text-box-trim: trim-both;
-        text-box-edge: cap alphabetic;
-        transition: transform 0.4s cubic-bezier(0.34, 1.85, 0.64, 1);
-    }
-
-    .icon-text:hover .label {
-        transform: scale(1.04);
+        line-height: inherit;
     }
 </style>

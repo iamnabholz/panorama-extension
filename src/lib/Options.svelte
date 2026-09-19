@@ -2,14 +2,11 @@
     import { appState, persist } from "./state.svelte";
     import pkg from "../../package.json" with { type: "json" };
     import { fetchBackground } from "./background";
-    import icon from "../assets/icon.svg?raw";
 
-    import TextInput from "./components/TextInput.svelte";
-    import ChoiceInput from "./components/ChoiceInput.svelte";
-    import ColorInput from "./components/ColorInput.svelte";
-    import CheckboxInput from "./components/CheckboxInput.svelte";
+    /* Global shared styles */
+    import "../styles/inputs.css";
 
-    const COOLDOWN_MS = 60 * 60 * 1000; // adjust to taste
+    const COOLDOWN_MS = 60 * 60 * 1000;
 
     let queryBind = $state(appState["image-cache"]?.query ?? "");
     let colorBind = $state(appState["color-cache"].startColor ?? "");
@@ -48,9 +45,9 @@
         return buildColorProperty(start, end);
     }
 
-    function saveImageQuery(newQuery: string) {
+    function saveImageQuery() {
         waitingResponse = true;
-        fetchBackground(newQuery).finally(() => (waitingResponse = false));
+        fetchBackground(queryBind).finally(() => (waitingResponse = false));
     }
 
     function saveColorCache() {
@@ -58,7 +55,6 @@
         if (appState["color-cache"].gradient) {
             appState["color-cache"].endColor = colorBindSecondary;
         }
-
         const newColor = currentColorValue();
         appState.background = { type: "color", value: newColor };
         applyBackgroundToDOM("color", newColor);
@@ -70,234 +66,327 @@
             newType === "image"
                 ? (appState["image-cache"]?.url ?? "")
                 : currentColorValue();
-
         appState.background = { type: newType, value: savedValue };
         applyBackgroundToDOM(newType, savedValue);
         persist();
     }
 </script>
 
-<div id="float-panel" class="glass">
+<div id="float-panel" class="glassy">
     <div id="float-panel__scroll">
-        <div class="basic-row">
-            <span style="width: 56px; height: auto;">
-                {@html icon}
-            </span>
-            <div class="basic-column" style="gap: 0;">
-                <span>
-                    <b style="font-size: 1rem;">Panorama Tab</b>
-                    <span style="color: var(--options-text-mix);">
-                        {pkg.version}
-                    </span>
-                </span>
-
-                <span>
-                    Made by
-                    <a target="_blank" href="https://nabholz.work">
-                        Lukas Nabholz
-                    </a>
-                </span>
-            </div>
-            <a
-                class="image-link"
-                href="https://www.buymeacoffee.com/nabholz"
-                target="_blank"
-            >
-                <img
-                    src="/media/bmac-button.webp"
-                    alt="Buy Me A Coffee"
-                    style="width: 140px !important;"
-                />
-            </a>
-        </div>
-
-        <div class="section-header">Options</div>
-
-        <CheckboxInput
-            id="greeting-on"
-            label="Show greeting"
-            bind:checked={appState.displayGreeting}
-            onChange={() => persist()}
-        />
-
-        <div class="basic-column">
-            <CheckboxInput
-                id="time-on"
-                label="Show current time"
-                bind:checked={appState.displayTime}
-                onChange={() => persist()}
-            />
-            <p class="hint">
-                Click the clock widget to switch between 12-hour and 24-hour
-                format.
-            </p>
-        </div>
-
-        <div class="basic-column">
-            <CheckboxInput
-                id="weather-on"
-                label="Show weather"
-                bind:checked={appState.displayWeather}
-                onChange={() => persist()}
-            />
-
-            <p class="hint">
-                Click the temperature widget to switch between Celsius and
-                Fahrenheit.
-            </p>
-        </div>
-
-        <ChoiceInput
-            id="bg-type"
-            label="Background"
-            options={[
-                {
-                    value: "image",
-                    label: "Image",
-                },
-                {
-                    value: "color",
-                    label: "Color",
-                },
-            ]}
-            value={appState.background.type}
-            onChange={(v) => changeBackgroundType(v)}
-        />
-        {#if appState.background.type == "image"}
-            <p class="hint">Use an image from Unsplash as background.</p>
-
-            <TextInput
-                id="bg-query-input"
-                label="image Topic"
-                bind:value={queryBind}
-                placeholder="e.g. ocean, sunset, city at night"
-                buttonLabel={isSameAsCached ? "New Image" : "Search"}
-                disableButton={disableFetchButton}
-                onSubmit={(v) => saveImageQuery(v)}
-            />
-
-            <ChoiceInput
-                id="bg-update"
-                label="image update frequency"
-                options={[
-                    {
-                        value: "never",
-                        label: "Manually",
-                    },
-                    {
-                        value: "hourly",
-                        label: "Hourly",
-                    },
-                    {
-                        value: "daily",
-                        label: "Daily",
-                    },
-                ]}
-                bind:value={appState.imageUpdateFrequency}
-                onChange={() => persist()}
-            />
-        {:else}
-            <CheckboxInput
-                id="gradient-color"
-                label="Make it gradient"
-                bind:checked={appState["color-cache"].gradient}
-                onChange={() => saveColorCache()}
-            />
-
-            <ColorInput
-                id="start-color"
-                label={appState["color-cache"].gradient
-                    ? "Start Color"
-                    : "Pick Color"}
-                bind:value={colorBind}
-                onChange={() => saveColorCache()}
-            />
-
-            {#if appState["color-cache"].gradient}
-                <ColorInput
-                    id="end-color"
-                    label="End Color"
-                    bind:value={colorBindSecondary}
-                    onChange={() => saveColorCache()}
-                />
-            {/if}
-        {/if}
-
-        <div class="section-header" style="padding-top: 24px;">About</div>
-        <div class="basic-column about-links">
-            <div class="link-row">
-                <span>{pkg.name} v{pkg.version}</span>
+        <div class="options-layout">
+            <header class="options-header">
+                <div class="brand">
+                    <div class="brand-title">
+                        <h1>Panorama</h1>
+                        <span class="version">v{pkg.version}</span>
+                    </div>
+                    <p class="author">
+                        by <a href="https://nabholz.work" target="_blank"
+                            >Lukas Nabholz</a
+                        >
+                    </p>
+                </div>
                 <a
+                    href="https://www.buymeacoffee.com/nabholz"
                     target="_blank"
-                    href="https://nabholz.notion.site/Panorama-Tab-Privacy-Policy-3cc1169905be80589a79cdba1840f806"
+                    class="coffee-link"
                 >
-                    Privacy Policy
+                    <img src="/media/bmac-button.webp" alt="Coffee" />
                 </a>
-                <a
-                    target="_blank"
-                    href="https://github.com/iamnabholz/panorama-extension"
-                >
-                    GitHub
-                </a>
-            </div>
-            <p class="credits">
-                Icons from <a href="https://pixelarticons.com">PixelArtIcons</a
-                >, font from
-                <a href="https://pangrampangram.com">PangramPangram</a>, weather
-                from
-                <a href="https://openweathermap.org">OpenWeatherMap</a>, and
-                backgrounds from <a href="https://unsplash.com">Unsplash</a>.
-            </p>
+            </header>
+
+            <!-- SECTION: GENERAL -->
+            <section class="option-section">
+                <h2 class="section-label">Summary</h2>
+                <div class="input-tray">
+                    <label class="toggle-row">
+                        <span>Date & Holidays</span>
+                        <input
+                            type="checkbox"
+                            bind:checked={appState.displayDate}
+                            onchange={persist}
+                        />
+                        <div class="toggle-switch"></div>
+                    </label>
+
+                    <hr class="divider" />
+
+                    <div class="grouped-fields">
+                        <label class="toggle-row">
+                            <span>Greetings</span>
+                            <input
+                                type="checkbox"
+                                bind:checked={appState.displayGreeting}
+                                onchange={persist}
+                            />
+                            <div class="toggle-switch"></div>
+                        </label>
+                        <div
+                            class="input-row"
+                            class:is-disabled={!appState.displayGreeting}
+                        >
+                            <input
+                                type="text"
+                                bind:value={appState.userName}
+                                placeholder="Your name..."
+                                disabled={!appState.displayGreeting}
+                            />
+                            <button
+                                class="primary"
+                                onclick={persist}
+                                disabled={!appState.displayGreeting}
+                                >Save</button
+                            >
+                        </div>
+                    </div>
+
+                    <hr class="divider" />
+
+                    <div class="stack-xs">
+                        <label class="toggle-row">
+                            <span>Current Time</span>
+                            <input
+                                type="checkbox"
+                                bind:checked={appState.displayTime}
+                                onchange={persist}
+                            />
+                            <div class="toggle-switch"></div>
+                        </label>
+                        <p class="hint">
+                            Click the clock widget to toggle 12/24h format.
+                        </p>
+                    </div>
+
+                    <hr class="divider" />
+
+                    <div class="stack-xs">
+                        <label class="toggle-row">
+                            <span>Weather Information</span>
+                            <input
+                                type="checkbox"
+                                bind:checked={appState.displayWeather}
+                                onchange={persist}
+                            />
+                            <div class="toggle-switch"></div>
+                        </label>
+                        <p class="hint">
+                            Click the temperature widget to toggle between C/F.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: BACKGROUND -->
+            <section class="option-section">
+                <h2 class="section-label">Background</h2>
+                <div class="input-tray">
+                    <div class="choice-group">
+                        <button
+                            class:selected={appState.background.type ===
+                                "image"}
+                            onclick={() => changeBackgroundType("image")}
+                        >
+                            <svg viewBox="0 0 256 256" fill="currentColor">
+                                <path
+                                    d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM216,200H40V157.33l37.33-37.33a16,16,0,0,1,22.67,0L128,148l29.33-29.33a16,16,0,0,1,22.67,0L216,156ZM156,100a12,12,0,1,1,12,12A12,12,0,0,1,156,100Z"
+                                />
+                            </svg>
+                            Unsplash
+                        </button>
+                        <button
+                            class:selected={appState.background.type ===
+                                "color"}
+                            onclick={() => changeBackgroundType("color")}
+                        >
+                            <svg viewBox="0 0 256 256" fill="currentColor">
+                                <path
+                                    d="M174.69,211.31a8,8,0,0,1,0-11.31l12-12a56,56,0,0,0,0-79.19l-42.34,42.34a8,8,0,0,1-11.32,0l-16-16a8,8,0,0,1,0-11.32l42.34-42.34a56,56,0,0,0-79.2,0l-12,12a8,8,0,0,1-11.31-11.31l12-12a72,72,0,0,1,101.82,0L222.06,123.4a72,72,0,0,1,0,101.82,8,8,0,0,1-11.31,0ZM118.06,143.9a8,8,0,0,0-11.32,0L64.4,186.24a56,56,0,0,1-79.2-79.2l12-12A8,8,0,0,0,11.31,83.73l-12,12a72,72,0,0,0,101.82,101.82l42.34-42.34a8,8,0,0,0,0-11.31Z"
+                                />
+                            </svg>
+                            Solid/Gradient
+                        </button>
+                    </div>
+
+                    {#if appState.background.type === "image"}
+                        <div class="input-row">
+                            <input
+                                type="text"
+                                bind:value={queryBind}
+                                placeholder="Topic (e.g. nature, city)"
+                            />
+                            <button
+                                class="primary"
+                                disabled={disableFetchButton}
+                                onclick={saveImageQuery}
+                            >
+                                {isSameAsCached ? "Refresh" : "Search"}
+                            </button>
+                        </div>
+                        <div>
+                            <span class="small">Refresh Frequency</span>
+                            <div class="choice-group small">
+                                {#each ["never", "hourly", "daily"] as freq}
+                                    <button
+                                        class:selected={appState.imageUpdateFrequency ===
+                                            freq}
+                                        onclick={() => {
+                                            appState.imageUpdateFrequency =
+                                                freq;
+                                            persist();
+                                        }}>{freq}</button
+                                    >
+                                {/each}
+                            </div>
+                        </div>
+                    {:else}
+                        <label class="toggle-row">
+                            <span>Gradient Enabled</span>
+                            <input
+                                type="checkbox"
+                                bind:checked={appState["color-cache"].gradient}
+                                onchange={saveColorCache}
+                            />
+                            <div class="toggle-switch"></div>
+                        </label>
+
+                        <div class="color-grid">
+                            <div class="color-field">
+                                <span class="small">Primary Color</span>
+                                <input
+                                    type="color"
+                                    bind:value={colorBind}
+                                    oninput={saveColorCache}
+                                />
+                            </div>
+                            {#if appState["color-cache"].gradient}
+                                <div class="color-field">
+                                    <span class="small">Secondary Color</span>
+                                    <input
+                                        type="color"
+                                        bind:value={colorBindSecondary}
+                                        oninput={saveColorCache}
+                                    />
+                                </div>
+                            {/if}
+                        </div>
+                    {/if}
+                </div>
+            </section>
+
+            <footer class="option-section footer">
+                <h2 class="section-label">About</h2>
+                <div class="input-tray small">
+                    <div class="link-grid">
+                        <a
+                            href="https://github.com/iamnabholz/panorama-extension"
+                            target="_blank">Source Code</a
+                        >
+                        <a
+                            href="https://nabholz.notion.site/Panorama-Tab-Privacy-Policy-3cc1169905be80589a79cdba1840f806"
+                            target="_blank">Privacy Policy</a
+                        >
+                    </div>
+                    <p class="credits">
+                        Crafted by Lukas Nabholz. Backgrounds by Unsplash.
+                        Weather by OpenWeatherMap. Font by PangramPangram.
+                    </p>
+                </div>
+            </footer>
         </div>
     </div>
 </div>
 
 <style>
-    .section-header {
-        font-size: 0.8em;
-        font-weight: bold;
-        border-bottom: 1px solid var(--white-20);
-        width: 100%;
-        padding-bottom: 8px;
-    }
-
-    :global(.hint) {
-        font-size: 0.8em;
-        color: var(--white-80);
-        cursor: default;
-        line-height: 1.1;
-    }
-
-    a {
-        cursor: pointer;
-        width: fit-content;
-    }
-
-    .about-links {
-        font-size: var(--panel-text-xs, 0.7em);
-        gap: 8px;
-        margin-bottom: 4vh;
-    }
-
-    .link-row {
+    .options-layout {
         display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: var(--space-08);
+
+        padding-block-start: var(--space-06);
     }
 
+    .options-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding-inline: var(--space-04);
+    }
+
+    .brand-title {
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-02);
+        line-height: 1;
+    }
+    .brand h1 {
+        font-size: var(--font-size-2xl);
+        margin: 0;
+    }
+    .version {
+        font-size: var(--font-size-xs);
+        opacity: 0.4;
+        font-weight: 800;
+    }
+    .author {
+        font-size: var(--font-size-sm);
+        margin-top: var(--space-01);
+    }
+    .coffee-link img {
+        width: 130px;
+        border-radius: var(--radius-sm);
+    }
+
+    .option-section {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-03);
+    }
+    .section-label {
+        font-size: var(--font-size-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        opacity: 0.5;
+        font-weight: 800;
+        padding-left: var(--space-05);
+    }
+
+    .grouped-fields {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-04);
+    }
+    .input-row {
+        display: flex;
+        gap: var(--space-02);
+        transition: opacity var(--duration-fast);
+    }
+    .input-row.is-disabled {
+        opacity: 0.3;
+        pointer-events: none;
+    }
+
+    .color-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-03);
+    }
+
+    .stack-xs {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-02);
+    }
+    .hint {
+        font-size: var(--font-size-sm);
+        opacity: 0.6;
+        margin-top: calc(var(--space-01) * -1);
+    }
+    .link-grid {
+        display: flex;
+        gap: var(--space-06);
+    }
     .credits {
-        margin-top: 12px;
-        color: var(--white-80);
-        line-height: 1.8;
-    }
-
-    .credits a {
-        color: inherit;
-        border-bottom-color: var(--white-60, currentColor);
-    }
-
-    .image-link {
-        cursor: pointer;
-        border: none;
+        line-height: 1.4;
     }
 </style>

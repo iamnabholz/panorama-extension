@@ -79,6 +79,7 @@ export interface WeatherData {
 export interface BackgroundImage {
   query: string;
   url: string;
+  color: string;
   author: string;
   link: string;
   fetchedAt: number;

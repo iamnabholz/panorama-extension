@@ -1,5 +1,5 @@
-import type { StateSchema } from "./interfaces";
-import { loadData, saveKey } from "./storage/storage";
+import type { StateSchema } from "./utils/interfaces";
+import { loadData, saveKey } from "./utils/storage";
 
 export const appState = $state<StateSchema>({
   useMetric: true,
@@ -19,6 +19,7 @@ export const uiState = $state({
   sentenceVisible: appState.sentenceVisible,
   loadingData: [] as any[],
   showOnboardAtLaunch: false,
+  isLoading: false,
 });
 
 export function startLoading(): string {
@@ -36,6 +37,7 @@ const keys: (keyof StateSchema)[] = [
   "use24Hour",
   "sentenceVisible",
   "imageUpdateFrequency",
+  "displayDate",
   "displayGreeting",
   "displayTime",
   "displayWeather",

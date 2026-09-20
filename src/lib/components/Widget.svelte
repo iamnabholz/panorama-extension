@@ -7,6 +7,7 @@
         onclick?: (event: MouseEvent) => void;
         title?: string;
         disabled?: boolean;
+        zoomIcon?: boolean;
     }
     let {
         text,
@@ -16,6 +17,7 @@
         onclick,
         title,
         disabled = false,
+        zoomIcon = false,
     }: Props = $props();
     const isButton = $derived(!!onclick);
     const hasIcon = $derived(!!icon || !!iconSrc);
@@ -27,7 +29,7 @@
 </script>
 
 {#snippet iconSlot()}
-    <span class="icon-slot">
+    <span class="icon-slot" class:zoom-icon={zoomIcon}>
         {#if icon}
             {@render icon()}
         {:else if iconSrc}
@@ -91,23 +93,21 @@
     .visual {
         display: inline-flex;
         align-items: baseline; /* Key: aligns icon and text baselines together */
-        gap: 0.2em;
+        gap: 0.1em;
         font-weight: var(--font-weight-bold);
         color: var(--color-text-summary);
         transform-origin: center;
-        transition: transform 110ms cubic-bezier(0.34, 1.85, 0.64, 1);
-        will-change: transform;
+        transition:
+            transform 110ms cubic-bezier(0.34, 1.85, 0.64, 1),
+            margin-inline-start 110ms cubic-bezier(0.34, 1.85, 0.64, 1);
+        will-change: transform margin-inline-start;
     }
-    .widget:hover {
-        margin-left: 0.4em;
-        margin-right: 0.2em;
-    }
+
     .widget:hover .visual {
-        transform: scale(1.1);
+        transform: scale(1.01);
     }
     .widget:active .visual {
-        transform: scale(0.92);
-        transition-duration: 0.1s;
+        transform: scale(0.99);
     }
 
     .icon-slot {
@@ -125,11 +125,11 @@
             transform 0.45s cubic-bezier(0.34, 1.85, 0.64, 1),
             filter 0.3s ease-out;
     }
-    .widget:hover .icon-slot {
-        transform: scale(1.2) rotate(-8deg);
+    .widget:hover .icon-slot.zoom-icon {
+        transform: scale(1.6) rotate(-8deg);
         filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.3));
     }
-    .widget:active .icon-slot {
+    .widget:active .icon-slot.zoom-icon {
         transform: scale(0.9) rotate(4deg);
         transition-duration: 0.1s;
     }

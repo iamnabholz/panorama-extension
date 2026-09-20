@@ -10,6 +10,7 @@
         stopLoading,
     } from "./lib/state.svelte";
 
+    import Background from "./lib/Background.svelte";
     import Holiday from "./lib/Holiday.svelte";
     import Clock from "./lib/Clock.svelte";
     import Greeting from "./lib/Greeting.svelte";
@@ -41,17 +42,60 @@
                 mounted = true;
             });
     });
+
+    // Click outside action for Svelte (targets #float-panel)
+    function clickOutside(node: HTMLElement, callback: () => void) {
+        const handleMousedown = (event: MouseEvent) => {
+            const optionsToggle = document.getElementById("options-toggle");
+            if (optionsToggle && optionsToggle.contains(event.target as Node)) {
+                return;
+            }
+
+            if (node && !node.contains(event.target as Node)) {
+                callback();
+            }
+        };
+
+        document.addEventListener("mousedown", handleMousedown, true);
+
+        return {
+            destroy() {
+                document.removeEventListener(
+                    "mousedown",
+                    handleMousedown,
+                    true,
+                );
+            },
+        };
+    }
+
+    function closeOptions() {
+        uiState.optionsOpen = false;
+        uiState.sentenceVisible = appState.sentenceVisible;
+    }
+
+    function handleKeydown(event: KeyboardEvent) {
+        if (event.key === "Meta") {
+            console.log("Command pressed");
+            // trigger your action here
+            uiState.isLoading = !uiState.isLoading;
+        }
+    }
 </script>
+
+<svelte:window on:keydown={handleKeydown} />
+
+<Background />
 
 <main>
     <div class="summary-wrapper">
-        {#if ready}
+        {#if ready && appState.displayDate}
             <span transition:fade>
                 <Holiday />
             </span>
         {/if}
         {#if ready && appState.displayGreeting}
-            <span in:fly={{ y: 120 }} out:fly={{ delay: 60, y: 120 }}>
+            <span in:fly={{ y: 25 }} out:fly={{ delay: 60, y: 25 }}>
                 <Greeting />
             </span>
         {/if}
@@ -59,16 +103,19 @@
         {#if ready}
             <p
                 class="summary-row"
-                in:fly={{ delay: 60, y: 120 }}
-                out:fly={{ y: 120 }}
+                in:fly={{ delay: 60, y: 25 }}
+                out:fly={{ y: 25 }}
             >
                 {#if appState.displayTime}
-                    It's <Clock />
+                    It's
+                    <Clock />
                     {#if appState.displayWeather}—{/if}
                 {/if}
                 {#if appState.displayWeather}
                     {appState.displayTime ? "currently" : "Currently"}
-                    <Temperature /> and <Weather />
+                    <Temperature />
+                    and
+                    <Weather />
                 {/if}
             </p>
         {/if}
@@ -80,8 +127,10 @@
 </div>
 
 {#if uiState.optionsOpen}
-    <div id="float-overlay" in:fly={{ delay: 60, y: 120 }} out:fly={{ y: 120 }}>
-        <Options />
+    <div id="float-overlay" in:fly={{ delay: 60, y: 25 }} out:fly={{ y: 25 }}>
+        <div use:clickOutside={closeOptions} style="display: contents;">
+            <Options />
+        </div>
     </div>
 {/if}
 
@@ -111,26 +160,27 @@
 
         color: var(--color-text-summary-muted);
         font-size: var(--font-size-summary);
-        text-shadow: var(--sentence-shadow);
+        text-shadow: var(--shadow-sentence);
 
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.2em; /* em-based so it scales with --font-size-summary */
+        gap: 0.2em;
         text-align: center;
 
-        /* Max width control with safety breathing room for scale animations */
         width: 100%;
-        max-width: min(900px, 92vw);
+        max-width: min(
+            900px,
+            92vw
+        ); /* Adjust this max-width and watch it fluidly reflow! */
         padding-inline: 2rem;
         box-sizing: border-box;
     }
 
     .summary-row {
-        display: block;
+        display: inline; /* Treats the entire block like a fluid paragraph */
         text-align: center;
-        text-wrap: balance;
-        /* even line lengths, nicely centered */
+        text-wrap: balance; /* Automatically balances line lengths nicely */
         line-height: 1.4;
         font-weight: var(--font-weight-regular);
         width: 100%;

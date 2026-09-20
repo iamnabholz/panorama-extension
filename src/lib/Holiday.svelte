@@ -1,6 +1,6 @@
 <script lang="ts">
     import { slide } from "svelte/transition";
-    import type { HolidayData } from "./interfaces";
+    import type { HolidayData } from "./utils/interfaces";
     import { appState } from "./state.svelte";
 
     // "YYYY-MM-DD" in local time (Intl avoids manual padStart plumbing)
@@ -42,7 +42,7 @@
     aria-expanded={dateExpanded}
     aria-controls="holiday-details"
     disabled={nextHoliday == null}
-    class="glassy stack"
+    class="surface stack"
     class:open={dateExpanded}
 >
     <span class="basic-row">
@@ -98,7 +98,7 @@
 </button>
 
 <style>
-    .glassy {
+    .surface {
         color: var(--color-text-summary);
     }
 
@@ -189,7 +189,7 @@
     .holiday-tag {
         font-size: 0.75em;
         font-weight: var(--font-weight-bold);
-        color: var(--color-accent-hover, var(--accent-color));
+        color: var(--color-accent-hover);
     }
 
     .holiday-name {

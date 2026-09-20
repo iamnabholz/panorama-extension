@@ -8,7 +8,7 @@
         />
         <meta name="color-scheme" content="light dark" />
 
-        <!-- Icons, ignore apple-touch-icon since this is a web extension -->
+        <!-- Icon, ignore apple-touch-icon since this is a web extension -->
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
 
         <title>New Tab</title>
@@ -23,8 +23,8 @@
                 position: relative;
             }
 
-            body::before,
-            body::after {
+            /* Initial paint background layer to prevent flash */
+            body::before {
                 content: "";
                 position: fixed;
                 inset: 0;
@@ -34,25 +34,7 @@
                 background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
-                z-index: -1;
-                transition: opacity 0.3s ease-out;
-                will-change: opacity;
-            }
-
-            body::before {
-                /* sharp layer */
-                transform: scale(1);
-            }
-
-            body::after {
-                /* pre-blurred layer */
-                filter: blur(4px);
-                transform: scale(1.04);
-                opacity: 0;
-            }
-
-            body.focused::after {
-                opacity: 1;
+                z-index: -2;
             }
         </style>
     </head>

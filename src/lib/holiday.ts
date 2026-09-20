@@ -1,4 +1,4 @@
-import type { HolidayCache, HolidayData } from "./interfaces";
+import type { HolidayCache, HolidayData } from "./utils/interfaces";
 import { appState, persist, startLoading, stopLoading } from "./state.svelte";
 
 const HOLIDAYS_URL = "https://holiday-grab.nabholz.workers.dev/";

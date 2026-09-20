@@ -3,13 +3,6 @@
     import LoaderIndicator from "./components/LoaderIndicator.svelte";
     import { appState, persist, uiState } from "./state.svelte";
 
-    $effect(() => {
-        document.body.classList.toggle(
-            "focused",
-            appState.sentenceVisible || uiState.optionsOpen,
-        );
-    });
-
     function toggleOptions() {
         if (uiState.optionsOpen) {
             uiState.optionsOpen = false;
@@ -38,7 +31,7 @@
 <div id="control-bar">
     <LoaderIndicator />
 
-    <div class="controls glassy">
+    <div class="controls surface">
         {#if imageCredit?.author && imageCredit?.link}
             <div
                 class="credits-wrapper"
@@ -46,7 +39,10 @@
             >
                 <a
                     class="credits-anchor surface-highlight"
-                    href={imageCredit.link}
+                    href={encodeURI(
+                        imageCredit.link +
+                            "?utm_source=panorama_tab&utm_medium=referral",
+                    )}
                     target="_blank"
                     rel="noopener noreferrer"
                     transition:fade={{ duration: 150 }}
@@ -243,7 +239,8 @@
 
     .controls svg {
         height: 1.2em;
-        width: max-content;
+        width: 1.2em;
+        flex-shrink: 0;
         display: block;
     }
 

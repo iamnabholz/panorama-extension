@@ -1,4 +1,4 @@
-import type { BackgroundImage } from "./interfaces";
+import type { BackgroundImage } from "./utils/interfaces";
 import { appState, persist, startLoading, stopLoading } from "./state.svelte";
 
 const WORKER_URL = "https://background-grab.nabholz.workers.dev/";
@@ -26,8 +26,9 @@ function toBackgroundImage(res: any, query: string): BackgroundImage {
   return {
     query,
     url: res.urls.full,
-    author: res.user?.name ?? "",
-    link: res.user?.links?.html ?? "",
+    author: res.user.name,
+    color: res.color,
+    link: res.user.links.html,
     fetchedAt: Date.now(),
   };
 }

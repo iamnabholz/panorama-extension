@@ -1,4 +1,4 @@
-import type { WeatherData, WeatherResponse } from "./interfaces";
+import type { WeatherData, WeatherResponse } from "./utils/interfaces";
 import { appState, persist, startLoading, stopLoading } from "./state.svelte";
 
 const OPEN_WEATHER_URL = "https://weather-grab.nabholz.workers.dev/";

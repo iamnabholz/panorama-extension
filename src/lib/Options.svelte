@@ -72,14 +72,14 @@
     }
 </script>
 
-<div id="float-panel" class="glassy">
+<div id="float-panel" class="surface">
     <div id="float-panel__scroll">
         <div class="options-layout">
             <header class="options-header">
                 <div class="brand">
                     <div class="brand-title">
                         <h1>Panorama</h1>
-                        <span class="version">v{pkg.version}</span>
+                        <span class="version">{pkg.version}</span>
                     </div>
                     <p class="author">
                         by <a href="https://nabholz.work" target="_blank"
@@ -99,7 +99,7 @@
             <!-- SECTION: GENERAL -->
             <section class="option-section">
                 <h2 class="section-label">Summary</h2>
-                <div class="input-tray">
+                <div class="input-tray surface-panel">
                     <label class="toggle-row">
                         <span>Date & Holidays</span>
                         <input
@@ -123,56 +123,71 @@
                             <div class="toggle-switch"></div>
                         </label>
                         <div
-                            class="input-row"
                             class:is-disabled={!appState.displayGreeting}
+                            class="grouped-fields"
                         >
                             <input
+                                autocorrect="off"
+                                autocomplete="off"
                                 type="text"
-                                bind:value={appState.userName}
-                                placeholder="Your name..."
+                                maxlength={12}
+                                value={appState.userName ?? ""}
+                                placeholder="e.g. Mark, Alice"
                                 disabled={!appState.displayGreeting}
+                                oninput={(e) => {
+                                    const val = (
+                                        e.currentTarget as HTMLInputElement
+                                    ).value;
+                                    // Trim leading/trailing spaces for the saved state, or keep empty if blank
+                                    appState.userName =
+                                        val.trim() === "" ? "" : val.trim();
+                                    persist();
+                                }}
                             />
-                            <button
-                                class="primary"
-                                onclick={persist}
-                                disabled={!appState.displayGreeting}
-                                >Save</button
-                            >
+
+                            <div class="hint">
+                                Type your name for more personalized greetings,
+                                or leave empty for only general greetings.
+                            </div>
                         </div>
-                    </div>
 
-                    <hr class="divider" />
+                        <hr class="divider" />
 
-                    <div class="stack-xs">
-                        <label class="toggle-row">
-                            <span>Current Time</span>
-                            <input
-                                type="checkbox"
-                                bind:checked={appState.displayTime}
-                                onchange={persist}
-                            />
-                            <div class="toggle-switch"></div>
-                        </label>
-                        <p class="hint">
-                            Click the clock widget to toggle 12/24h format.
-                        </p>
-                    </div>
+                        <div class="stack-xs">
+                            <label class="toggle-row">
+                                <span>Current Time</span>
+                                <input
+                                    type="checkbox"
+                                    bind:checked={appState.displayTime}
+                                    onchange={persist}
+                                />
+                                <div class="toggle-switch"></div>
+                            </label>
+                            <p class="hint">
+                                Click the clock widget to toggle 12/24h format.
+                            </p>
+                        </div>
 
-                    <hr class="divider" />
+                        <hr class="divider" />
 
-                    <div class="stack-xs">
-                        <label class="toggle-row">
-                            <span>Weather Information</span>
-                            <input
-                                type="checkbox"
-                                bind:checked={appState.displayWeather}
-                                onchange={persist}
-                            />
-                            <div class="toggle-switch"></div>
-                        </label>
-                        <p class="hint">
-                            Click the temperature widget to toggle between C/F.
-                        </p>
+                        <div class="stack-xs">
+                            <label class="toggle-row">
+                                <span>Weather Information</span>
+                                <input
+                                    type="checkbox"
+                                    bind:checked={appState.displayWeather}
+                                    onchange={persist}
+                                />
+                                <div class="toggle-switch"></div>
+                            </label>
+                            <p class="hint">
+                                Click the temperature widget to toggle between
+                                °C/°F.
+                                <br />
+                                Weather is wrong? We determine your location based
+                                on your IP address.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -180,54 +195,100 @@
             <!-- SECTION: BACKGROUND -->
             <section class="option-section">
                 <h2 class="section-label">Background</h2>
-                <div class="input-tray">
-                    <div class="choice-group">
+                <div class="input-tray surface-panel">
+                    <div class="choice-group" style="--choice-count: 3;">
                         <button
-                            class:selected={appState.background.type ===
-                                "image"}
-                            onclick={() => changeBackgroundType("image")}
+                            class:selected={appState.background.type === "none"}
+                            onclick={() => changeBackgroundType("none")}
                         >
-                            <svg viewBox="0 0 256 256" fill="currentColor">
-                                <path
-                                    d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM216,200H40V157.33l37.33-37.33a16,16,0,0,1,22.67,0L128,148l29.33-29.33a16,16,0,0,1,22.67,0L216,156ZM156,100a12,12,0,1,1,12,12A12,12,0,0,1,156,100Z"
-                                />
-                            </svg>
-                            Unsplash
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="1em"
+                                height="1em"
+                                viewBox="-2 -4 24 24"
+                                ><title>picture-f</title><path
+                                    fill="currentColor"
+                                    d="m20 10.536l-4.416-4.44a3 3 0 0 0-4.69.582L5.072 16H3a3 3 0 0 1-3-3V3a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3zm-.011 2.724A3 3 0 0 1 17 16H7.64l4.969-8.293a1 1 0 0 1 1.563-.195zM6 9a3 3 0 1 0 0-6a3 3 0 0 0 0 6"
+                                /></svg
+                            >
+                            None
                         </button>
                         <button
                             class:selected={appState.background.type ===
                                 "color"}
                             onclick={() => changeBackgroundType("color")}
                         >
-                            <svg viewBox="0 0 256 256" fill="currentColor">
-                                <path
-                                    d="M174.69,211.31a8,8,0,0,1,0-11.31l12-12a56,56,0,0,0,0-79.19l-42.34,42.34a8,8,0,0,1-11.32,0l-16-16a8,8,0,0,1,0-11.32l42.34-42.34a56,56,0,0,0-79.2,0l-12,12a8,8,0,0,1-11.31-11.31l12-12a72,72,0,0,1,101.82,0L222.06,123.4a72,72,0,0,1,0,101.82,8,8,0,0,1-11.31,0ZM118.06,143.9a8,8,0,0,0-11.32,0L64.4,186.24a56,56,0,0,1-79.2-79.2l12-12A8,8,0,0,0,11.31,83.73l-12,12a72,72,0,0,0,101.82,101.82l42.34-42.34a8,8,0,0,0,0-11.31Z"
-                                />
-                            </svg>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="1em"
+                                height="1em"
+                                viewBox="-2 -3.5 24 24"
+                                ><title>rectangle-f</title><path
+                                    fill="currentColor"
+                                    d="M3 .565h14a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3v-10a3 3 0 0 1 3-3"
+                                /></svg
+                            >
                             Solid/Gradient
+                        </button>
+                        <button
+                            class:selected={appState.background.type ===
+                                "image"}
+                            onclick={() => changeBackgroundType("image")}
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                ><title>image-solid</title><path
+                                    fill="currentColor"
+                                    fill-rule="evenodd"
+                                    d="M7.268 4.658a54.7 54.7 0 0 1 9.465 0l1.51.132a3.14 3.14 0 0 1 2.831 2.66a30.6 30.6 0 0 1 0 9.1q-.061.397-.212.754c-.066.157-.27.181-.386.055l-4.421-4.864a.75.75 0 0 0-.792-.207l-2.531.844l-3.671-4.13A.75.75 0 0 0 7.97 8.97l-4.914 4.914a.246.246 0 0 1-.422-.159a30.6 30.6 0 0 1 .292-6.276a3.14 3.14 0 0 1 2.831-2.66zM14 9a1.5 1.5 0 1 1 3 0a1.5 1.5 0 0 1-3 0"
+                                    clip-rule="evenodd"
+                                /><path
+                                    fill="currentColor"
+                                    d="M2.961 16.1a.25.25 0 0 0-.07.21l.035.24a3.14 3.14 0 0 0 2.831 2.66l1.51.131c3.15.274 6.316.274 9.466 0l1.51-.131a3.1 3.1 0 0 0 1.185-.347c.137-.071.16-.252.056-.366l-4.1-4.51a.25.25 0 0 0-.265-.07l-2.382.794a.75.75 0 0 1-.798-.213l-3.295-3.707a.25.25 0 0 0-.364-.01z"
+                                /></svg
+                            >
+                            Unsplash
                         </button>
                     </div>
 
                     {#if appState.background.type === "image"}
-                        <div class="input-row">
-                            <input
-                                type="text"
-                                bind:value={queryBind}
-                                placeholder="Topic (e.g. nature, city)"
-                            />
-                            <button
-                                class="primary"
-                                disabled={disableFetchButton}
-                                onclick={saveImageQuery}
+                        <form
+                            class="input-field grouped-fields"
+                            onsubmit={(e) => {
+                                e.preventDefault();
+                                if (!disableFetchButton) saveImageQuery();
+                            }}
+                        >
+                            <label for="query"> Topic for the image </label>
+                            <div class="input-row">
+                                <input
+                                    autocorrect="off"
+                                    autocomplete="off"
+                                    maxlength={24}
+                                    id="query"
+                                    type="text"
+                                    bind:value={queryBind}
+                                    placeholder="e.g. nature, city, blue"
+                                />
+                                <button
+                                    type="submit"
+                                    class="primary"
+                                    disabled={disableFetchButton}
+                                >
+                                    {isSameAsCached ? "Refresh" : "Search"}
+                                </button>
+                            </div>
+                        </form>
+                        <div class="input-field grouped-fields">
+                            <span>Refresh Frequency</span>
+                            <div
+                                class="choice-group small"
+                                style="--choice-count: 3;"
                             >
-                                {isSameAsCached ? "Refresh" : "Search"}
-                            </button>
-                        </div>
-                        <div>
-                            <span class="small">Refresh Frequency</span>
-                            <div class="choice-group small">
                                 {#each ["never", "hourly", "daily"] as freq}
                                     <button
+                                        type="button"
                                         class:selected={appState.imageUpdateFrequency ===
                                             freq}
                                         onclick={() => {
@@ -239,9 +300,14 @@
                                 {/each}
                             </div>
                         </div>
-                    {:else}
+
+                        <div class="hint">
+                            You can manually get a new image every few minutes.
+                            let the API service rest.
+                        </div>
+                    {:else if appState.background.type === "color"}
                         <label class="toggle-row">
-                            <span>Gradient Enabled</span>
+                            <span>Gradient</span>
                             <input
                                 type="checkbox"
                                 bind:checked={appState["color-cache"].gradient}
@@ -274,22 +340,27 @@
                 </div>
             </section>
 
-            <footer class="option-section footer">
+            <footer class="option-section">
                 <h2 class="section-label">About</h2>
-                <div class="input-tray small">
-                    <div class="link-grid">
+                <div class="input-tray surface-panel">
+                    <p>Designed and developed by Lukas Nabholz.</p>
+                    <div class="link-flex">
+                        <a
+                            href="https://nabholz.notion.site/Panorama-Tab-Privacy-Policy-3cc1169905be80589a79cdba1840f806"
+                            target="_blank">Privacy Policy</a
+                        >
                         <a
                             href="https://github.com/iamnabholz/panorama-extension"
                             target="_blank">Source Code</a
                         >
                         <a
-                            href="https://nabholz.notion.site/Panorama-Tab-Privacy-Policy-3cc1169905be80589a79cdba1840f806"
-                            target="_blank">Privacy Policy</a
+                            href="https://buymeacoffee.com/nabholz/"
+                            target="_blank">Support Development</a
                         >
                     </div>
                     <p class="credits">
-                        Crafted by Lukas Nabholz. Backgrounds by Unsplash.
-                        Weather by OpenWeatherMap. Font by PangramPangram.
+                        Backgrounds by Unsplash. Weather by OpenWeatherMap. Font
+                        by PangramPangram.
                     </p>
                 </div>
             </footer>
@@ -325,12 +396,10 @@
     }
     .version {
         font-size: var(--font-size-xs);
-        opacity: 0.4;
-        font-weight: 800;
+        opacity: 0.6;
     }
     .author {
         font-size: var(--font-size-sm);
-        margin-top: var(--space-01);
     }
     .coffee-link img {
         width: 130px;
@@ -361,10 +430,6 @@
         gap: var(--space-02);
         transition: opacity var(--duration-fast);
     }
-    .input-row.is-disabled {
-        opacity: 0.3;
-        pointer-events: none;
-    }
 
     .color-grid {
         display: grid;
@@ -382,11 +447,16 @@
         opacity: 0.6;
         margin-top: calc(var(--space-01) * -1);
     }
-    .link-grid {
+    .link-flex {
         display: flex;
-        gap: var(--space-06);
+        column-gap: var(--space-05);
+        row-gap: var(--space-02);
+        flex-wrap: wrap;
     }
     .credits {
         line-height: 1.4;
+    }
+    footer {
+        font-size: var(--font-size-sm);
     }
 </style>

@@ -1,27 +1,26 @@
 @import "./reset.css";
 
-@property --mix-color {
-    syntax: "<color>";
-    inherits: true;
-    initial-value: blue;
-}
-
 :root {
     color-scheme: light dark;
+    --color-body-background: light-dark(#f5f5f7, #1c1c1e);
 
     /* body::before background values, basically what the web extension uses to remember what to display */
     --background-value: none;
-    --background-color: var(--color-html-background);
+    --background-color: var(--color-body-background);
 
-    --mix-color: var(--background-color);
-
-    /* Color — surfaces */
-    --color-background: light-dark(#f5f5f7, #1c1c1e);
-    --color-surface: light-dark(#ffffff, #2c2c2e);
+    /*
+        Values only change on data-contrast=["light-text"], not on light/dark mode theme.
+        Default theme is dark-text over light background/contrast
+    */
+    /* Color — surfaces and backgrounds */
+    --color-background: #f5f5f7;
+    --color-background-glass: rgba(255, 255, 255, 0.1);
+    --color-background-elevated: rgba(255, 255, 255, 0.6);
+    --color-background-panel: rgba(235, 235, 235, 0.5);
 
     /* Color — text */
-    --color-text: light-dark(#1d1d1f, #f5f5f7);
-    --color-text-secondary: light-dark(#ffffff80, #ffffff80);
+    --color-text: #1d1d1f;
+    --color-text-secondary: #ffffff80;
     --color-text-summary: #ffffff;
     --color-text-summary-muted: #ffffff80;
 
@@ -30,17 +29,18 @@
     --color-border-strong: #6e6e73;
 
     /* Color — accent / interactive */
-    --color-accent: #30d158;
+    --color-accent: #2f8fff;
     --color-accent-hover: #34c759;
     --color-accent-active: #2f8fff;
     --color-focus: var(--color-accent);
 
-    --bg-color: linear-gradient(
-        128deg,
-        var(--background-color) 0%,
-        var(--background-color) 100%
-    );
-    --bg-image: none;
+    --color-white: white;
+    --color-black: black;
+    --color-grey: grey;
+    --color-blue: blue;
+    --color-green: green;
+    --color-red: red;
+    --color-yellow: yellow;
 
     /* Typography */
     --font-sans: "PP Sans Rounded", sans-serif;
@@ -81,12 +81,12 @@
     --radius-xl: 1.5rem; /* 24px */
     --radius-full: 999px;
 
-    --sentence-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
-
     /* Shadow */
     --shadow-sm: 0 1px 2px #0000000a;
     --shadow-md: 0 4px 12px #0000000d;
     --shadow-lg: 0 8px 30px #00000012;
+
+    --shadow-sentence: 0 0 6px rgba(0, 0, 0, 0.2);
 
     /* Motion */
     --duration-fast: 110ms;
@@ -102,6 +102,19 @@
     --field-radius-md: 6px;
     --field-radius-lg: 8px;
     --field-transition: 150ms ease-out;
+}
+
+:root[data-contrast="light-text"] {
+    --color-background: #1c1c1e;
+    --color-background-glass: rgba(0, 0, 0, 0.15);
+    --color-background-elevated: rgba(255, 255, 255, 0.1);
+    --color-background-panel: rgba(35, 35, 35, 0.5);
+
+    --color-text: #f5f5f7;
+    --color-text-secondary: #ffffff80;
+
+    --color-text-summary: #ffffff;
+    --color-text-summary-muted: #ffffff80;
 }
 
 @font-face {
@@ -190,9 +203,9 @@ button:disabled {
     cursor: not-allowed;
 }
 
-.glassy {
+.surface {
     position: relative;
-    background: light-dark(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.15));
+    background: var(--color-background-glass);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
 
@@ -204,9 +217,8 @@ button:disabled {
 }
 
 .surface-elevated {
-    background: light-dark(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+    background: var(--color-background-elevated);
     backdrop-filter: blur(10px);
-    border-radius: var(--radius-full);
 
     /* Subtle highlight on the top edge of the pill */
     box-shadow:
@@ -215,6 +227,11 @@ button:disabled {
 
     border: 0.5px solid rgba(255, 255, 255, 0.1);
     transition: all var(--duration-moderate) var(--ease-standard);
+}
+
+.surface-panel {
+    background: var(--color-background-panel);
+    backdrop-filter: blur(5px);
 }
 
 .surface-highlight {
@@ -232,8 +249,8 @@ button:disabled {
     transform: scale(0.98);
 }
 
-.glassy::before,
-.glassy::after {
+.surface::before,
+.surface::after {
     display: none;
 }
 
@@ -248,16 +265,14 @@ button:disabled {
 }
 
 #float-panel {
-    width: min(500px, 90vw);
-    max-height: min(520px, 80vh);
+    width: min(480px, 90vw);
+    max-height: min(500px, 80vh);
 
     border-radius: var(--radius-lg);
     overflow: hidden;
 
     display: flex;
     flex-direction: column;
-
-    transform: translateY(-2svh);
 }
 
 #float-panel__scroll {

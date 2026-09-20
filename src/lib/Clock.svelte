@@ -38,6 +38,7 @@
     title={`Press to switch to ${appState.use24Hour ? "12" : "24"}-hour format.`}
     text={formattedTime.toUpperCase()}
     onclick={toggleFormat}
+    zoomIcon
 >
     {#snippet icon()}
         <ClockIcon {currentTime} />

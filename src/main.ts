@@ -2,32 +2,44 @@ import { mount } from "svelte";
 import "./styles/styles.css";
 import App from "./App.svelte";
 import { uiState } from "./lib/state.svelte";
+import { loadBackground } from "./lib/utils/storage";
 
-function getCache() {
-  const cached = localStorage.getItem("background");
-  if (cached) {
-    const background = JSON.parse(cached);
+function restoreInitialBackground(): void {
+  try {
+    const background = loadBackground();
 
-    if (background.type === "image") {
-      document.documentElement.style.setProperty(
-        "--background-value",
-        `url("${background.value}")`,
-      );
-    } else {
-      document.documentElement.style.setProperty(
-        "--background-value",
-        background.value as string,
-      );
+    if (!background) {
+      uiState.showOnboardAtLaunch = true;
+      return;
     }
-  } else {
-    uiState.showOnboardAtLaunch = true;
+
+    let value = "none";
+
+    if (background.type === "image" && background.value !== "") {
+      // Quote the URL so its contents cannot escape the CSS url() argument.
+      const url = new URL(background.value).href;
+      value = `url(${JSON.stringify(url)})`;
+    } else if (background.type === "color") {
+      value = background.value;
+    }
+
+    document.documentElement.style.setProperty("--background-value", value);
+  } catch (error) {
+    // Early painting is optional; a cache problem must not block mounting.
+    console.warn("Could not restore the initial background.", error);
   }
 }
 
-getCache();
+restoreInitialBackground();
 
-const app = mount(App, {
-  target: document.getElementById("app")!,
-});
+const target = document.getElementById("app");
+
+if (!target) {
+  throw new Error(
+    'Cannot start Panorama: the "#app" mount element is missing.',
+  );
+}
+
+const app = mount(App, { target });
 
 export default app;

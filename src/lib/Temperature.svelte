@@ -15,7 +15,7 @@
 
     function toggleFormat() {
         appState.useMetric = !appState.useMetric;
-        persist();
+        persist("useMetric");
     }
 
     function celsiusToFahrenheit(celsius: number): number {
@@ -25,7 +25,7 @@
 
 <Widget
     title={`Press to switch to ${appState.useMetric ? "Fahrenheit" : "Celsius"}.`}
-    text={`${displayTemp ? displayTemp : "-"}°${unit}`}
+    text={`${displayTemp != null ? displayTemp : "-"}°${unit}`}
     onclick={toggleFormat}
     disabled={displayTemp == null}
 />

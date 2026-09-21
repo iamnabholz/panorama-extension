@@ -18,7 +18,7 @@
 
         uiState.sentenceVisible = !uiState.sentenceVisible;
         appState.sentenceVisible = uiState.sentenceVisible;
-        persist();
+        persist("sentenceVisible");
     }
 
     let imageCredit = $derived(
@@ -26,6 +26,19 @@
             ? appState["image-cache"]
             : undefined,
     );
+
+    let summaryDisabled = $derived(
+        !appState.displayGreeting &&
+            !appState.displayDate &&
+            !appState.displayTime &&
+            !appState.displayWeather,
+    );
+
+    $effect(() => {
+        if (summaryDisabled) {
+            uiState.sentenceVisible = false;
+        }
+    });
 </script>
 
 <div id="control-bar">
@@ -66,113 +79,75 @@
         >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 32 32"
                 width="1em"
                 height="1em"
-                viewBox="0 0 24 24"
                 aria-hidden="true"
                 focusable="false"
             >
-                {#if uiState.optionsOpen}
-                    <path
-                        fill="currentColor"
-                        fill-rule="evenodd"
-                        d="M4 7h8.17a3.001 3.001 0 0 1 5.66 0H20a1 1 0 1 1 0 2h-2.17a3.001 3.001 0 0 1-5.66 0H4a1 1 0 0 1 0-2m0 8h2.17a3.001 3.001 0 0 1 5.66 0H20a1 1 0 1 1 0 2h-8.17a3.001 3.001 0 0 1-5.66 0H4a1 1 0 1 1 0-2"
-                        clip-rule="evenodd"
-                    />
-                {:else}
-                    <g fill="none">
-                        <circle
-                            cx="9"
-                            cy="16"
-                            r="2"
-                            fill="currentColor"
-                            opacity=".16"
-                        />
-                        <circle
-                            cx="15"
-                            cy="8"
-                            r="2"
-                            fill="currentColor"
-                            opacity=".16"
-                        />
-                        <path
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M4 8h9m4 0h3m-9 8h9M4 16h3"
-                        />
-                        <circle
-                            cx="9"
-                            cy="16"
-                            r="2"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        />
-                        <circle
-                            cx="15"
-                            cy="8"
-                            r="2"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        />
-                    </g>
-                {/if}
+                <path
+                    d="M7 11a1 1 0 0 1 0-2h18a1 1 0 0 1 0 2zm0 11a1 1 0 0 1 0-2h18a1 1 0 0 1 0 2z"
+                />
+
+                <circle
+                    class="dot dot-top"
+                    class:open={uiState.optionsOpen}
+                    cx="22"
+                    cy="10"
+                    r="4"
+                />
+
+                <circle
+                    class="dot dot-bottom"
+                    class:open={uiState.optionsOpen}
+                    cx="10"
+                    cy="21"
+                    r="4"
+                />
             </svg>
         </button>
-        <button
-            type="button"
-            class="surface-highlight"
-            class:surface-elevated={uiState.sentenceVisible}
-            onclick={toggleVisibility}
-            aria-pressed={uiState.sentenceVisible}
-            aria-label={uiState.sentenceVisible
-                ? "Hide information"
-                : "Show information"}
-            title={uiState.sentenceVisible
-                ? "Hide information."
-                : "Show information."}
-        >
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="1em"
-                height="1em"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                focusable="false"
+        {#if !summaryDisabled}
+            <button
+                type="button"
+                class="surface-highlight"
+                class:surface-elevated={uiState.sentenceVisible}
+                onclick={toggleVisibility}
+                aria-pressed={uiState.sentenceVisible}
+                aria-label={uiState.sentenceVisible
+                    ? "Hide information"
+                    : "Show information"}
+                title={uiState.sentenceVisible
+                    ? "Hide information."
+                    : "Show information."}
+                transition:slide={{ axis: "x" }}
             >
-                {#if uiState.sentenceVisible}
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    xml:space="preserve"
+                    fill-rule="evenodd"
+                    stroke-linejoin="round"
+                    stroke-miterlimit="2"
+                    clip-rule="evenodd"
+                    viewBox="0 0 32 32"
+                    width="1em"
+                    height="1em"
+                    aria-hidden="true"
+                    focusable="false"
+                >
                     <path
-                        fill="currentColor"
-                        fill-rule="evenodd"
-                        d="M18 4v3h3a1 1 0 0 1 1 1v10a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1m2 14a1 1 0 1 1-2 0V9h2zM6 8a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H7a1 1 0 0 1-1-1m2 4a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1"
-                        clip-rule="evenodd"
+                        fill-opacity={uiState.sentenceVisible ? "1" : ".14"}
+                        d="M24.81 7.2A3.2 3.2 0 0 1 28 10.37v11.24a3.2 3.2 0 0 1-3.19 3.19H7.2A3.2 3.2 0 0 1 4 21.6V10.39A3.2 3.2 0 0 1 7.19 7.2zM10.5 15h11a1 1 0 0 0 0-2h-11a1 1 0 0 0 0 2m2 4.5h7a1 1 0 0 0 0-2h-7a1 1 0 0 0 0 2"
                     />
-                {:else}
-                    <g fill="none">
-                        <path
-                            fill="currentColor"
-                            d="M3 4h14v16H5a2 2 0 0 1-2-2z"
-                            opacity=".16"
-                        />
-                        <path
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M3 4v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8h-4"
-                        />
-                        <path
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M3 4h14v14a2 2 0 0 0 2 2v0M13 8H7m6 4H9"
-                        />
-                    </g>
-                {/if}
-            </svg>
-        </button>
+                    <path
+                        d="M24.81 6.2A4.2 4.2 0 0 1 29 10.37v11.24a4.2 4.2 0 0 1-4.19 4.19H7.2A4.2 4.2 0 0 1 3 21.6V10.39A4.2 4.2 0 0 1 7.19 6.2zm0 2H7.2c-1.21 0-2.2.96-2.2 2.17v11.24c0 1.2.98 2.19 2.19 2.19H24.8a2.2 2.2 0 0 0 2.19-2.2V10.39A2.2 2.2 0 0 0 24.8 8.2"
+                    />
+                    <path
+                        fill-opacity={uiState.sentenceVisible ? "0" : "1"}
+                        d="M10.5 15a1 1 0 0 1 0-2h11a1 1 0 0 1 0 2zm2 4.5a1 1 0 0 1 0-2h7a1 1 0 0 1 0 2z"
+                    />
+                </svg>
+            </button>
+        {/if}
     </div>
 </div>
 
@@ -259,11 +234,19 @@
             backdrop-filter var(--duration-fast) var(--ease-standard);
     }
 
-    button {
-        padding-inline: var(--space-04);
-    }
-
     button:active {
         transform: scale(1.1);
+    }
+
+    /* options panel button transition */
+    .dot {
+        transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .dot-top.open {
+        transform: translateX(-12px);
+    }
+
+    .dot-bottom.open {
+        transform: translateX(12px);
     }
 </style>

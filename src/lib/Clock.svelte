@@ -30,7 +30,7 @@
 
     function toggleFormat() {
         appState.use24Hour = !appState.use24Hour;
-        persist();
+        persist("use24Hour");
     }
 </script>
 

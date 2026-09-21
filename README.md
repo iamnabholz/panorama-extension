@@ -16,17 +16,36 @@ Panorama Tab swaps your browser's new tab for a simple glanceable summary laid o
 ## Development
 
 ```bash
-# install dependencies
+# Install dependencies
 npm install
 
-# run the web app locally
+# Run the application as a local web page
 npm run dev
 
-# build the browser extension
-npm run build
+# Build the Chrome extension
+npm run build:chrome
+
+# Build the Firefox extension
+npm run build:firefox
 ```
 
-To load the extension build locally: open your browser's extensions page, enable developer mode, and load `dist` as an unpacked extension.
+Both extension builds write to `dist`. Building one browser replaces the
+previous browser's output. `npm run build` defaults to Firefox unless
+`TARGET` is set.
+
+### Chrome
+
+1. Run `npm run build:chrome`.
+2. Open `chrome://extensions`.
+3. Enable Developer mode.
+4. Choose **Load unpacked** and select `dist`.
+
+### Firefox
+
+1. Run `npm run build:firefox`.
+2. Open `about:debugging#/runtime/this-firefox`.
+3. Choose **Load Temporary Add-on**.
+4. Select `dist/manifest.json`.
 
 ## Privacy
 

@@ -70,6 +70,7 @@ button.primary {
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-sm);
     text-align: center;
+    flex-shrink: 0;
 }
 
 button.primary:hover:not(:disabled) {
@@ -149,7 +150,7 @@ input[type="checkbox"] {
     display: flex;
     align-items: center;
     width: 54px;
-    background: var(--color-background-elevated);
+    background: var(--color-border-strong);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-full);
     padding: 3px;
@@ -197,6 +198,7 @@ input[type="checkbox"]:checked ~ .toggle-switch::after {
     position: relative;
     width: 100%;
     box-sizing: border-box;
+    gap: var(--space-02);
     grid-template-columns: repeat(var(--choice-count, 3), 1fr);
     transition: all var(--duration-fast) var(--ease-standard);
 }
@@ -210,7 +212,7 @@ input[type="checkbox"]:checked ~ .toggle-switch::after {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--space-03);
+    gap: var(--space-02);
     padding: var(--space-02) var(--space-02);
     font-size: var(--font-size-xs);
     text-transform: uppercase;
@@ -219,17 +221,38 @@ input[type="checkbox"]:checked ~ .toggle-switch::after {
     color: var(--color-text);
     opacity: 0.6;
     background: transparent;
-    border: none;
+    border: 1px solid transparent;
     box-shadow: none;
     cursor: pointer;
     transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.choice-group button span {
+    border-radius: var(--radius-full);
+    background-color: transparent;
+    padding: var(--space-01) var(--space-04);
+    padding-top: var(--space-02);
 }
 
 .choice-group button:hover {
     border-color: transparent;
     box-shadow: none;
     opacity: 1;
-    color: var(--color-accent);
+}
+
+.choice-group button:hover span {
+    background-color: var(--color-background);
+    border-color: var(--color-accent);
+    box-shadow:
+        0 0 0 3px color-mix(in oklab, var(--color-accent) 25%, transparent),
+        var(--shadow-md);
+}
+
+.choice-group button.selected:hover span {
+    border-color: var(--color-accent);
+    box-shadow:
+        0 0 0 3px color-mix(in oklab, var(--color-accent) 25%, transparent),
+        var(--shadow-md);
 }
 
 .choice-group button.selected {
@@ -238,10 +261,7 @@ input[type="checkbox"]:checked ~ .toggle-switch::after {
 }
 
 .choice-group button.selected span {
-    padding: var(--space-01) var(--space-04);
-    padding-top: var(--space-02);
     color: var(--color-white);
-    border-radius: var(--radius-full);
     background-color: var(--color-accent);
 }
 
@@ -261,11 +281,16 @@ input[type="checkbox"]:checked ~ .toggle-switch::after {
 }
 
 .choice-group.small button {
-    color: var(--color-text);
     border-radius: var(--radius-full);
     padding: var(--space-03) var(--space-03);
     flex-direction: row;
     text-transform: capitalize;
+
+    border-radius: var(--radius-full);
+}
+
+.choice-group.small button.selected {
+    color: var(--color-white);
 }
 
 .choice-group.small::before {

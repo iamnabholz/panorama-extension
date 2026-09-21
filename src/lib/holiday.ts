@@ -48,7 +48,7 @@ export async function fetchHolidays(): Promise<HolidayCache | null> {
     };
 
     appState["holiday-cache"] = newCache;
-    persist();
+    persist("holiday-cache");
 
     return newCache;
   } catch (err) {

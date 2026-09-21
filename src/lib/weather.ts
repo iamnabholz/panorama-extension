@@ -48,7 +48,7 @@ export async function fetchWeather(): Promise<WeatherData | null> {
   try {
     const fresh = await fetchFromApi();
     appState["weather-cache"] = fresh;
-    persist();
+    persist("weather-cache");
 
     return fresh;
   } catch (err) {

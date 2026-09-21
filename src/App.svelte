@@ -8,6 +8,7 @@
         hydrateState,
         startLoading,
         stopLoading,
+        retryFailedWrites,
     } from "./lib/state.svelte";
 
     import Background from "./lib/Background.svelte";
@@ -74,12 +75,29 @@
         uiState.sentenceVisible = appState.sentenceVisible;
     }
 
+    let myg = $state(true);
+
     function handleKeydown(event: KeyboardEvent) {
         if (event.key === "Meta") {
             console.log("Command pressed");
 
+            myg = !myg;
             //uiState.showOnboardAtLaunch = true;
         }
+    }
+
+    import { quintIn, quintOut } from "svelte/easing";
+
+    function blur(node: HTMLElement, { duration = 600, reverse = false } = {}) {
+        return {
+            duration,
+            easing: reverse ? quintIn : quintOut,
+
+            css: (t: number) => `
+                opacity: ${t};
+                filter: blur(${(1 - t) * 5}px);
+            `,
+        };
     }
 </script>
 
@@ -122,12 +140,19 @@
     </div>
 </main>
 
-<div class:is-onboarding={uiState.showOnboardAtLaunch} transition:fade>
-    <ControlBar />
-</div>
+{#if myg}
+    <div
+        style="transform: translateY(0px);"
+        class:is-onboarding={uiState.showOnboardAtLaunch}
+        in:blur
+        out:blur={{ reverse: true }}
+    >
+        <ControlBar />
+    </div>
+{/if}
 
 {#if uiState.optionsOpen}
-    <div id="float-overlay" in:fly={{ delay: 60, y: 25 }} out:fly={{ y: 25 }}>
+    <div id="float-overlay" in:blur={{ reverse: true }} out:blur>
         <div use:clickOutside={closeOptions} style="display: contents;">
             <Options />
         </div>
@@ -139,6 +164,18 @@
         <Onboard />
     </div>
 {/if}
+
+<div class="storage-notice" class:visible={uiState.storageError !== null}>
+    <p role="status" aria-live="polite" aria-atomic="true">
+        {uiState.storageError ?? ""}
+    </p>
+
+    {#if uiState.storageError}
+        <button type="button" onclick={() => retryFailedWrites()}>
+            Retry saving
+        </button>
+    {/if}
+</div>
 
 <style>
     main {
@@ -191,5 +228,48 @@
         opacity: 0.5;
         filter: grayscale(0.5);
         transition: all var(--duration-moderate) var(--ease-standard);
+    }
+
+    .storage-notice {
+        position: fixed;
+        top: var(--space-05);
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2000;
+
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-03);
+
+        width: max-content;
+        max-width: calc(100vw - 2rem);
+        box-sizing: border-box;
+
+        color: var(--color-text);
+        font-size: var(--font-size-sm);
+    }
+
+    .storage-notice.visible {
+        padding: var(--space-04);
+        background: var(--color-background);
+        border: 1px solid var(--color-border-strong);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+    }
+
+    .storage-notice p {
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .storage-notice button {
+        flex-shrink: 0;
+        text-decoration: underline;
+    }
+
+    .storage-notice button:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 3px;
     }
 </style>

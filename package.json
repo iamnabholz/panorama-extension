@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run check && vite build",
+    "build:chrome": "TARGET=chrome npm run build",
+    "build:firefox": "TARGET=firefox npm run build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
   },
@@ -17,8 +19,5 @@
     "svelte-check": "^4.7.3",
     "typescript": "~6.0.2",
     "vite": "^8.2.2"
-  },
-  "dependencies": {
-    "vite-plugin-web-extension": "^4.5.1"
   }
 }

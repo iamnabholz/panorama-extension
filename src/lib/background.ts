@@ -68,7 +68,7 @@ export async function fetchBackground(
 
     appState["image-cache"] = fresh;
     appState.background.value = fresh.url;
-    persist();
+    persist("image-cache", "background");
 
     return fresh;
   } catch (err) {

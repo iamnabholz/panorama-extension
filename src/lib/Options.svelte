@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { appState, persist } from "./state.svelte";
+    import { appState, persist, uiState } from "./state.svelte";
     import pkg from "../../package.json" with { type: "json" };
     import { fetchBackground } from "./background";
 
@@ -8,6 +8,13 @@
     import { slide } from "svelte/transition";
 
     const COOLDOWN_MS = 60 * 60 * 1000;
+
+    let summaryDisabled = $derived(
+        !appState.displayGreeting &&
+            !appState.displayDate &&
+            !appState.displayTime &&
+            !appState.displayWeather,
+    );
 
     let queryBind = $state(appState["image-cache"]?.query ?? "");
     let colorBind = $state(appState["color-cache"].startColor ?? "");
@@ -53,23 +60,36 @@
 
     function saveColorCache() {
         appState["color-cache"].startColor = colorBind;
+
         if (appState["color-cache"].gradient) {
             appState["color-cache"].endColor = colorBindSecondary;
         }
         const newColor = currentColorValue();
-        appState.background = { type: "color", value: newColor };
+
+        appState.background = {
+            type: "color",
+            value: newColor,
+        };
+
         applyBackgroundToDOM("color", newColor);
-        persist();
+        persist("color-cache", "background");
     }
 
     function changeBackgroundType(newType: string) {
         const savedValue =
             newType === "image"
                 ? (appState["image-cache"]?.url ?? "")
-                : currentColorValue();
-        appState.background = { type: newType, value: savedValue };
+                : newType === "color"
+                  ? currentColorValue()
+                  : "none";
+
+        appState.background = {
+            type: newType,
+            value: savedValue,
+        };
+
         applyBackgroundToDOM(newType, savedValue);
-        persist();
+        persist("background");
     }
 </script>
 
@@ -101,12 +121,53 @@
             <section class="option-section">
                 <h2 class="section-label">Display & Widgets</h2>
                 <div class="input-tray surface-panel">
+                    {#if summaryDisabled}
+                        <p class="warning-text" transition:slide|local>
+                            <span class="warning-icon" aria-hidden="true">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    xml:space="preserve"
+                                    fill-rule="evenodd"
+                                    stroke-linejoin="round"
+                                    stroke-miterlimit="2"
+                                    clip-rule="evenodd"
+                                    width="1em"
+                                    height="1em"
+                                    viewBox="0 0 32 32"
+                                    aria-hidden="true"
+                                    focusable="false"
+                                >
+                                    <path fill="none" d="M0 0h32v32H0z" />
+                                    <path
+                                        fill-opacity=".14"
+                                        d="M12.48 6.47a4.12 4.12 0 0 1 6.9-.02l9.29 14.17A4.12 4.12 0 0 1 25.22 27H6.74a4.12 4.12 0 0 1-3.45-6.36z"
+                                    />
+                                    <path
+                                        d="M12.48 6.47a4.12 4.12 0 0 1 6.9-.02l9.29 14.17A4.12 4.12 0 0 1 25.22 27H6.74a4.12 4.12 0 0 1-3.45-6.36zm1.67 1.09L4.96 21.73A2.12 2.12 0 0 0 6.74 25h18.48A2.12 2.12 0 0 0 27 21.72L17.7 7.55a2.12 2.12 0 0 0-3.55 0"
+                                    />
+                                    <circle
+                                        cx="15.5"
+                                        cy="21.5"
+                                        r=".5"
+                                        transform="matrix(2 0 0 2 -15 -21.5)"
+                                    />
+                                    <path
+                                        d="M15 12.39c0-.5.45-.89 1-.89s1 .4 1 .89v6.22c0 .5-.45.89-1 .89s-1-.4-1-.89z"
+                                    />
+                                </svg>
+                            </span>
+                            <span class="warning-content">
+                                Nothing is enabled, summary button will not be
+                                visible on the control bar
+                            </span>
+                        </p>
+                    {/if}
                     <label class="toggle-row">
                         <span>Show Date & Holidays</span>
                         <input
                             type="checkbox"
                             bind:checked={appState.displayDate}
-                            onchange={persist}
+                            onchange={() => persist("displayDate")}
                         />
                         <div class="toggle-switch"></div>
                     </label>
@@ -119,7 +180,7 @@
                             <input
                                 type="checkbox"
                                 bind:checked={appState.displayGreeting}
-                                onchange={persist}
+                                onchange={() => persist("displayGreeting")}
                             />
                             <div class="toggle-switch"></div>
                         </label>
@@ -135,12 +196,10 @@
                                 value={appState.userName ?? ""}
                                 placeholder="Your name (e.g. Alex)"
                                 disabled={!appState.displayGreeting}
-                                oninput={(e) => {
-                                    const val = (
-                                        e.currentTarget as HTMLInputElement
-                                    ).value;
-                                    appState.userName = val.trim();
-                                    persist();
+                                oninput={(event) => {
+                                    appState.userName =
+                                        event.currentTarget.value;
+                                    persist("userName");
                                 }}
                             />
 
@@ -158,7 +217,7 @@
                                 <input
                                     type="checkbox"
                                     bind:checked={appState.displayTime}
-                                    onchange={persist}
+                                    onchange={() => persist("displayTime")}
                                 />
                                 <div class="toggle-switch"></div>
                             </label>
@@ -176,7 +235,7 @@
                                 <input
                                     type="checkbox"
                                     bind:checked={appState.displayWeather}
-                                    onchange={persist}
+                                    onchange={() => persist("displayWeather")}
                                 />
                                 <div class="toggle-switch"></div>
                             </label>
@@ -309,8 +368,10 @@
                                             onclick={() => {
                                                 appState.imageUpdateFrequency =
                                                     freq;
-                                                persist();
-                                            }}>{freq}</button
+                                                persist("imageUpdateFrequency");
+                                            }}
+                                        >
+                                            {freq}</button
                                         >
                                     {/each}
                                 </div>
@@ -331,7 +392,11 @@
                                     bind:checked={
                                         appState["color-cache"].gradient
                                     }
-                                    onchange={saveColorCache}
+                                    onchange={(event) => {
+                                        appState["color-cache"].gradient =
+                                            event.currentTarget.checked;
+                                        saveColorCache();
+                                    }}
                                 />
                                 <div class="toggle-switch"></div>
                             </label>
@@ -342,7 +407,11 @@
                                     <input
                                         type="color"
                                         bind:value={colorBind}
-                                        oninput={saveColorCache}
+                                        oninput={(event) => {
+                                            colorBind =
+                                                event.currentTarget.value;
+                                            saveColorCache();
+                                        }}
                                     />
                                 </label>
                                 {#if appState["color-cache"].gradient}
@@ -353,7 +422,11 @@
                                         <input
                                             type="color"
                                             bind:value={colorBindSecondary}
-                                            oninput={saveColorCache}
+                                            oninput={(event) => {
+                                                colorBindSecondary =
+                                                    event.currentTarget.value;
+                                                saveColorCache();
+                                            }}
                                         />
                                     </label>
                                 {/if}
@@ -477,10 +550,40 @@
         row-gap: var(--space-02);
         flex-wrap: wrap;
     }
+
     .credits {
         line-height: 1.4;
     }
+
     footer {
         font-size: var(--font-size-sm);
+    }
+
+    .warning-text {
+        display: flex;
+        align-items: center;
+        gap: var(--space-03);
+
+        background-color: color-mix(in srgb, var(--color-red) 10%, transparent);
+
+        color: var(--color-red);
+        padding: var(--space-04);
+        padding-top: 14px;
+        border-radius: var(--radius-sm);
+
+        font-size: var(--font-size-xs);
+        line-height: var(--line-height-tight);
+        font-weight: var(--font-weight-bold);
+    }
+
+    .warning-icon {
+        display: flex;
+        flex: 0 0 auto;
+
+        font-size: 1.75rem;
+    }
+
+    .warning-content {
+        flex: 1;
     }
 </style>

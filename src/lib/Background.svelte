@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { untrack } from "svelte";
     import { appState, uiState } from "./state.svelte";
     import { isDarkBackground } from "./utils/contrast";
 
@@ -26,10 +27,13 @@
         } else if (appState.background.type === "color") {
             sampleColor = appState["color-cache"].startColor;
         } else {
+            // FIX THIS
             // 'none' mode: check current computed body background color
             sampleColor = getComputedStyle(document.documentElement)
-                .getPropertyValue("--color-body-background")
+                .getPropertyValue("background-color")
                 .trim();
+
+            console.log(sampleColor);
         }
 
         const isDark = isDarkBackground(sampleColor);
@@ -44,8 +48,8 @@
         }
     });
 
-    let activeBg = $state(currentBg);
-    let stagingBg = $state(currentBg);
+    let activeBg = $state(untrack(() => currentBg));
+    let stagingBg = $state(untrack(() => currentBg));
     let isFading = $state(false);
 
     $effect(() => {

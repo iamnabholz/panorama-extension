@@ -1,171 +1,273 @@
 <script lang="ts">
     import Clock from "./Clock.svelte";
     import { uiState } from "./state.svelte";
+    import { slide, fade } from "svelte/transition";
 
     let currentStep = $state(0);
+    const totalSteps = 3;
 
     function completeOnboard() {
         uiState.showOnboardAtLaunch = false;
     }
 
     function goNext() {
-        if (currentStep === 1) {
+        if (currentStep === totalSteps - 1) {
             completeOnboard();
             return;
         }
         currentStep = currentStep + 1;
     }
+
     function goPrevious() {
         if (currentStep === 0) return;
         currentStep = currentStep - 1;
     }
 </script>
 
-<div class="bg"></div>
-<div id="float-panel" class="surface">
-    <div id="float-panel__scroll">
-        {#if currentStep === 0}
-            <p style="padding-top: 12px; font-weight: bold;">Welcome</p>
-            <p>
-                Change the background, and customize items from the summary by
-                opening the options panel with the left icon.
-                <br /> <br />
-                Show or hide the summary by clicking the eye icon on the right.
-            </p>
-
-            <div class="row glass bar-row">
-                <div class="bar-button">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                        focusable="false"
-                    >
-                        <path
-                            d="M10 22H6v-2h4v2Zm-4-2H4v-2H2v-2h2v-2h2v6Zm6-4h10v2H12v2h-2v-6h2v2Zm-2-2H6v-2h4v2Zm8-2h-4v-2h4v2Zm-6-4H2V6h10V4h2v6h-2V8Zm8-2h2v2h-2v2h-2V4h2v2Zm-2-2h-4V2h4v2Z"
-                        />
-                    </svg>
-                </div>
-                <div class="bar-button">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                        focusable="false"
-                    >
-                        <path
-                            d="M16 20H8v-2h8v2Zm-8-2H4v-2h4v2Zm12 0h-4v-2h4v2ZM4 16H2v-2h2v2Zm10-6h-2v2h2v-2h2v4h-2v2h-4v-2H8v-4h2V8h4v2Zm8 6h-2v-2h2v2ZM2 14H0v-4h2v4Zm22 0h-2v-4h2v4ZM4 10H2V8h2v2Zm18 0h-2V8h2v2ZM8 8H4V6h4v2Zm12 0h-4V6h4v2Zm-4-2H8V4h8v2Z"
-                        />
-                    </svg>
-                </div>
+<div class="onboard-overlay" transition:fade={{ duration: 200 }}>
+    <div id="float-panel" class="surface onboard-card">
+        <div id="float-panel__scroll">
+            <div class="step-content">
+                {#if currentStep === 0}
+                    <div transition:fade={{ duration: 150 }}>
+                        <h2>Welcome to Panorama</h2>
+                        <p>
+                            Transform your new tab into a focused, beautiful
+                            dashboard. Everything you see is customizable to fit
+                            your workflow.
+                        </p>
+                        <div class="preview-box surface-panel">
+                            <div class="mock-ui">
+                                <div class="mock-dot red"></div>
+                                <div class="mock-dot yellow"></div>
+                                <div class="mock-dot green"></div>
+                            </div>
+                        </div>
+                    </div>
+                {:else if currentStep === 1}
+                    <div transition:fade={{ duration: 150 }}>
+                        <h2>Make it yours</h2>
+                        <p>
+                            Use the <b>Settings</b> icon on the bottom left to change
+                            backgrounds, toggle widgets, or set your name for a personal
+                            greeting.
+                        </p>
+                        <div class="icon-instruction">
+                            <div class="instruction-row">
+                                <div class="icon-circle">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        aria-hidden="true"
+                                        focusable="false"
+                                    >
+                                        <path
+                                            fill="currentColor"
+                                            fill-rule="evenodd"
+                                            d="M4 7h8.17a3.001 3.001 0 0 1 5.66 0H20a1 1 0 1 1 0 2h-2.17a3.001 3.001 0 0 1-5.66 0H4a1 1 0 0 1 0-2m0 8h2.17a3.001 3.001 0 0 1 5.66 0H20a1 1 0 1 1 0 2h-8.17a3.001 3.001 0 0 1-5.66 0H4a1 1 0 1 1 0-2"
+                                            clip-rule="evenodd"
+                                        />
+                                    </svg>
+                                </div>
+                                <span>Customize your dashboard</span>
+                            </div>
+                            <div class="instruction-row">
+                                <div class="icon-circle">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        aria-hidden="true"
+                                        focusable="false"
+                                    >
+                                        <path
+                                            fill="currentColor"
+                                            fill-rule="evenodd"
+                                            d="M18 4v3h3a1 1 0 0 1 1 1v10a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1m2 14a1 1 0 1 1-2 0V9h2zM6 8a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H7a1 1 0 0 1-1-1m2 4a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1"
+                                            clip-rule="evenodd"
+                                        />
+                                    </svg>
+                                </div>
+                                <span>Show or hide the interface</span>
+                            </div>
+                        </div>
+                    </div>
+                {:else if currentStep === 2}
+                    <div transition:fade={{ duration: 150 }}>
+                        <h2>Stay Informed</h2>
+                        <p>
+                            Click on widgets to interact with them. You can
+                            toggle units, view upcoming holidays, or check the
+                            local weather.
+                        </p>
+                        <div class="clock-preview">
+                            <Clock />
+                            <span class="hint">Click to toggle format</span>
+                        </div>
+                    </div>
+                {/if}
             </div>
-        {:else if currentStep === 1}
-            <p style="padding-top: 12px; font-weight: bold;">Interactivity</p>
-            <p>
-                Click the clock or temperature in your summary to switch units.
-                <br /> <br />
-                Or click on the current date to show information about upcoming holidays
-                in your country.
-                <br /> <br />
-            </p>
 
-            <div class="summary-clock">
-                <Clock />
-            </div>
-        {/if}
-
-        <div class="basic-row" style="align-self: flex-end; gap: 8px;">
-            {#if currentStep > 0}
-                <button class="glass" onclick={goPrevious}> Back </button>
-            {/if}
-            <button onclick={goNext}>
-                {currentStep === 1 ? "Finish" : "Next"}
-            </button>
+            <footer class="onboard-footer">
+                {#if currentStep > 0}
+                    <button class="secondary-btn" onclick={goPrevious}
+                        >Back</button
+                    >
+                {/if}
+                <button class="primary-btn" onclick={goNext}>
+                    {currentStep === totalSteps - 1
+                        ? "Start using Panorama"
+                        : "Continue"}
+                </button>
+            </footer>
         </div>
     </div>
 </div>
 
 <style>
-    #float-panel {
-        height: min-content;
-        z-index: 10;
-    }
-
-    button:hover:not(:disabled),
-    button:focus-visible:not(:disabled) {
-        outline: 2px solid var(--color-white);
-        outline-offset: 2px;
-    }
-
-    button {
-        cursor: pointer;
-        padding: 8px 16px;
-        border: none;
-        color: inherit;
-        font: inherit;
-        background-color: var(--color-white);
-        color: var(--color-black);
-        border-radius: var(--field-radius-md);
-        transition: var(--field-transition);
-    }
-    button:disabled {
-        background-color: var(--white-60);
-        cursor: not-allowed;
-    }
-    .bg {
-        position: absolute;
-        background-color: black;
-        width: 100dvw;
-        height: 100dvh;
-        opacity: 0.4;
-        z-index: 5;
-    }
-
-    .bar-row {
-        display: flex;
-        align-self: center;
-        align-items: center;
-        width: fit-content;
-        border-radius: 100px;
-        padding: 4px;
-    }
-
-    .bar-button {
-        cursor: pointer;
+    .onboard-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.4);
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 22px;
-        height: 32px;
-        width: fit-content;
-
-        border-radius: 100px;
-        color: inherit;
-
-        background: transparent;
-        transition:
-            background-color 150ms ease-out,
-            outline-color 150ms ease-out;
+        z-index: 1000;
+        backdrop-filter: blur(4px);
     }
 
-    .bar-button:hover,
-    .bar-button:focus-visible {
-        background: rgba(255, 255, 255, 0.15);
+    .onboard-card {
+        width: min(440px, 95vw);
+        height: auto;
+        border-radius: var(--radius-xl);
     }
 
-    .bar-button svg {
-        height: 24px;
-        width: 24px;
-        display: block;
-
-        filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.2));
+    .step-content {
+        padding-top: var(--space-03);
+        min-height: 240px;
+        display: flex;
+        flex-direction: column;
     }
 
-    .summary-clock {
-        align-self: center;
-        font-size: var(--sentence-font-size);
-        font-weight: bold;
+    h2 {
+        font-size: var(--font-size-2xl);
+        margin-bottom: var(--space-03);
+    }
+
+    p {
+        color: var(--color-text-secondary);
+        margin-bottom: var(--space-06);
+    }
+
+    .preview-box {
+        height: 120px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: flex-start;
+        padding: var(--space-04);
+        border: 1px solid var(--color-border);
+    }
+
+    .mock-ui {
+        display: flex;
+        gap: 6px;
+    }
+
+    .mock-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        opacity: 0.5;
+    }
+    .red {
+        background: var(--color-red);
+    }
+    .yellow {
+        background: var(--color-yellow);
+    }
+    .green {
+        background: var(--color-green);
+    }
+
+    .icon-instruction {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-04);
+    }
+
+    .instruction-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-04);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-bold);
+    }
+
+    .icon-circle {
+        width: 40px;
+        height: 40px;
+        background: var(--color-background-elevated);
+        padding: var(--space-03);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-text);
+        border: 1px solid var(--color-border);
+    }
+
+    .clock-preview {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-02);
+        padding: var(--space-04);
+        background: var(--color-background-panel);
+        border-radius: var(--radius-md);
+    }
+
+    .onboard-footer {
+        display: flex;
+        gap: var(--space-03);
+        margin-top: var(--space-04);
+    }
+
+    button {
+        flex: 1;
+        padding: var(--space-04);
+        border-radius: var(--radius-md);
+        font-weight: var(--font-weight-bold);
+        text-align: center;
+        transition: all var(--duration-fast) var(--ease-standard);
+        cursor: pointer;
+        font-family: var(--font-sans);
+    }
+
+    .primary-btn {
+        background: var(--color-accent);
+        color: var(--color-white);
+        border: none;
+    }
+
+    .primary-btn:hover {
+        background: var(--color-accent-hover);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .secondary-btn {
+        background: var(--color-background-elevated);
+        color: var(--color-text);
+        border: 1px solid var(--color-border);
+    }
+
+    .secondary-btn:hover {
+        border-color: var(--color-border-strong);
+        background: var(--color-background-panel);
+    }
+
+    .hint {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-secondary);
+        font-weight: normal;
     }
 </style>

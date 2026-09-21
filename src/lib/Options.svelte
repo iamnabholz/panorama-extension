@@ -5,6 +5,7 @@
 
     /* Global shared styles */
     import "../styles/inputs.css";
+    import { slide } from "svelte/transition";
 
     const COOLDOWN_MS = 60 * 60 * 1000;
 
@@ -98,10 +99,10 @@
 
             <!-- SECTION: GENERAL -->
             <section class="option-section">
-                <h2 class="section-label">Summary</h2>
+                <h2 class="section-label">Display & Widgets</h2>
                 <div class="input-tray surface-panel">
                     <label class="toggle-row">
-                        <span>Date & Holidays</span>
+                        <span>Show Date & Holidays</span>
                         <input
                             type="checkbox"
                             bind:checked={appState.displayDate}
@@ -114,7 +115,7 @@
 
                     <div class="grouped-fields">
                         <label class="toggle-row">
-                            <span>Greetings</span>
+                            <span>Personalized Greeting</span>
                             <input
                                 type="checkbox"
                                 bind:checked={appState.displayGreeting}
@@ -132,22 +133,20 @@
                                 type="text"
                                 maxlength={12}
                                 value={appState.userName ?? ""}
-                                placeholder="e.g. Mark, Alice"
+                                placeholder="Your name (e.g. Alex)"
                                 disabled={!appState.displayGreeting}
                                 oninput={(e) => {
                                     const val = (
                                         e.currentTarget as HTMLInputElement
                                     ).value;
-                                    // Trim leading/trailing spaces for the saved state, or keep empty if blank
-                                    appState.userName =
-                                        val.trim() === "" ? "" : val.trim();
+                                    appState.userName = val.trim();
                                     persist();
                                 }}
                             />
 
                             <div class="hint">
-                                Type your name for more personalized greetings,
-                                or leave empty for only general greetings.
+                                Enter your name for a personal touch, or leave
+                                it blank for a general greeting.
                             </div>
                         </div>
 
@@ -155,7 +154,7 @@
 
                         <div class="stack-xs">
                             <label class="toggle-row">
-                                <span>Current Time</span>
+                                <span>Clock</span>
                                 <input
                                     type="checkbox"
                                     bind:checked={appState.displayTime}
@@ -164,7 +163,8 @@
                                 <div class="toggle-switch"></div>
                             </label>
                             <p class="hint">
-                                Click the clock widget to toggle 12/24h format.
+                                Tip: You can click the clock on your dashboard
+                                to switch between 12h and 24h formats.
                             </p>
                         </div>
 
@@ -172,7 +172,7 @@
 
                         <div class="stack-xs">
                             <label class="toggle-row">
-                                <span>Weather Information</span>
+                                <span>Weather Forecast</span>
                                 <input
                                     type="checkbox"
                                     bind:checked={appState.displayWeather}
@@ -181,11 +181,8 @@
                                 <div class="toggle-switch"></div>
                             </label>
                             <p class="hint">
-                                Click the temperature widget to toggle between
-                                °C/°F.
-                                <br />
-                                Weather is wrong? We determine your location based
-                                on your IP address.
+                                Location is estimated via IP. Click the weather
+                                widget to toggle between Celsius and Fahrenheit.
                             </p>
                         </div>
                     </div>
@@ -194,7 +191,7 @@
 
             <!-- SECTION: BACKGROUND -->
             <section class="option-section">
-                <h2 class="section-label">Background</h2>
+                <h2 class="section-label">Background Style</h2>
                 <div class="input-tray surface-panel">
                     <div class="choice-group" style="--choice-count: 3;">
                         <button
@@ -203,15 +200,19 @@
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                width="1em"
-                                height="1em"
-                                viewBox="-2 -4 24 24"
-                                ><title>picture-f</title><path
-                                    fill="currentColor"
-                                    d="m20 10.536l-4.416-4.44a3 3 0 0 0-4.69.582L5.072 16H3a3 3 0 0 1-3-3V3a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3zm-.011 2.724A3 3 0 0 1 17 16H7.64l4.969-8.293a1 1 0 0 1 1.563-.195zM6 9a3 3 0 1 0 0-6a3 3 0 0 0 0 6"
-                                /></svg
+                                xml:space="preserve"
+                                fill-rule="evenodd"
+                                stroke-linejoin="round"
+                                stroke-miterlimit="2"
+                                clip-rule="evenodd"
+                                viewBox="0 0 32 32"
+                                fill="currentColor"
                             >
-                            None
+                                <path
+                                    d="M26.92 5C29.72 5 32 7.28 32 10.08v11.84c0 2.8-2.28 5.08-5.08 5.08H5.08A5.1 5.1 0 0 1 0 21.92V10.08C0 7.28 2.28 5 5.08 5zm0 2H5.08A3.1 3.1 0 0 0 2 10.08v11.84C2 23.62 3.38 25 5.08 25h21.84c1.7 0 3.08-1.38 3.08-3.08V10.08C30 8.38 28.62 7 26.92 7"
+                                />
+                            </svg>
+                            <span>Minimal</span>
                         </button>
                         <button
                             class:selected={appState.background.type ===
@@ -220,15 +221,22 @@
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                width="1em"
-                                height="1em"
-                                viewBox="-2 -3.5 24 24"
-                                ><title>rectangle-f</title><path
-                                    fill="currentColor"
-                                    d="M3 .565h14a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3v-10a3 3 0 0 1 3-3"
-                                /></svg
+                                xml:space="preserve"
+                                fill-rule="evenodd"
+                                stroke-linejoin="round"
+                                stroke-miterlimit="2"
+                                clip-rule="evenodd"
+                                viewBox="0 0 32 32"
+                                fill="currentColor"
                             >
-                            Solid/Gradient
+                                <path
+                                    d="M26.92 5C29.72 5 32 7.28 32 10.08v11.84c0 2.8-2.28 5.08-5.08 5.08H5.08A5.1 5.1 0 0 1 0 21.92V10.08C0 7.28 2.28 5 5.08 5zm0 2H5.08A3.1 3.1 0 0 0 2 10.08v11.84C2 23.62 3.38 25 5.08 25h21.84c1.7 0 3.08-1.38 3.08-3.08V10.08C30 8.38 28.62 7 26.92 7"
+                                />
+                                <path
+                                    d="m26.64 9 .27.03.26.08.23.12.2.17.17.2.12.23.08.26.03.27v11.28l-.03.27-.08.26-.12.23-.17.2-.2.17-.23.12-.26.08-.27.03H5.36l-.27-.03-.26-.08-.23-.12-.2-.17-.17-.2-.12-.23-.08-.26-.03-.27V10.36l.03-.27.08-.26.12-.23.17-.2.2-.17.23-.12.26-.08.27-.03z"
+                                />
+                            </svg>
+                            <span>Color</span>
                         </button>
                         <button
                             class:selected={appState.background.type ===
@@ -237,104 +245,119 @@
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                ><title>image-solid</title><path
-                                    fill="currentColor"
-                                    fill-rule="evenodd"
-                                    d="M7.268 4.658a54.7 54.7 0 0 1 9.465 0l1.51.132a3.14 3.14 0 0 1 2.831 2.66a30.6 30.6 0 0 1 0 9.1q-.061.397-.212.754c-.066.157-.27.181-.386.055l-4.421-4.864a.75.75 0 0 0-.792-.207l-2.531.844l-3.671-4.13A.75.75 0 0 0 7.97 8.97l-4.914 4.914a.246.246 0 0 1-.422-.159a30.6 30.6 0 0 1 .292-6.276a3.14 3.14 0 0 1 2.831-2.66zM14 9a1.5 1.5 0 1 1 3 0a1.5 1.5 0 0 1-3 0"
-                                    clip-rule="evenodd"
-                                /><path
-                                    fill="currentColor"
-                                    d="M2.961 16.1a.25.25 0 0 0-.07.21l.035.24a3.14 3.14 0 0 0 2.831 2.66l1.51.131c3.15.274 6.316.274 9.466 0l1.51-.131a3.1 3.1 0 0 0 1.185-.347c.137-.071.16-.252.056-.366l-4.1-4.51a.25.25 0 0 0-.265-.07l-2.382.794a.75.75 0 0 1-.798-.213l-3.295-3.707a.25.25 0 0 0-.364-.01z"
-                                /></svg
+                                xml:space="preserve"
+                                fill-rule="evenodd"
+                                stroke-linejoin="round"
+                                stroke-miterlimit="2"
+                                clip-rule="evenodd"
+                                viewBox="0 0 32 32"
+                                fill="currentColor"
                             >
-                            Unsplash
+                                <path
+                                    d="M26.92 5C29.72 5 32 7.28 32 10.08v11.84c0 2.8-2.28 5.08-5.08 5.08H5.08A5.1 5.1 0 0 1 0 21.92V10.08C0 7.28 2.28 5 5.08 5zm0 2H5.08A3.1 3.1 0 0 0 2 10.08v11.84C2 23.62 3.38 25 5.08 25h21.84c1.7 0 3.08-1.38 3.08-3.08V10.08C30 8.38 28.62 7 26.92 7M5.14 20.33A.66.66 0 0 1 4 19.86v-9.51l.03-.27.08-.26.12-.23.17-.2.2-.17.23-.12.26-.08.27-.03h21.28l.27.03.26.08.23.12.2.17.17.2.12.23.08.26.03.27v7.01a.66.66 0 0 1-1.15.44l-.34-.38-.01-.01a4 4 0 0 0-2.97-1.31c-1.13 0-2.2.48-2.97 1.3l-1.3 1.4a.66.66 0 0 1-.96 0l-2.87-3.09a4 4 0 0 0-2.97-1.3c-1.13 0-2.2.47-2.97 1.3zM20.5 11a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m7.45 10.99-.06.18-.12.23-.17.2-.2.17-.23.12-.26.08-.27.03h-4.13a.7.7 0 0 1-.48-.2l-1.46-1.57a.66.66 0 0 1 0-.9l1.45-1.55h.01a2.02 2.02 0 0 1 3-.01l2.22 2.5.67.75zm-9.5-.1a.66.66 0 0 1-.48 1.11H6.9a.66.66 0 0 1-.48-1.11l4.54-4.8c.4-.43.94-.67 1.51-.68.57 0 1.1.25 1.5.68l3.46 3.7-.05.04.7.66z"
+                                />
+                            </svg>
+                            <span>Images</span>
                         </button>
                     </div>
-
                     {#if appState.background.type === "image"}
-                        <form
-                            class="input-field grouped-fields"
-                            onsubmit={(e) => {
-                                e.preventDefault();
-                                if (!disableFetchButton) saveImageQuery();
-                            }}
-                        >
-                            <label for="query"> Topic for the image </label>
-                            <div class="input-row">
-                                <input
-                                    autocorrect="off"
-                                    autocomplete="off"
-                                    maxlength={24}
-                                    id="query"
-                                    type="text"
-                                    bind:value={queryBind}
-                                    placeholder="e.g. nature, city, blue"
-                                />
-                                <button
-                                    type="submit"
-                                    class="primary"
-                                    disabled={disableFetchButton}
-                                >
-                                    {isSameAsCached ? "Refresh" : "Search"}
-                                </button>
-                            </div>
-                        </form>
-                        <div class="input-field grouped-fields">
-                            <span>Refresh Frequency</span>
-                            <div
-                                class="choice-group small"
-                                style="--choice-count: 3;"
+                        <div transition:slide|local class="grouped-fields">
+                            <form
+                                style="padding-top: 8px;"
+                                class="input-field grouped-fields"
+                                onsubmit={(e) => {
+                                    e.preventDefault();
+                                    if (!disableFetchButton) saveImageQuery();
+                                }}
                             >
-                                {#each ["never", "hourly", "daily"] as freq}
+                                <label for="query">Search Unsplash</label>
+                                <div class="input-row">
+                                    <input
+                                        autocorrect="off"
+                                        autocomplete="off"
+                                        maxlength={24}
+                                        id="query"
+                                        type="text"
+                                        bind:value={queryBind}
+                                        placeholder="Keywords (e.g. mountains, dark, space)"
+                                    />
                                     <button
-                                        type="button"
-                                        class:selected={appState.imageUpdateFrequency ===
-                                            freq}
-                                        onclick={() => {
-                                            appState.imageUpdateFrequency =
-                                                freq;
-                                            persist();
-                                        }}>{freq}</button
+                                        type="submit"
+                                        class="primary"
+                                        disabled={disableFetchButton}
                                     >
-                                {/each}
-                            </div>
-                        </div>
+                                        {isSameAsCached
+                                            ? "Shuffle"
+                                            : "Set Topic"}
+                                    </button>
+                                </div>
+                            </form>
+                            <div
+                                class="input-field grouped-fields"
+                                style="padding-top: 16px;"
+                            >
+                                <span>Auto-Refresh</span>
+                                <div
+                                    class="choice-group small"
+                                    style="--choice-count: 3;"
+                                >
+                                    {#each ["never", "hourly", "daily"] as freq}
+                                        <button
+                                            type="button"
+                                            class:selected={appState.imageUpdateFrequency ===
+                                                freq}
+                                            onclick={() => {
+                                                appState.imageUpdateFrequency =
+                                                    freq;
+                                                persist();
+                                            }}>{freq}</button
+                                        >
+                                    {/each}
+                                </div>
 
-                        <div class="hint">
-                            You can manually get a new image every few minutes.
-                            let the API service rest.
+                                <p class="hint">
+                                    Manual refreshing is limited to once every
+                                    few minutes to keep the service fast for
+                                    everyone.
+                                </p>
+                            </div>
                         </div>
                     {:else if appState.background.type === "color"}
-                        <label class="toggle-row">
-                            <span>Gradient</span>
-                            <input
-                                type="checkbox"
-                                bind:checked={appState["color-cache"].gradient}
-                                onchange={saveColorCache}
-                            />
-                            <div class="toggle-switch"></div>
-                        </label>
-
-                        <div class="color-grid">
-                            <div class="color-field">
-                                <span class="small">Primary Color</span>
+                        <div transition:slide|local>
+                            <label class="toggle-row">
+                                <span>Gradient</span>
                                 <input
-                                    type="color"
-                                    bind:value={colorBind}
-                                    oninput={saveColorCache}
+                                    type="checkbox"
+                                    bind:checked={
+                                        appState["color-cache"].gradient
+                                    }
+                                    onchange={saveColorCache}
                                 />
-                            </div>
-                            {#if appState["color-cache"].gradient}
-                                <div class="color-field">
-                                    <span class="small">Secondary Color</span>
+                                <div class="toggle-switch"></div>
+                            </label>
+
+                            <div class="color-grid">
+                                <label class="color-field stack-xs">
+                                    <span class="small">Primary Color</span>
                                     <input
                                         type="color"
-                                        bind:value={colorBindSecondary}
+                                        bind:value={colorBind}
                                         oninput={saveColorCache}
                                     />
-                                </div>
-                            {/if}
+                                </label>
+                                {#if appState["color-cache"].gradient}
+                                    <label class="color-field stack-xs">
+                                        <span class="small"
+                                            >Secondary Color</span
+                                        >
+                                        <input
+                                            type="color"
+                                            bind:value={colorBindSecondary}
+                                            oninput={saveColorCache}
+                                        />
+                                    </label>
+                                {/if}
+                            </div>
                         </div>
                     {/if}
                 </div>
@@ -446,6 +469,7 @@
         font-size: var(--font-size-sm);
         opacity: 0.6;
         margin-top: calc(var(--space-01) * -1);
+        line-height: 1.4;
     }
     .link-flex {
         display: flex;

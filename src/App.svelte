@@ -77,8 +77,8 @@
     function handleKeydown(event: KeyboardEvent) {
         if (event.key === "Meta") {
             console.log("Command pressed");
-            // trigger your action here
-            uiState.isLoading = !uiState.isLoading;
+
+            //uiState.showOnboardAtLaunch = true;
         }
     }
 </script>
@@ -122,7 +122,7 @@
     </div>
 </main>
 
-<div transition:fade>
+<div class:is-onboarding={uiState.showOnboardAtLaunch} transition:fade>
     <ControlBar />
 </div>
 
@@ -184,5 +184,12 @@
         line-height: 1.4;
         font-weight: var(--font-weight-regular);
         width: 100%;
+    }
+
+    .is-onboarding {
+        pointer-events: none;
+        opacity: 0.5;
+        filter: grayscale(0.5);
+        transition: all var(--duration-moderate) var(--ease-standard);
     }
 </style>

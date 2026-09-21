@@ -3,7 +3,7 @@
     import { uiState } from "../state.svelte";
 </script>
 
-{#if uiState.loadingData.length > 0 || uiState.isLoading}
+{#if uiState.loadingData.length > 0}
     <div class="loader-wrapper" transition:slide={{ axis: "x", duration: 200 }}>
         <div class="loader-inner">
             <div class="surface loader">
@@ -69,7 +69,6 @@
 
 <style>
     .loader-wrapper {
-        overflow: hidden;
         flex-shrink: 0;
     }
 

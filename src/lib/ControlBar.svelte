@@ -233,7 +233,8 @@
     }
 
     .credits-anchor span {
-        color: var(--color-text-secondary);
+        color: var(--color-text);
+        opacity: 0.7;
         font-size: 0.85em;
     }
 

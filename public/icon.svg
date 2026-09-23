@@ -9,12 +9,12 @@
 >
     <style>
         path {
-            fill: #000;
+            fill: #000000;
         }
 
         @media (prefers-color-scheme: dark) {
             path {
-                fill: #fff;
+                fill: #ffffff;
             }
         }
     </style>

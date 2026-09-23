@@ -1,15 +1,63 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { slide } from "svelte/transition";
     import type { HolidayData } from "./utils/interfaces";
     import { appState } from "./state.svelte";
 
-    // "YYYY-MM-DD" in local time (Intl avoids manual padStart plumbing)
-    const isoFormatter = new Intl.DateTimeFormat("en-CA"); // en-CA = YYYY-MM-DD
     function toLocalISODate(date: Date): string {
-        return isoFormatter.format(date);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
     }
 
-    const todayIso = $derived(toLocalISODate(new Date()));
+    function fromLocalISODate(value: string): Date {
+        const [year, month, day] = value.split("-").map(Number);
+        return new Date(year, month - 1, day);
+    }
+
+    let todayIso = $state(toLocalISODate(new Date()));
+
+    onMount(() => {
+        let timer: ReturnType<typeof setTimeout>;
+
+        function refreshDate() {
+            clearTimeout(timer);
+
+            const now = new Date();
+            todayIso = toLocalISODate(now);
+
+            const nextMidnight = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() + 1,
+            );
+
+            timer = setTimeout(
+                refreshDate,
+                nextMidnight.getTime() - now.getTime() + 100,
+            );
+        }
+
+        function handleVisibility() {
+            if (document.visibilityState === "visible") {
+                refreshDate();
+            }
+        }
+
+        refreshDate();
+
+        // Catch up after the browser suspends a background tab.
+        document.addEventListener("visibilitychange", handleVisibility);
+        window.addEventListener("focus", refreshDate);
+
+        return () => {
+            clearTimeout(timer);
+            document.removeEventListener("visibilitychange", handleVisibility);
+            window.removeEventListener("focus", refreshDate);
+        };
+    });
 
     const sortedUpcoming = $derived.by((): HolidayData[] => {
         return (appState["holiday-cache"]?.holidays ?? [])
@@ -57,7 +105,6 @@
                 stroke-linejoin="round"
                 aria-hidden="true"
             >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                 <path
                     d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12"
                 />
@@ -69,7 +116,7 @@
         </span>
 
         <span class="date-label">
-            {formatter.format(new Date())}
+            {formatter.format(fromLocalISODate(todayIso))}
         </span>
     </span>
 
@@ -82,14 +129,12 @@
         >
             <span class="holiday-content">
                 <span class="holiday-tag">
-                    {isTodayHoliday ? "TODAY" : "NEXT"}:
+                    {isTodayHoliday ? "TODAY" : "NEXT"}
                 </span>
                 <span class="holiday-name">{nextHoliday.name}</span>
                 {#if !isTodayHoliday}
                     <span class="holiday-date">
-                        ({formatter.format(
-                            new Date(nextHoliday.date as string),
-                        )})
+                        {formatter.format(fromLocalISODate(nextHoliday.date))}
                     </span>
                 {/if}
             </span>
@@ -98,44 +143,39 @@
 </button>
 
 <style>
-    .surface {
-        color: var(--color-text-summary);
-    }
-
     button {
+        padding: 0.4em;
+        padding-inline-end: 0.7em;
         cursor: pointer;
-        padding: 4px 10px 4px 4px;
         border-radius: var(--radius-full);
         display: flex;
         flex-direction: column;
         align-items: center;
+        gap: var(--space-04);
+
+        overflow: hidden;
+        text-shadow: none;
+
         font-weight: var(--font-weight-bold);
         font-size: var(--font-size-md);
         line-height: 1.4;
-        color: inherit;
-        background-color: transparent;
-        transform-origin: center;
-        height: 40px;
-        transition: all var(--duration-fast) var(--ease-standard);
-        overflow: hidden;
-    }
 
-    button:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.05);
+        color: var(--color-text-summary);
+        transform-origin: center;
+        transition: all var(--duration-fast) var(--ease-standard);
     }
 
     button.open {
-        background: light-dark(rgba(255, 255, 255, 0.25), rgba(0, 0, 0, 0.35));
-        height: auto;
-        padding: var(--space-03);
         border-radius: var(--radius-xl);
+        padding: var(--space-04);
+        padding-right: calc(var(--space-04) + 5px);
+        background-color: var(--color-background-panel);
     }
 
     .basic-row {
         display: flex;
         align-items: center;
-        gap: 2px;
-        height: 32px;
+        gap: var(--space-01);
     }
 
     .date-label {
@@ -144,36 +184,36 @@
     }
 
     button svg {
-        width: 18px;
-        height: 18px;
+        width: 1.2em;
+        height: 1.2em;
         flex-shrink: 0;
     }
 
     .icon-badge {
+        padding: 6px;
+        height: 32px;
+        width: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 32px;
-        width: 32px;
         border-radius: var(--radius-full);
         background-color: transparent;
         transition: background-color var(--duration-fast) var(--ease-out);
     }
 
     .icon-badge.showing-today {
-        background-color: var(--color-accent);
+        margin-inline-end: 0.3em;
+        background-color: var(--color-red);
     }
 
     button:disabled {
         cursor: default;
-        opacity: 0.6;
     }
 
     .holiday-info {
         font-size: var(--font-size-sm);
-        line-height: 1.3;
+        line-height: 1;
         text-align: center;
-        padding: 2px 8px 4px 8px;
         overflow: hidden; /* Clips contents cleanly during vertical slide */
     }
 
@@ -182,23 +222,24 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: var(--space-02);
         white-space: nowrap; /* Prevents text from wrapping mid-transition */
+        padding-top: var(--space-02);
     }
 
     .holiday-tag {
-        font-size: 0.75em;
+        font-size: var(--font-size-xs);
         font-weight: var(--font-weight-bold);
-        color: var(--color-accent-hover);
+        color: var(--color-red);
     }
 
     .holiday-name {
+        font-size: var(--font-size-sm);
         font-weight: var(--font-weight-bold);
     }
 
     .holiday-date {
-        font-size: 0.85em;
-        color: var(--color-text-secondary);
+        font-size: var(--font-size-xs);
         font-weight: var(--font-weight-regular);
     }
 </style>

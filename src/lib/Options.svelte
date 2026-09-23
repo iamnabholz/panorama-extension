@@ -1,5 +1,7 @@
 <script lang="ts">
     import { appState, persist, uiState } from "./state.svelte";
+    import { sound } from "./utils/sound";
+
     import pkg from "../../package.json" with { type: "json" };
     import { fetchBackground } from "./background";
 
@@ -91,9 +93,18 @@
         applyBackgroundToDOM(newType, savedValue);
         persist("background");
     }
+
+    function handleToggleSound(event: Event) {
+        const input = event.target;
+
+        if (input instanceof HTMLInputElement && input.type === "checkbox") {
+            input.checked ? sound.playToggleOn() : sound.playToggleOff;
+            //sound.playTone(input.checked ? 880 : 440, 0.06, "sine", 0.03);
+        }
+    }
 </script>
 
-<div id="float-panel" class="surface">
+<div id="float-panel" class="surface" onchange={handleToggleSound}>
     <div id="float-panel__scroll">
         <div class="options-layout">
             <header class="options-header">
@@ -116,6 +127,32 @@
                     <img src="/media/bmac-button.webp" alt="Coffee" />
                 </a>
             </header>
+
+            <!-- SECTION: GENERAL -->
+            <section class="option-section">
+                <h2 class="section-label">Sounds</h2>
+                <div class="input-tray surface-panel">
+                    <label class="toggle-row">
+                        <span>Play sound on click</span>
+                        <input
+                            type="checkbox"
+                            checked={appState.displayDate}
+                            onchange={() => console.log("sound")}
+                        />
+                        <div class="toggle-switch"></div>
+                    </label>
+                    <hr class="divider" />
+                    <label class="toggle-row">
+                        <span>Play sound on hover</span>
+                        <input
+                            type="checkbox"
+                            checked={appState.displayDate}
+                            onchange={() => console.log("sound")}
+                        />
+                        <div class="toggle-switch"></div>
+                    </label>
+                </div>
+            </section>
 
             <!-- SECTION: GENERAL -->
             <section class="option-section">
@@ -176,7 +213,7 @@
 
                     <div class="grouped-fields">
                         <label class="toggle-row">
-                            <span>Personalized Greeting</span>
+                            <span>Timely Greeting</span>
                             <input
                                 type="checkbox"
                                 bind:checked={appState.displayGreeting}

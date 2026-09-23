@@ -19,6 +19,7 @@ label,
     font-weight: var(--font-weight-bold);
     color: var(--color-text);
     line-height: var(--line-height-tight);
+    text-transform: capitalize;
 }
 
 .input-field {

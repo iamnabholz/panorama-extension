@@ -1,151 +1,195 @@
 <script lang="ts">
+    import type { Snippet } from "svelte";
+    import { sound } from "../utils/sound";
+
     interface Props {
         text: string;
-        icon?: import("svelte").Snippet;
-        iconSrc?: string;
-        iconAlt?: string;
+        icon?: Snippet;
+
         onclick?: (event: MouseEvent) => void;
         title?: string;
         disabled?: boolean;
         zoomIcon?: boolean;
+        textOnly?: boolean;
+        color?: string;
     }
+
     let {
         text,
         icon,
-        iconSrc,
-        iconAlt = "",
+
         onclick,
         title,
         disabled = false,
         zoomIcon = false,
+        textOnly = false,
+        color,
     }: Props = $props();
-    const isButton = $derived(!!onclick);
-    const hasIcon = $derived(!!icon || !!iconSrc);
 
-    function handleClick(event: MouseEvent) {
-        if (disabled) return;
-        onclick?.(event);
-    }
+    const hasIcon = $derived(!textOnly && !!icon);
+    const words = $derived(text.trim().split(/\s+/).filter(Boolean));
 </script>
 
 {#snippet iconSlot()}
     <span class="icon-slot" class:zoom-icon={zoomIcon}>
-        {#if icon}
-            {@render icon()}
-        {:else if iconSrc}
-            <img src={iconSrc} alt={iconAlt} />
-        {/if}
+        <span class="icon-art">
+            {@render icon?.()}
+        </span>
     </span>
 {/snippet}
 
-{#if isButton}
+{#snippet content(label: string, showIcon: boolean)}
+    <span class="visual">
+        {#if showIcon}
+            {@render iconSlot()}
+        {/if}
+        <span class="label">{label}</span>
+    </span>
+{/snippet}
+
+{#if onclick}
     <button
+        data-sentence-piece
         type="button"
         class="widget"
-        onclick={handleClick}
+        onclick={(event) => {
+            sound.playTap();
+            onclick?.(event);
+        }}
+        class:text-only={textOnly}
+        style:color
         {title}
-        aria-disabled={disabled}
-        class:is-disabled={disabled}
+        {disabled}
     >
-        <span class="visual">
-            {#if hasIcon}
-                {@render iconSlot()}
-            {/if}
-            <span class="label">{text}</span>
-        </span>
+        {@render content(text, hasIcon)}
     </button>
 {:else}
-    <span class="widget">
-        <span class="visual">
-            {#if hasIcon}
-                {@render iconSlot()}
-            {/if}
-            <span class="label">{text}</span>
+    {#each words as word, index (`${index}:${word}`)}
+        {#if index > 0}{" "}{/if}
+        <span
+            data-sentence-piece
+            class="widget"
+            class:text-only={textOnly}
+            style:color
+            {title}
+        >
+            {@render content(word, hasIcon && index === 0)}
         </span>
-    </span>
+    {/each}
 {/if}
 
 <style>
     .widget {
-        display: inline;
-        vertical-align: baseline;
-        background: none;
-        margin: 0px;
-        border: 0;
-        font: inherit;
-        color: inherit;
-        white-space: nowrap;
-        cursor: default;
-    }
-    button.widget {
-        cursor: pointer;
-    }
-    button.widget.is-disabled {
-        cursor: default;
-    }
+        --growth: 1.2;
 
-    .widget:focus-visible {
-        outline: 4px solid currentColor;
-        outline-offset: 2px;
-        border-radius: 8px;
+        display: inline-block;
+        position: relative;
+        vertical-align: baseline;
+
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: none;
+
+        font: inherit;
+        line-height: inherit;
+        letter-spacing: inherit;
+        text-align: inherit;
+        text-shadow: inherit;
+        color: var(--color-text-summary);
+        font-weight: var(--font-weight-bold);
+
+        white-space: nowrap;
+        cursor: inherit;
+        overflow: visible;
     }
 
     .visual {
-        display: inline-flex;
-        align-items: baseline; /* Key: aligns icon and text baselines together */
-        gap: 0.1em;
-        font-weight: var(--font-weight-bold);
-        color: var(--color-text-summary);
+        display: inline-block;
+        position: relative;
+        vertical-align: baseline;
         transform-origin: center;
-        transition:
-            transform 110ms cubic-bezier(0.34, 1.85, 0.64, 1),
-            margin-inline-start 110ms cubic-bezier(0.34, 1.85, 0.64, 1);
-        will-change: transform margin-inline-start;
+
+        transition: transform 400ms cubic-bezier(0.34, 1.85, 0.64, 1);
     }
 
-    .widget:hover .visual {
-        transform: scale(1.01);
+    button.widget {
+        cursor: pointer;
+        box-shadow: none;
     }
-    .widget:active .visual {
-        transform: scale(0.99);
+
+    button.widget:not(:disabled):not(.text-only):is(:hover, :focus-visible) {
+        padding-inline: 0.05em;
+
+        &:has(.icon-slot) {
+            padding-inline: 0.38em;
+        }
+    }
+
+    button.widget:not(:disabled):not(.text-only):is(:hover, :focus-visible)
+        .icon-slot {
+        padding-inline: 0.6em;
+    }
+
+    button.widget:not(:disabled):not(.text-only):is(:hover, :focus-visible)
+        .visual {
+        transform: scale(var(--growth));
+    }
+
+    button.widget:not(:disabled):not(.text-only):active .visual {
+        transform: scale(0.985);
+        transition-duration: 90ms;
+    }
+
+    button.widget:disabled {
+        cursor: default;
+    }
+
+    button.widget:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 0.09em;
+        border-radius: 0.12em;
+    }
+
+    .text-only {
+        color: inherit;
+        font-weight: inherit;
     }
 
     .icon-slot {
         display: inline-block;
-        scale: 1.2;
-        width: 0.9em;
-        height: 0.9em;
-        flex-shrink: 0;
-        fill: currentColor;
-        /* Optical baseline alignment for SVG/Images inside inline-flex baseline */
         position: relative;
-        top: 0.1em;
-        filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.2));
-        transition:
-            transform 0.45s cubic-bezier(0.34, 1.85, 0.64, 1),
-            filter 0.3s ease-out;
-    }
-    .widget:hover .icon-slot.zoom-icon {
-        transform: scale(1.6) rotate(-8deg);
-        filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.3));
-    }
-    .widget:active .icon-slot.zoom-icon {
-        transform: scale(0.9) rotate(4deg);
-        transition-duration: 0.1s;
+
+        width: 1em;
+        height: 0;
+        vertical-align: baseline;
     }
 
-    .icon-slot :global(svg),
-    .icon-slot img {
+    .icon-art {
+        position: absolute;
+        inset-inline-start: 0;
+        bottom: -0.18em;
+
+        width: 1.1em;
+        height: 1.1em;
+
+        fill: currentColor;
+        pointer-events: none;
+        filter: drop-shadow(0 0.035em 0.07em rgb(0 0 0 / 0.16));
+
+        transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .icon-art :global(svg) {
+        display: block;
         width: 100%;
         height: 100%;
-        display: block;
-    }
-    .icon-slot img {
-        transform: translateY(-2px);
-        scale: 1.8;
+        object-fit: contain;
     }
 
-    .label {
-        line-height: inherit;
+    button.widget:not(:disabled):is(:hover, :focus-visible)
+        .zoom-icon
+        .icon-art {
+        transform: rotate(-7deg) scale(1.4);
     }
 </style>

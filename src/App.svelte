@@ -13,10 +13,8 @@
 
     import Background from "./lib/Background.svelte";
     import Holiday from "./lib/Holiday.svelte";
-    import Clock from "./lib/Clock.svelte";
     import Greeting from "./lib/Greeting.svelte";
-    import Weather from "./lib/Weather.svelte";
-    import Temperature from "./lib/Temperature.svelte";
+    import Sentence from "./lib/components/Sentence.svelte";
 
     import Options from "./lib/Options.svelte";
     import ControlBar from "./lib/ControlBar.svelte";
@@ -24,6 +22,15 @@
     import { fetchHolidays } from "./lib/holiday";
     import { fetchWeather } from "./lib/weather";
     import Onboard from "./lib/Onboard.svelte";
+    import {
+        blur,
+        reveal,
+        settle,
+        dismiss,
+        springSettle,
+    } from "./lib/utils/transitions";
+
+    import { sound } from "./lib/utils/sound";
 
     let mounted = $state(false);
     let ready = $derived(mounted && uiState.sentenceVisible);
@@ -75,29 +82,12 @@
         uiState.sentenceVisible = appState.sentenceVisible;
     }
 
-    let myg = $state(true);
-
     function handleKeydown(event: KeyboardEvent) {
         if (event.key === "Meta") {
             console.log("Command pressed");
 
-            myg = !myg;
             //uiState.showOnboardAtLaunch = true;
         }
-    }
-
-    import { quintIn, quintOut } from "svelte/easing";
-
-    function blur(node: HTMLElement, { duration = 600, reverse = false } = {}) {
-        return {
-            duration,
-            easing: reverse ? quintIn : quintOut,
-
-            css: (t: number) => `
-                opacity: ${t};
-                filter: blur(${(1 - t) * 5}px);
-            `,
-        };
     }
 </script>
 
@@ -108,51 +98,43 @@
 <main>
     <div class="summary-wrapper">
         {#if ready && appState.displayDate}
-            <span transition:fade>
+            <span in:settle out:dismiss>
                 <Holiday />
             </span>
         {/if}
         {#if ready && appState.displayGreeting}
-            <span in:fly={{ y: 25 }} out:fly={{ delay: 60, y: 25 }}>
+            <span
+                class="text-motion"
+                in:springSettle={{ delay: 25 }}
+                out:dismiss={{ delay: 25 }}
+            >
                 <Greeting />
             </span>
         {/if}
 
         {#if ready}
-            <p
-                class="summary-row"
-                in:fly={{ delay: 60, y: 25 }}
-                out:fly={{ y: 25 }}
+            <span
+                class="text-motion"
+                in:springSettle={{ delay: 50 }}
+                out:dismiss={{ delay: 50 }}
             >
-                {#if appState.displayTime}
-                    It's
-                    <Clock />
-                    {#if appState.displayWeather}—{/if}
-                {/if}
-                {#if appState.displayWeather}
-                    {appState.displayTime ? "currently" : "Currently"}
-                    <Temperature />
-                    and
-                    <Weather />
-                {/if}
-            </p>
+                <Sentence />
+            </span>
         {/if}
     </div>
 </main>
 
-{#if myg}
-    <div
-        style="transform: translateY(0px);"
-        class:is-onboarding={uiState.showOnboardAtLaunch}
-        in:blur
-        out:blur={{ reverse: true }}
-    >
-        <ControlBar />
-    </div>
-{/if}
+<div
+    style="transform: translateY(0px);"
+    class:is-onboarding={uiState.showOnboardAtLaunch}
+    in:blur
+    out:blur={{ reverse: true }}
+>
+    <ControlBar />
+</div>
 
 {#if uiState.optionsOpen}
-    <div id="float-overlay" in:blur={{ reverse: true }} out:blur>
+    <div id="float-overlay" in:settle={{ delay: 50 }} out:dismiss>
         <div use:clickOutside={closeOptions} style="display: contents;">
             <Options />
         </div>
@@ -165,17 +147,19 @@
     </div>
 {/if}
 
-<div class="storage-notice" class:visible={uiState.storageError !== null}>
-    <p role="status" aria-live="polite" aria-atomic="true">
-        {uiState.storageError ?? ""}
-    </p>
+{#if uiState.storageError !== null}
+    <div class="storage-notice">
+        <p role="status" aria-live="polite" aria-atomic="true">
+            {uiState.storageError ?? ""}
+        </p>
 
-    {#if uiState.storageError}
-        <button type="button" onclick={() => retryFailedWrites()}>
-            Retry saving
-        </button>
-    {/if}
-</div>
+        {#if uiState.storageError}
+            <button type="button" onclick={() => retryFailedWrites()}>
+                Retry saving
+            </button>
+        {/if}
+    </div>
+{/if}
 
 <style>
     main {
@@ -206,21 +190,8 @@
         text-align: center;
 
         width: 100%;
-        max-width: min(
-            900px,
-            92vw
-        ); /* Adjust this max-width and watch it fluidly reflow! */
         padding-inline: 2rem;
         box-sizing: border-box;
-    }
-
-    .summary-row {
-        display: inline; /* Treats the entire block like a fluid paragraph */
-        text-align: center;
-        text-wrap: balance; /* Automatically balances line lengths nicely */
-        line-height: 1.4;
-        font-weight: var(--font-weight-regular);
-        width: 100%;
     }
 
     .is-onboarding {
@@ -250,7 +221,7 @@
         font-size: var(--font-size-sm);
     }
 
-    .storage-notice.visible {
+    .storage-notice {
         padding: var(--space-04);
         background: var(--color-background);
         border: 1px solid var(--color-border-strong);

@@ -29,7 +29,7 @@
         y1="2"
         x2="12"
         y2="3.2"
-        stroke="black"
+        stroke="var(--color-black)"
         stroke-width="0.8"
         stroke-linecap="round"
     />
@@ -38,7 +38,7 @@
         y1="12"
         x2="20.8"
         y2="12"
-        stroke="black"
+        stroke="var(--color-black)"
         stroke-width="0.8"
         stroke-linecap="round"
     />
@@ -47,7 +47,7 @@
         y1="22"
         x2="12"
         y2="20.8"
-        stroke="black"
+        stroke="var(--color-black)"
         stroke-width="0.8"
         stroke-linecap="round"
     />
@@ -56,7 +56,7 @@
         y1="12"
         x2="3.2"
         y2="12"
-        stroke="black"
+        stroke="var(--color-black)"
         stroke-width="0.8"
         stroke-linecap="round"
     />
@@ -66,7 +66,7 @@
         y1="12"
         x2="12"
         y2="6"
-        stroke="black"
+        stroke="var(--color-black)"
         stroke-width="1.5"
         stroke-linecap="round"
         transform="rotate({hourAngle} 12 12)"
@@ -76,7 +76,7 @@
         y1="12"
         x2="12"
         y2="4"
-        stroke="black"
+        stroke="var(--color-black)"
         stroke-width="1.5"
         stroke-linecap="round"
         transform="rotate({minuteAngle} 12 12)"
@@ -86,10 +86,10 @@
         y1="14"
         x2="12"
         y2="3"
-        stroke="red"
+        stroke="var(--color-red)"
         stroke-width="0.8"
         stroke-linecap="square"
         transform="rotate({secondsAngle} 12 12)"
     />
-    <circle cx="12" cy="12" r="1" fill="red" />
+    <circle cx="12" cy="12" r="1" fill="var(--color-red)" />
 </svg>

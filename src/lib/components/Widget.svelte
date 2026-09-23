@@ -53,7 +53,7 @@
         type="button"
         class="widget"
         onclick={(event) => {
-            sound.playTap();
+            sound.playClick();
             onclick?.(event);
         }}
         class:text-only={textOnly}

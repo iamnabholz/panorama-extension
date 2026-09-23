@@ -14,6 +14,8 @@ export interface StateSchema {
   displayTime: boolean;
   displayWeather: boolean;
 
+  playSounds: boolean;
+
   background: {
     type: string;
     value: string;

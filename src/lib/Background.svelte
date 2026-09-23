@@ -27,13 +27,17 @@
         } else if (appState.background.type === "color") {
             sampleColor = appState["color-cache"].startColor;
         } else {
-            // FIX THIS
-            // 'none' mode: check current computed body background color
-            sampleColor = getComputedStyle(document.documentElement)
-                .getPropertyValue("background-color")
-                .trim();
+            const probe = document.createElement("span");
+            probe.style.cssText = `
+                position: absolute;
+                visibility: hidden;
+                pointer-events: none;
+                background-color: var(--background-color);
+            `;
 
-            console.log(sampleColor);
+            document.documentElement.appendChild(probe);
+            sampleColor = getComputedStyle(probe).backgroundColor;
+            probe.remove();
         }
 
         const isDark = isDarkBackground(sampleColor);

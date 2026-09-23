@@ -11,6 +11,7 @@ export const appState = $state<StateSchema>({
   displayGreeting: true,
   displayTime: true,
   displayWeather: true,
+  playSounds: true,
   background: { type: "image", value: "" },
   "color-cache": { gradient: false, startColor: "#aaaaaa" },
 });
@@ -44,6 +45,7 @@ const keys: (keyof StateSchema)[] = [
   "displayGreeting",
   "displayTime",
   "displayWeather",
+  "playSounds",
   "background",
   "color-cache",
   "image-cache",

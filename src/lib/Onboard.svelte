@@ -25,16 +25,15 @@
 </script>
 
 <div class="onboard-overlay" transition:fade={{ duration: 200 }}>
-    <div id="float-panel" class="surface onboard-card">
+    <div id="float-panel" class="surface-elevated onboard-card">
         <div id="float-panel__scroll">
             <div class="step-content">
                 {#if currentStep === 0}
-                    <div transition:fade={{ duration: 150 }}>
+                    <div transition:slide|local={{ duration: 150 }}>
                         <h2>Welcome to Panorama</h2>
                         <p>
-                            Transform your new tab into a focused, beautiful
-                            dashboard. Everything you see is customizable to fit
-                            your workflow.
+                            Transform your new tab into a simple, beautiful
+                            summary.
                         </p>
                         <div class="preview-box surface-panel">
                             <div class="mock-ui">
@@ -45,45 +44,66 @@
                         </div>
                     </div>
                 {:else if currentStep === 1}
-                    <div transition:fade={{ duration: 150 }}>
+                    <div transition:slide|local={{ duration: 150 }}>
                         <h2>Make it yours</h2>
                         <p>
-                            Use the <b>Settings</b> icon on the bottom left to change
-                            backgrounds, toggle widgets, or set your name for a personal
-                            greeting.
+                            Use the <b>Settings</b> icon located on the control bar
+                            at the bottom of your screen to change backgrounds, toggle
+                            widgets, or set your name for a personal greeting.
                         </p>
                         <div class="icon-instruction">
                             <div class="instruction-row">
                                 <div class="icon-circle">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 24 24"
+                                        viewBox="0 0 32 32"
                                         aria-hidden="true"
                                         focusable="false"
                                     >
                                         <path
-                                            fill="currentColor"
-                                            fill-rule="evenodd"
-                                            d="M4 7h8.17a3.001 3.001 0 0 1 5.66 0H20a1 1 0 1 1 0 2h-2.17a3.001 3.001 0 0 1-5.66 0H4a1 1 0 0 1 0-2m0 8h2.17a3.001 3.001 0 0 1 5.66 0H20a1 1 0 1 1 0 2h-8.17a3.001 3.001 0 0 1-5.66 0H4a1 1 0 1 1 0-2"
-                                            clip-rule="evenodd"
+                                            d="M7 11a1 1 0 0 1 0-2h18a1 1 0 0 1 0 2zm0 11a1 1 0 0 1 0-2h18a1 1 0 0 1 0 2z"
+                                        />
+
+                                        <circle
+                                            class="dot dot-top"
+                                            cx="22"
+                                            cy="10"
+                                            r="4"
+                                        />
+
+                                        <circle
+                                            class="dot dot-bottom"
+                                            cx="10"
+                                            cy="21"
+                                            r="4"
                                         />
                                     </svg>
                                 </div>
-                                <span>Customize your dashboard</span>
+                                <span>Customize the experience</span>
                             </div>
                             <div class="instruction-row">
                                 <div class="icon-circle">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 24 24"
+                                        xml:space="preserve"
+                                        fill-rule="evenodd"
+                                        stroke-linejoin="round"
+                                        stroke-miterlimit="2"
+                                        clip-rule="evenodd"
+                                        viewBox="0 0 32 32"
                                         aria-hidden="true"
                                         focusable="false"
                                     >
                                         <path
-                                            fill="currentColor"
-                                            fill-rule="evenodd"
-                                            d="M18 4v3h3a1 1 0 0 1 1 1v10a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1m2 14a1 1 0 1 1-2 0V9h2zM6 8a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H7a1 1 0 0 1-1-1m2 4a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1"
-                                            clip-rule="evenodd"
+                                            fill-opacity="1"
+                                            d="M24.81 7.2A3.2 3.2 0 0 1 28 10.37v11.24a3.2 3.2 0 0 1-3.19 3.19H7.2A3.2 3.2 0 0 1 4 21.6V10.39A3.2 3.2 0 0 1 7.19 7.2zM10.5 15h11a1 1 0 0 0 0-2h-11a1 1 0 0 0 0 2m2 4.5h7a1 1 0 0 0 0-2h-7a1 1 0 0 0 0 2"
+                                        />
+                                        <path
+                                            d="M24.81 6.2A4.2 4.2 0 0 1 29 10.37v11.24a4.2 4.2 0 0 1-4.19 4.19H7.2A4.2 4.2 0 0 1 3 21.6V10.39A4.2 4.2 0 0 1 7.19 6.2zm0 2H7.2c-1.21 0-2.2.96-2.2 2.17v11.24c0 1.2.98 2.19 2.19 2.19H24.8a2.2 2.2 0 0 0 2.19-2.2V10.39A2.2 2.2 0 0 0 24.8 8.2"
+                                        />
+                                        <path
+                                            fill-opacity="0"
+                                            d="M10.5 15a1 1 0 0 1 0-2h11a1 1 0 0 1 0 2zm2 4.5a1 1 0 0 1 0-2h7a1 1 0 0 1 0 2z"
                                         />
                                     </svg>
                                 </div>
@@ -92,7 +112,7 @@
                         </div>
                     </div>
                 {:else if currentStep === 2}
-                    <div transition:fade={{ duration: 150 }}>
+                    <div transition:slide|local={{ duration: 150 }}>
                         <h2>Stay Informed</h2>
                         <p>
                             Click on widgets to interact with them. You can
@@ -100,7 +120,9 @@
                             local weather.
                         </p>
                         <div class="clock-preview">
-                            <Clock />
+                            <span style="font-size: var(--font-size-summary);">
+                                <Clock />
+                            </span>
                             <span class="hint">Click to toggle format</span>
                         </div>
                     </div>
@@ -132,7 +154,6 @@
         align-items: center;
         justify-content: center;
         z-index: 1000;
-        backdrop-filter: blur(4px);
     }
 
     .onboard-card {
@@ -250,7 +271,6 @@
 
     .primary-btn:hover {
         background: var(--color-accent-hover);
-        transform: translateY(-1px);
         box-shadow: var(--shadow-md);
     }
 

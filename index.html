@@ -17,24 +17,16 @@
             html,
             body {
                 margin: 0;
-                height: 100vh;
+                height: 100svh;
             }
             body {
-                position: relative;
-            }
-
-            /* Initial paint background layer to prevent flash */
-            body::before {
-                content: "";
                 position: fixed;
                 inset: 0;
-                height: 100dvh;
                 background-color: var(--background-color);
                 background-image: var(--background-value);
                 background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
-                z-index: -2;
             }
         </style>
     </head>

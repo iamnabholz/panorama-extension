@@ -1,143 +1,333 @@
-/**
- * A simple sound utility using the Web Audio API to generate synthesized sounds
- * without needing external audio files.
- */
+import { toStore } from "svelte/store";
+import { appState } from "../state.svelte";
+
+type Note = {
+  frequency: number;
+  endFrequency?: number;
+  duration: number;
+  level: number;
+  type?: OscillatorType;
+  delay?: number;
+};
+
+type Voice = {
+  oscillator: OscillatorNode;
+  gain: GainNode;
+};
+
+const MASTER_VOLUME = 0.15;
+const MAX_VOICES = 8;
+
 class SoundPlayer {
   private ctx: AudioContext | null = null;
+  private master: GainNode | null = null;
+  private voices = new Set<Voice>();
+  private unsubscribe?: () => void;
+  private resuming = false;
+  private generation = 0;
+  private disposed = false;
+
+  constructor() {
+    if (typeof window === "undefined") return;
+
+    // React to rune-backed state without needing a .svelte.ts filename.
+    this.unsubscribe = toStore(() => appState.playSounds).subscribe(
+      (enabled) => {
+        if (this.master && this.ctx) {
+          this.master.gain.setValueAtTime(
+            enabled ? MASTER_VOLUME : 0,
+            this.ctx.currentTime,
+          );
+        }
+
+        if (!enabled) this.stopAll();
+      },
+    );
+  }
 
   private getContext() {
-    if (!this.ctx) {
-      this.ctx = new (
-        window.AudioContext || (window as any).webkitAudioContext
-      )();
+    if (this.ctx) return this.ctx;
+
+    const ctx = new AudioContext();
+    const master = ctx.createGain();
+
+    master.gain.value = appState.playSounds ? MASTER_VOLUME : 0;
+    master.connect(ctx.destination);
+
+    this.ctx = ctx;
+    this.master = master;
+
+    return ctx;
+  }
+
+  private release(voice: Voice) {
+    voice.oscillator.onended = null;
+    voice.oscillator.disconnect();
+    voice.gain.disconnect();
+    this.voices.delete(voice);
+  }
+
+  private stopVoice(voice: Voice) {
+    try {
+      voice.oscillator.stop();
+    } catch {
+      // Also allow cleanup if scheduling failed before start().
     }
-    return this.ctx;
+
+    this.release(voice);
+  }
+
+  private stopAll() {
+    this.generation += 1;
+
+    for (const voice of this.voices) {
+      this.stopVoice(voice);
+    }
+  }
+
+  private schedule(ctx: AudioContext, note: Note, baseTime: number) {
+    const master = this.master;
+    if (!master) return;
+
+    while (this.voices.size >= MAX_VOICES) {
+      const oldest = this.voices.values().next().value;
+      if (!oldest) break;
+      this.stopVoice(oldest);
+    }
+
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const voice = { oscillator, gain };
+
+    this.voices.add(voice);
+
+    const start = baseTime + (note.delay ?? 0);
+    const end = start + note.duration;
+    const attack = Math.min(0.003, note.duration * 0.15);
+    const release = Math.min(0.01, note.duration * 0.2);
+    const maxFrequency = ctx.sampleRate * 0.45;
+
+    oscillator.type = note.type ?? "sine";
+    oscillator.frequency.setValueAtTime(
+      Math.min(note.frequency, maxFrequency),
+      start,
+    );
+    oscillator.frequency.exponentialRampToValueAtTime(
+      Math.min(note.endFrequency ?? note.frequency, maxFrequency),
+      end,
+    );
+
+    gain.gain.setValueAtTime(0, start);
+    gain.gain.linearRampToValueAtTime(note.level, start + attack);
+    gain.gain.exponentialRampToValueAtTime(0.0001, end - release);
+    gain.gain.linearRampToValueAtTime(0, end);
+
+    oscillator.connect(gain);
+    gain.connect(master);
+
+    oscillator.onended = () => this.release(voice);
+    oscillator.start(start);
+    oscillator.stop(end);
+  }
+
+  // The only playback entry point for every preset and custom tone.
+  private async play(notes: readonly Note[]) {
+    if (this.disposed || typeof window === "undefined") return;
+
+    if (!appState.playSounds) {
+      this.stopAll();
+      return;
+    }
+
+    const generation = this.generation;
+
+    try {
+      const ctx = this.getContext();
+
+      if (ctx.state !== "running") {
+        // Don't queue up a burst of feedback while audio is blocked.
+        if (this.resuming) return;
+
+        this.resuming = true;
+        const requestedAt = Date.now();
+
+        try {
+          await ctx.resume();
+        } finally {
+          this.resuming = false;
+        }
+
+        if (Date.now() - requestedAt > 300) return;
+      }
+
+      if (
+        this.disposed ||
+        !appState.playSounds ||
+        generation !== this.generation ||
+        ctx.state !== "running"
+      ) {
+        return;
+      }
+
+      const start = ctx.currentTime + 0.005;
+
+      for (const note of notes) {
+        this.schedule(ctx, note, start);
+      }
+    } catch {
+      // Optional feedback must never break the interaction.
+      this.stopAll();
+    }
   }
 
   /**
-   * Plays a simple beep sound
-   * @param frequency - Frequency in Hz (default 440 - A4)
-   * @param duration - Duration in seconds (default 0.1)
-   * @param type - Oscillator type: 'sine', 'square', 'sawtooth', 'triangle'
+   * Custom tone, using the same mute and master-volume pipeline.
+   * Volume is now a relative level between 0 and 1.
    */
   playTone(
     frequency = 440,
     duration = 0.1,
     type: OscillatorType = "sine",
-    volume = 1.0,
+    volume = 1,
   ) {
-    const ctx = this.getContext();
-
-    // Resume context if it was suspended (browsers often block auto-play)
-    if (ctx.state === "suspended") {
-      ctx.resume();
+    if (
+      !Number.isFinite(frequency) ||
+      !Number.isFinite(duration) ||
+      !Number.isFinite(volume) ||
+      frequency <= 0 ||
+      duration <= 0 ||
+      volume <= 0
+    ) {
+      return;
     }
 
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
-
-    // Fade out to avoid "clicks"
-    gainNode.gain.setValueAtTime(volume, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(
-      0.0001,
-      ctx.currentTime + duration,
-    );
-
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
-
-    oscillator.start();
-    oscillator.stop(ctx.currentTime + duration);
+    void this.play([
+      {
+        frequency,
+        duration: Math.max(0.01, Math.min(duration, 5)),
+        type,
+        level: Math.min(volume, 1),
+      },
+    ]);
   }
 
-  /**
-   * Plays a quick two-note sweep between two frequencies, used by
-   * playToggleOn/playToggleOff. Kept private since it's just a building block.
-   */
-  private playSweep(
-    startFreq: number,
-    endFreq: number,
-    duration = 0.06,
-    volume = 0.015,
-  ) {
-    const ctx = this.getContext();
-
-    if (ctx.state === "suspended") {
-      ctx.resume();
-    }
-
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(startFreq, ctx.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(
-      endFreq,
-      ctx.currentTime + duration,
-    );
-
-    gainNode.gain.setValueAtTime(volume, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(
-      0.0001,
-      ctx.currentTime + duration,
-    );
-
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
-
-    oscillator.start();
-    oscillator.stop(ctx.currentTime + duration);
-  }
-
-  /**
-   * A pleasant "success" double-beep
-   */
-  playSuccess() {
-    this.playTone(523.25, 0.1, "sine", 0.1); // C5
-    setTimeout(() => this.playTone(659.25, 0.15, "sine", 0.1), 100); // E5
-  }
-
-  /**
-   * A soft "click" for UI interactions
-   */
-  playClick() {
-    this.playTone(800, 0.05, "sine", 0.05);
-  }
-
-  /**
-   * A very subtle rising blip for switching a toggle ON.
-   */
+  /** An upward, springy “bloop”. */
   playToggleOn() {
-    this.playSweep(600, 900, 0.06, 0.15);
+    void this.play([
+      {
+        frequency: 420,
+        endFrequency: 840,
+        duration: 0.09,
+        level: 0.5,
+      },
+      {
+        frequency: 1050,
+        duration: 0.045,
+        delay: 0.045,
+        level: 0.12,
+      },
+    ]);
   }
 
-  /**
-   * A very subtle falling blip for switching a toggle OFF.
-   * Mirrors playToggleOn but sweeps downward, so on/off feel paired.
-   */
+  /** A rounded downward “plop”, paired with toggle-on. */
   playToggleOff() {
-    this.playSweep(900, 600, 0.06, 0.15);
+    void this.play([
+      {
+        frequency: 720,
+        endFrequency: 280,
+        duration: 0.095,
+        level: 0.5,
+      },
+    ]);
   }
 
-  /**
-   * A light, quiet tap sound for simple taps on a summary/row.
-   * Quieter and shorter than playClick.
-   */
+  /** A crisp, two-part mechanical “tick”. */
+  playClick() {
+    void this.play([
+      {
+        frequency: 1500,
+        endFrequency: 700,
+        duration: 0.025,
+        type: "triangle",
+        level: 0.38,
+      },
+      {
+        frequency: 480,
+        endFrequency: 320,
+        duration: 0.04,
+        delay: 0.012,
+        level: 0.3,
+      },
+    ]);
+  }
+
+  /** A soft, low “tok”, like tapping a hollow wooden key. */
   playTap() {
-    this.playTone(1000, 0.04, "sine", 0.012);
+    void this.play([
+      {
+        frequency: 360,
+        endFrequency: 170,
+        duration: 0.07,
+        level: 0.5,
+      },
+      {
+        frequency: 900,
+        endFrequency: 600,
+        duration: 0.02,
+        type: "triangle",
+        level: 0.1,
+      },
+    ]);
   }
 
-  /**
-   * An almost-subliminal blip for hovering over a summary/row.
-   * Deliberately the quietest and shortest sound in the set,
-   * since hover fires far more often than click.
-   */
+  /** A tiny glassy “ting”; intentionally quieter for frequent events. */
   playHover() {
-    this.playTone(1200, 0.025, "sine", 0.006);
+    void this.play([
+      {
+        frequency: 1400,
+        endFrequency: 1600,
+        duration: 0.035,
+        level: 0.18,
+      },
+    ]);
+  }
+
+  /** A short, ascending three-note reward. */
+  playSuccess() {
+    void this.play([
+      { frequency: 523.25, duration: 0.11, level: 0.42 },
+      {
+        frequency: 659.25,
+        duration: 0.11,
+        delay: 0.075,
+        level: 0.4,
+      },
+      {
+        frequency: 783.99,
+        duration: 0.16,
+        delay: 0.15,
+        level: 0.38,
+      },
+    ]);
+  }
+
+  dispose() {
+    this.disposed = true;
+    this.unsubscribe?.();
+    this.stopAll();
+    this.master?.disconnect();
+
+    if (this.ctx && this.ctx.state !== "closed") {
+      void this.ctx.close().catch(() => {});
+    }
+
+    this.master = null;
+    this.ctx = null;
   }
 }
 
 export const sound = new SoundPlayer();
+
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => sound.dispose());
+}

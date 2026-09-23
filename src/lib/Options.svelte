@@ -5,7 +5,7 @@
     import pkg from "../../package.json" with { type: "json" };
     import { fetchBackground } from "./background";
 
-    /* Global shared styles */
+    /* styles for inputs only */
     import "../styles/inputs.css";
     import { slide } from "svelte/transition";
 
@@ -98,8 +98,7 @@
         const input = event.target;
 
         if (input instanceof HTMLInputElement && input.type === "checkbox") {
-            input.checked ? sound.playToggleOn() : sound.playToggleOff;
-            //sound.playTone(input.checked ? 880 : 440, 0.06, "sine", 0.03);
+            input.checked ? sound.playToggleOn() : sound.playToggleOff();
         }
     }
 </script>
@@ -128,7 +127,7 @@
                 </a>
             </header>
 
-            <!-- SECTION: GENERAL -->
+            <!-- SECTION: SOUND -->
             <section class="option-section">
                 <h2 class="section-label">Sounds</h2>
                 <div class="input-tray surface-panel">
@@ -136,18 +135,8 @@
                         <span>Play sound on click</span>
                         <input
                             type="checkbox"
-                            checked={appState.displayDate}
-                            onchange={() => console.log("sound")}
-                        />
-                        <div class="toggle-switch"></div>
-                    </label>
-                    <hr class="divider" />
-                    <label class="toggle-row">
-                        <span>Play sound on hover</span>
-                        <input
-                            type="checkbox"
-                            checked={appState.displayDate}
-                            onchange={() => console.log("sound")}
+                            bind:checked={appState.playSounds}
+                            onchange={() => persist("playSounds")}
                         />
                         <div class="toggle-switch"></div>
                     </label>
@@ -476,7 +465,33 @@
             <footer class="option-section">
                 <h2 class="section-label">About</h2>
                 <div class="input-tray surface-panel">
-                    <p>Designed and developed by Lukas Nabholz.</p>
+                    <svg
+                        width="56px"
+                        height="56px"
+                        xmlns="http://www.w3.org/2000/svg"
+                        xml:space="preserve"
+                        fill-rule="evenodd"
+                        stroke-linejoin="round"
+                        stroke-miterlimit="2"
+                        clip-rule="evenodd"
+                        viewBox="0 0 32 32"
+                    >
+                        <path
+                            fill="#fcc010"
+                            d="M6.13 23.8 4.42 5.5a5 5 0 0 1 8.18-4.3l14.1 11.78a5 5 0 0 1-.87 8.27l-.45.23.94 1.77a5 5 0 0 1-2.1 6.75l-2.66 1.4a5 5 0 0 1-6.75-2.1l-.93-1.77-.44.23a5 5 0 0 1-7.3-3.96"
+                        />
+                        <path
+                            fill="black"
+                            d="m10.11 23.43-1.7-18.3a1 1 0 0 1 1.63-.87l14.1 11.8a1 1 0 0 1-.17 1.65l-3.99 2.09 2.8 5.31a1 1 0 0 1-.43 1.35l-2.65 1.4a1 1 0 0 1-1.35-.42l-2.8-5.31-3.98 2.09a1 1 0 0 1-1.46-.8m1.86-1.68 3.54-1.86a1 1 0 0 1 1.35.42l2.8 5.31.88-.46-2.8-5.32a1 1 0 0 1 .43-1.35l3.54-1.86-11.1-9.28z"
+                        />
+                    </svg>
+
+                    <p>
+                        Designed and developed by <a
+                            target="_blank"
+                            href="https://nabholz.work">Lukas Nabholz</a
+                        >.
+                    </p>
                     <div class="link-flex">
                         <a
                             href="https://nabholz.notion.site/Panorama-Tab-Privacy-Policy-3cc1169905be80589a79cdba1840f806"
@@ -493,7 +508,7 @@
                     </div>
                     <p class="credits">
                         Backgrounds by Unsplash. Weather by OpenWeatherMap. Font
-                        by PangramPangram.
+                        by PangramPangram. Icons by Meteocons.
                     </p>
                 </div>
             </footer>

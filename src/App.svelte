@@ -125,7 +125,6 @@
 </main>
 
 <div
-    style="transform: translateY(0px);"
     class:is-onboarding={uiState.showOnboardAtLaunch}
     in:blur
     out:blur={{ reverse: true }}
@@ -196,8 +195,6 @@
 
     .is-onboarding {
         pointer-events: none;
-        opacity: 0.5;
-        filter: grayscale(0.5);
         transition: all var(--duration-moderate) var(--ease-standard);
     }
 

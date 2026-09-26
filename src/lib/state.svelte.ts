@@ -23,6 +23,9 @@ export const uiState = $state({
   showOnboardAtLaunch: false,
   isLoading: false,
   storageError: null as string | null,
+  loadingBackground: false,
+  loadingWeather: false,
+  loadingHolidays: false,
 });
 
 export function startLoading(): string {

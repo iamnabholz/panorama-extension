@@ -18,7 +18,7 @@
                 attributeName="transform"
                 begin="0s"
                 calcMode="spline"
-                dur="18s"
+                dur="30s"
                 keySplines=".42 0 .58 1; .42 0 .58 1"
                 repeatCount="indefinite"
                 type="rotate"

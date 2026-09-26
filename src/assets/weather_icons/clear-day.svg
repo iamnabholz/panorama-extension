@@ -22,7 +22,7 @@
                 <animateTransform
                     attributeName="transform"
                     begin="0s"
-                    dur="30s"
+                    dur="60s"
                     repeatCount="indefinite"
                     type="rotate"
                     values="0 64.0 64.0;360 64.0 64.0"

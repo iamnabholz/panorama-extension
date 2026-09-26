@@ -35,7 +35,7 @@
                         <animateTransform
                             attributeName="transform"
                             begin="0s"
-                            dur="6s"
+                            dur="60s"
                             repeatCount="indefinite"
                             type="rotate"
                             values="0 64.0 72.0;360 64.0 72.0"
@@ -57,7 +57,7 @@
                     attributeName="transform"
                     begin="0s"
                     calcMode="spline"
-                    dur="3s"
+                    dur="30s"
                     keySplines=".42 0 .58 1; .42 0 .58 1"
                     repeatCount="indefinite"
                     type="translate"
@@ -74,9 +74,9 @@
             >
                 <animateTransform
                     attributeName="transform"
-                    begin="-2.8s"
+                    begin="-28s"
                     calcMode="spline"
-                    dur="3s"
+                    dur="30s"
                     keySplines=".42 0 .58 1; .42 0 .58 1"
                     repeatCount="indefinite"
                     type="translate"

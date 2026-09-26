@@ -25,7 +25,7 @@
 </script>
 
 <div class="onboard-overlay" transition:fade={{ duration: 200 }}>
-    <div id="float-panel" class="surface-elevated onboard-card">
+    <div id="float-panel" class="onboard-card">
         <div id="float-panel__scroll">
             <div class="step-content">
                 {#if currentStep === 0}
@@ -35,12 +35,14 @@
                             Transform your new tab into a simple, beautiful
                             summary.
                         </p>
-                        <div class="preview-box surface-panel">
+                        <div class="preview-box">
                             <div class="mock-ui">
                                 <div class="mock-dot red"></div>
                                 <div class="mock-dot yellow"></div>
                                 <div class="mock-dot green"></div>
                             </div>
+
+                            <span class="mock-text"> hello </span>
                         </div>
                     </div>
                 {:else if currentStep === 1}
@@ -113,7 +115,7 @@
                     </div>
                 {:else if currentStep === 2}
                     <div transition:slide|local={{ duration: 150 }}>
-                        <h2>Stay Informed</h2>
+                        <h2>Pick your preferences</h2>
                         <p>
                             Click on widgets to interact with them. You can
                             toggle units, view upcoming holidays, or check the
@@ -149,7 +151,7 @@
     .onboard-overlay {
         position: fixed;
         inset: 0;
-        background-color: rgba(0, 0, 0, 0.4);
+        background-color: rgba(0, 0, 0, 0.2);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -159,6 +161,9 @@
     .onboard-card {
         width: min(440px, 95vw);
         height: auto;
+        padding: var(--space-02);
+        background-color: var(--color-background);
+        border: 1px solid var(--color-border);
         border-radius: var(--radius-xl);
     }
 
@@ -186,18 +191,34 @@
         align-items: flex-start;
         padding: var(--space-04);
         border: 1px solid var(--color-border);
+
+        position: relative;
+        background: var(--background-value);
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+
+    .preview-box::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: var(--color-background-panel);
+        z-index: 1;
     }
 
     .mock-ui {
         display: flex;
         gap: 6px;
+        z-index: 2;
     }
 
     .mock-dot {
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        opacity: 0.5;
     }
     .red {
         background: var(--color-red);
@@ -207,6 +228,26 @@
     }
     .green {
         background: var(--color-green);
+    }
+
+    .mock-text {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: var(--font-size-4xl);
+        font-weight: var(--font-weight-bold);
+        text-transform: capitalize;
+
+        color: var(--color-text-summary);
+        opacity: 0.8;
     }
 
     .icon-instruction {

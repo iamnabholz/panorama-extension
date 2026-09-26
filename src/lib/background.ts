@@ -1,8 +1,26 @@
 import type { BackgroundImage } from "./utils/interfaces";
-import { appState, persist, startLoading, stopLoading } from "./state.svelte";
+import {
+  appState,
+  persist,
+  startLoading,
+  stopLoading,
+  uiState,
+} from "./state.svelte";
 
 const WORKER_URL = "https://background-grab.nabholz.workers.dev/";
-const DEFAULT_QUERY = "Ocean view";
+const DEFAULT_QUERIES = [
+  "Ocean view",
+  "Forest",
+  "Architecture",
+  "Sunset",
+  "Horizon",
+  "Beach",
+  "Night street",
+  "Street photography",
+  "Neon signs",
+  "Gradients",
+  "Abstract",
+];
 
 const TIMER_HOURLY = 60 * 60 * 1000;
 const TIMER_DAILY = 24 * 60 * 60 * 1000;
@@ -25,7 +43,7 @@ function isStale(data: BackgroundImage): boolean {
 function toBackgroundImage(res: any, query: string): BackgroundImage {
   return {
     query,
-    url: res.urls.full,
+    url: res.urls.raw + "&w=1500&dpr=2",
     author: res.user.name,
     color: res.color,
     link: res.user.links.html,
@@ -52,23 +70,44 @@ async function fetchFromApi(query: string): Promise<BackgroundImage> {
 export async function fetchBackground(
   query: string,
 ): Promise<BackgroundImage | null> {
+  if (uiState.loadingBackground) return null;
+  uiState.loadingBackground = true;
+
   const loadId = startLoading();
 
   try {
     const fresh = await fetchFromApi(query);
 
     const img = new Image();
+    img.crossOrigin = "anonymous";
     img.src = fresh.url;
     await img.decode();
 
-    document.documentElement.style.setProperty(
-      "--background-value",
-      `url("${fresh.url}")`,
-    );
+    const canvas = document.createElement("canvas");
+    const scale = Math.min(1, 1280 / img.naturalWidth);
+    canvas.width = Math.round(img.naturalWidth * scale);
+    canvas.height = Math.round(img.naturalHeight * scale);
+
+    const ctx = canvas.getContext("2d")!;
+    if (!ctx) throw new Error("Canvas 2D context unavailable");
+
+    ctx.filter = "blur(8px)";
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    fresh.blurredUrl = canvas.toDataURL("image/webp", 0.8);
 
     appState["image-cache"] = fresh;
-    appState.background.value = fresh.url;
-    persist("image-cache", "background");
+    persist("image-cache");
+
+    if (appState.background.type === "image") {
+      document.documentElement.style.setProperty(
+        "--background-value",
+        `url("${fresh.url}")`,
+      );
+
+      appState.background.value = fresh.url;
+      persist("background");
+    }
 
     return fresh;
   } catch (err) {
@@ -76,6 +115,7 @@ export async function fetchBackground(
 
     return null;
   } finally {
+    uiState.loadingBackground = false;
     stopLoading(loadId);
   }
 }
@@ -93,6 +133,8 @@ export async function checkBackgroundCache(): Promise<BackgroundImage | null> {
     return cached;
   }
 
-  const query = cached?.query ?? DEFAULT_QUERY;
+  const query =
+    cached?.query ??
+    DEFAULT_QUERIES[Math.floor(Math.random() * DEFAULT_QUERIES.length)];
   return (await fetchBackground(query)) ?? cached ?? null;
 }

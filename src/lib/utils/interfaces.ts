@@ -85,6 +85,7 @@ export interface BackgroundImage {
   author: string;
   link: string;
   fetchedAt: number;
+  blurredUrl?: string;
 }
 
 //Holidays

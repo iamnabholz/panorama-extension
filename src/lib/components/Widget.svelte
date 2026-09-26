@@ -5,10 +5,8 @@
     interface Props {
         text: string;
         icon?: Snippet;
-
         onclick?: (event: MouseEvent) => void;
         title?: string;
-        disabled?: boolean;
         zoomIcon?: boolean;
         textOnly?: boolean;
         color?: string;
@@ -20,7 +18,6 @@
 
         onclick,
         title,
-        disabled = false,
         zoomIcon = false,
         textOnly = false,
         color,
@@ -47,36 +44,20 @@
     </span>
 {/snippet}
 
-{#if onclick}
-    <button
-        data-sentence-piece
-        type="button"
-        class="widget"
-        onclick={(event) => {
-            sound.playClick();
-            onclick?.(event);
-        }}
-        class:text-only={textOnly}
-        style:color
-        {title}
-        {disabled}
-    >
-        {@render content(text, hasIcon)}
-    </button>
-{:else}
-    {#each words as word, index (`${index}:${word}`)}
-        {#if index > 0}{" "}{/if}
-        <span
-            data-sentence-piece
-            class="widget"
-            class:text-only={textOnly}
-            style:color
-            {title}
-        >
-            {@render content(word, hasIcon && index === 0)}
-        </span>
-    {/each}
-{/if}
+<button
+    data-sentence-piece
+    type="button"
+    class="widget"
+    onclick={(event) => {
+        sound.playClick();
+        onclick?.(event);
+    }}
+    class:text-only={textOnly}
+    style:color
+    {title}
+>
+    {@render content(text, hasIcon)}
+</button>
 
 <style>
     .widget {
@@ -185,11 +166,16 @@
         width: 100%;
         height: 100%;
         object-fit: contain;
+        transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     button.widget:not(:disabled):is(:hover, :focus-visible)
         .zoom-icon
         .icon-art {
-        transform: rotate(-7deg) scale(1.4);
+        transform: rotate(-7deg);
+
+        :global(svg) {
+            transform: scale(1.4);
+        }
     }
 </style>

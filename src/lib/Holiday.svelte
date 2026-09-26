@@ -68,10 +68,22 @@
     let nextHoliday = $derived(sortedUpcoming[0] ?? null);
     let isTodayHoliday = $derived(nextHoliday?.date === todayIso);
 
-    let formatter = new Intl.DateTimeFormat(undefined, {
+    let formatterDay = new Intl.DateTimeFormat(undefined, {
         weekday: "long",
+    });
+
+    let formatterDate = new Intl.DateTimeFormat(undefined, {
+        day: "numeric",
+    });
+
+    let formatterMonth = new Intl.DateTimeFormat(undefined, {
+        month: "short",
+    });
+
+    let formatter = new Intl.DateTimeFormat(undefined, {
         day: "numeric",
         month: "short",
+        weekday: "long",
     });
 
     let dateExpanded = $state(false);
@@ -94,29 +106,13 @@
     class:open={dateExpanded}
 >
     <span class="basic-row">
-        <span class="icon-badge" class:showing-today={isTodayHoliday}>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-            >
-                <path
-                    d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12"
-                />
-                <path d="M16 3l0 4" />
-                <path d="M8 3l0 4" />
-                <path d="M4 11l16 0" />
-                <path d="M8 15h2v2h-2l0 -2" />
-            </svg>
+        <span class="date-label">
+            {formatterDay.format(fromLocalISODate(todayIso))},
+            {formatterDate.format(fromLocalISODate(todayIso))}
         </span>
 
-        <span class="date-label">
-            {formatter.format(fromLocalISODate(todayIso))}
+        <span class="month-label" class:showing-today={isTodayHoliday}>
+            {formatterMonth.format(fromLocalISODate(todayIso))}
         </span>
     </span>
 
@@ -144,14 +140,13 @@
 
 <style>
     button {
-        padding: 0.4em;
-        padding-inline-end: 0.7em;
         cursor: pointer;
         border-radius: var(--radius-full);
         display: flex;
         flex-direction: column;
-        align-items: center;
         gap: var(--space-04);
+        padding: var(--space-03) var(--space-05);
+        padding-top: calc(var(--space-03) + 2px);
 
         overflow: hidden;
         text-shadow: none;
@@ -160,50 +155,32 @@
         font-size: var(--font-size-md);
         line-height: 1.4;
 
-        color: var(--color-text-summary);
+        color: var(--color-text);
         transform-origin: center;
         transition: all var(--duration-fast) var(--ease-standard);
     }
 
     button.open {
-        border-radius: var(--radius-xl);
-        padding: var(--space-04);
-        padding-right: calc(var(--space-04) + 5px);
+        border-radius: var(--radius-lg);
+        padding-block: var(--space-05);
         background-color: var(--color-background-panel);
     }
 
     .basic-row {
         display: flex;
         align-items: center;
-        gap: var(--space-01);
+        justify-content: space-between;
+        gap: var(--space-09);
     }
 
-    .date-label {
-        padding-inline-end: 4px;
-        padding-block-start: 4px;
+    .month-label {
+        color: var(--color-text-summary-muted);
+        font-size: var(--font-size-xs);
+        text-transform: uppercase;
     }
 
-    button svg {
-        width: 1.2em;
-        height: 1.2em;
-        flex-shrink: 0;
-    }
-
-    .icon-badge {
-        padding: 6px;
-        height: 32px;
-        width: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: var(--radius-full);
-        background-color: transparent;
-        transition: background-color var(--duration-fast) var(--ease-out);
-    }
-
-    .icon-badge.showing-today {
-        margin-inline-end: 0.3em;
-        background-color: var(--color-red);
+    .month-label.showing-today {
+        color: var(--color-red);
     }
 
     button:disabled {
@@ -213,15 +190,15 @@
     .holiday-info {
         font-size: var(--font-size-sm);
         line-height: 1;
-        text-align: center;
         overflow: hidden; /* Clips contents cleanly during vertical slide */
+        width: 100%;
     }
 
     .holiday-content {
-        display: inline-flex;
+        display: flex;
         flex-direction: column;
-        align-items: center;
         justify-content: center;
+        align-items: flex-start;
         gap: var(--space-02);
         white-space: nowrap; /* Prevents text from wrapping mid-transition */
         padding-top: var(--space-02);

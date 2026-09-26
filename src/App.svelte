@@ -39,7 +39,7 @@
         const loadId = startLoading();
         hydrateState()
             .then(() => {
-                fetchHolidays();
+                if (appState.displayDate) fetchHolidays();
                 if (appState.displayWeather) fetchWeather();
                 if (appState.background.type === "image")
                     checkBackgroundCache();
@@ -81,17 +81,7 @@
         uiState.optionsOpen = false;
         uiState.sentenceVisible = appState.sentenceVisible;
     }
-
-    function handleKeydown(event: KeyboardEvent) {
-        if (event.key === "Meta") {
-            console.log("Command pressed");
-
-            //uiState.showOnboardAtLaunch = true;
-        }
-    }
 </script>
-
-<svelte:window on:keydown={handleKeydown} />
 
 <Background />
 

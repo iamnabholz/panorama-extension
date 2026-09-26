@@ -1,5 +1,11 @@
 import type { HolidayCache, HolidayData } from "./utils/interfaces";
-import { appState, persist, startLoading, stopLoading } from "./state.svelte";
+import {
+  appState,
+  persist,
+  startLoading,
+  stopLoading,
+  uiState,
+} from "./state.svelte";
 
 const HOLIDAYS_URL = "https://holiday-grab.nabholz.workers.dev/";
 const CACHE_DURATION_MS = 4 * 30 * 24 * 60 * 60 * 1000;
@@ -32,12 +38,17 @@ function isStale(cache: HolidayCache): boolean {
  * so Jan 1 always triggers a refetch regardless of cache age.
  */
 export async function fetchHolidays(): Promise<HolidayCache | null> {
+  if (uiState.loadingHolidays) {
+    return appState["holiday-cache"] ?? null;
+  }
+
   const cached = appState["holiday-cache"];
   if (cached && !isStale(cached)) {
     console.log("holidays from cache");
     return cached;
   }
 
+  uiState.loadingHolidays = true;
   const loadId = startLoading();
   try {
     const fresh = await fetchFromApi();
@@ -56,6 +67,7 @@ export async function fetchHolidays(): Promise<HolidayCache | null> {
 
     return cached ?? null; // fall back to stale cache if we have one, else null
   } finally {
+    uiState.loadingHolidays = false;
     stopLoading(loadId);
   }
 }

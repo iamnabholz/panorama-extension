@@ -1,5 +1,11 @@
 import type { WeatherData, WeatherResponse } from "./utils/interfaces";
-import { appState, persist, startLoading, stopLoading } from "./state.svelte";
+import {
+  appState,
+  persist,
+  startLoading,
+  stopLoading,
+  uiState,
+} from "./state.svelte";
 
 const OPEN_WEATHER_URL = "https://weather-grab.nabholz.workers.dev/";
 const CACHE_DURATION_MS = 120 * 60 * 1000; // adjust as needed
@@ -38,12 +44,17 @@ async function fetchFromApi(): Promise<WeatherData> {
  * Returns null if the fetch fails and there's no usable cache.
  */
 export async function fetchWeather(): Promise<WeatherData | null> {
+  if (uiState.loadingWeather) {
+    return appState["weather-cache"] ?? null;
+  }
+
   const cached = appState["weather-cache"];
   if (cached && !isStale(cached)) {
     console.log("weather from cache");
     return cached;
   }
 
+  uiState.loadingWeather = true;
   const loadId = startLoading();
   try {
     const fresh = await fetchFromApi();
@@ -56,6 +67,7 @@ export async function fetchWeather(): Promise<WeatherData | null> {
 
     return cached ?? null; // fall back to stale cache if we have one, else null
   } finally {
+    uiState.loadingWeather = false;
     stopLoading(loadId);
   }
 }

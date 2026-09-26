@@ -3,11 +3,15 @@
     import { sound } from "./utils/sound";
 
     import pkg from "../../package.json" with { type: "json" };
-    import { fetchBackground } from "./background";
+    import { fetchBackground, checkBackgroundCache } from "./background";
+    import { fetchWeather } from "./weather";
+    import { fetchHolidays } from "./holiday";
 
     /* styles for inputs only */
     import "../styles/inputs.css";
     import { slide } from "svelte/transition";
+
+    import appIcon from "../assets/app_icon.png";
 
     const COOLDOWN_MS = 60 * 60 * 1000;
 
@@ -31,9 +35,9 @@
     let isCoolingDown = $derived(
         Date.now() < (appState["image-cache"]?.fetchedAt ?? 0) + COOLDOWN_MS,
     );
-    let waitingResponse = $state(false);
+
     let disableFetchButton = $derived(
-        (isSameAsCached && isCoolingDown) || waitingResponse,
+        (isSameAsCached && isCoolingDown) || uiState.loadingBackground,
     );
 
     function applyBackgroundToDOM(type: string, value: string) {
@@ -56,8 +60,8 @@
     }
 
     function saveImageQuery() {
-        waitingResponse = true;
-        fetchBackground(queryBind).finally(() => (waitingResponse = false));
+        if (disableFetchButton) return;
+        void fetchBackground(queryBind);
     }
 
     function saveColorCache() {
@@ -92,6 +96,10 @@
 
         applyBackgroundToDOM(newType, savedValue);
         persist("background");
+
+        if (newType === "image") {
+            void checkBackgroundCache();
+        }
     }
 
     function handleToggleSound(event: Event) {
@@ -108,15 +116,20 @@
         <div class="options-layout">
             <header class="options-header">
                 <div class="brand">
-                    <div class="brand-title">
-                        <h1>Panorama</h1>
-                        <span class="version">{pkg.version}</span>
+                    <div class="brand-logo">
+                        <img src={appIcon} alt="" />
                     </div>
-                    <p class="author">
-                        by <a href="https://nabholz.work" target="_blank"
-                            >Lukas Nabholz</a
-                        >
-                    </p>
+                    <div class="stack" style="gap: 0;">
+                        <div class="brand-title">
+                            <h1>Panorama</h1>
+                            <span class="version">{pkg.version}</span>
+                        </div>
+                        <p class="author">
+                            by <a href="https://nabholz.work" target="_blank"
+                                >Lukas Nabholz</a
+                            >
+                        </p>
+                    </div>
                 </div>
                 <a
                     href="https://www.buymeacoffee.com/nabholz"
@@ -132,11 +145,15 @@
                 <h2 class="section-label">Sounds</h2>
                 <div class="input-tray surface-panel">
                     <label class="toggle-row">
-                        <span>Play sound on click</span>
+                        <span>Play on interactions</span>
                         <input
                             type="checkbox"
-                            bind:checked={appState.playSounds}
-                            onchange={() => persist("playSounds")}
+                            checked={appState.playSounds}
+                            onchange={(event) => {
+                                appState.playSounds =
+                                    event.currentTarget.checked;
+                                persist("playSounds");
+                            }}
                         />
                         <div class="toggle-switch"></div>
                     </label>
@@ -192,9 +209,18 @@
                         <span>Show Date & Holidays</span>
                         <input
                             type="checkbox"
-                            bind:checked={appState.displayDate}
-                            onchange={() => persist("displayDate")}
+                            checked={appState.displayDate}
+                            onchange={(event) => {
+                                appState.displayDate =
+                                    event.currentTarget.checked;
+                                persist("displayDate");
+
+                                if (appState.displayDate) {
+                                    void fetchHolidays();
+                                }
+                            }}
                         />
+
                         <div class="toggle-switch"></div>
                     </label>
 
@@ -205,8 +231,12 @@
                             <span>Timely Greeting</span>
                             <input
                                 type="checkbox"
-                                bind:checked={appState.displayGreeting}
-                                onchange={() => persist("displayGreeting")}
+                                checked={appState.displayGreeting}
+                                onchange={(event) => {
+                                    appState.displayGreeting =
+                                        event.currentTarget.checked;
+                                    persist("displayGreeting");
+                                }}
                             />
                             <div class="toggle-switch"></div>
                         </label>
@@ -242,8 +272,12 @@
                                 <span>Clock</span>
                                 <input
                                     type="checkbox"
-                                    bind:checked={appState.displayTime}
-                                    onchange={() => persist("displayTime")}
+                                    checked={appState.displayTime}
+                                    onchange={(event) => {
+                                        appState.displayTime =
+                                            event.currentTarget.checked;
+                                        persist("displayTime");
+                                    }}
                                 />
                                 <div class="toggle-switch"></div>
                             </label>
@@ -260,8 +294,16 @@
                                 <span>Weather Forecast</span>
                                 <input
                                     type="checkbox"
-                                    bind:checked={appState.displayWeather}
-                                    onchange={() => persist("displayWeather")}
+                                    checked={appState.displayWeather}
+                                    onchange={(event) => {
+                                        appState.displayWeather =
+                                            event.currentTarget.checked;
+                                        persist("displayWeather");
+
+                                        if (appState.displayWeather) {
+                                            void fetchWeather();
+                                        }
+                                    }}
                                 />
                                 <div class="toggle-switch"></div>
                             </label>
@@ -350,8 +392,8 @@
                             <form
                                 style="padding-top: 8px;"
                                 class="input-field grouped-fields"
-                                onsubmit={(e) => {
-                                    e.preventDefault();
+                                onsubmit={(event) => {
+                                    event.preventDefault();
                                     if (!disableFetchButton) saveImageQuery();
                                 }}
                             >
@@ -395,6 +437,7 @@
                                                 appState.imageUpdateFrequency =
                                                     freq;
                                                 persist("imageUpdateFrequency");
+                                                void checkBackgroundCache();
                                             }}
                                         >
                                             {freq}</button
@@ -415,9 +458,7 @@
                                 <span>Gradient</span>
                                 <input
                                     type="checkbox"
-                                    bind:checked={
-                                        appState["color-cache"].gradient
-                                    }
+                                    checked={appState["color-cache"].gradient}
                                     onchange={(event) => {
                                         appState["color-cache"].gradient =
                                             event.currentTarget.checked;
@@ -426,34 +467,34 @@
                                 />
                                 <div class="toggle-switch"></div>
                             </label>
-
+                            <br />
                             <div class="color-grid">
                                 <label class="color-field stack-xs">
-                                    <span class="small">Primary Color</span>
                                     <input
                                         type="color"
-                                        bind:value={colorBind}
+                                        value={colorBind}
                                         oninput={(event) => {
                                             colorBind =
                                                 event.currentTarget.value;
                                             saveColorCache();
                                         }}
                                     />
+                                    <span class="small">Primary Color</span>
                                 </label>
                                 {#if appState["color-cache"].gradient}
                                     <label class="color-field stack-xs">
-                                        <span class="small"
-                                            >Secondary Color</span
-                                        >
                                         <input
                                             type="color"
-                                            bind:value={colorBindSecondary}
+                                            value={colorBindSecondary}
                                             oninput={(event) => {
                                                 colorBindSecondary =
                                                     event.currentTarget.value;
                                                 saveColorCache();
                                             }}
                                         />
+                                        <span class="small"
+                                            >Secondary Color</span
+                                        >
                                     </label>
                                 {/if}
                             </div>
@@ -527,9 +568,34 @@
 
     .options-header {
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: var(--space-04);
         padding-inline: var(--space-04);
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: var(--space-04);
+        min-width: 0;
+    }
+
+    .brand-logo {
+        width: 56px;
+        aspect-ratio: 1;
+        flex-shrink: 0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 3px 8px 0 #00000020;
+    }
+
+    .brand-logo img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
     }
 
     .brand-title {
@@ -537,6 +603,7 @@
         align-items: baseline;
         gap: var(--space-02);
         line-height: 1;
+        padding-top: 3px;
     }
     .brand h1 {
         font-size: var(--font-size-2xl);
@@ -549,8 +616,15 @@
     .author {
         font-size: var(--font-size-sm);
     }
+    .coffee-link {
+        flex-shrink: 0;
+        margin-inline-start: auto;
+    }
+
     .coffee-link img {
+        display: block;
         width: 130px;
+        height: auto;
         border-radius: var(--radius-sm);
     }
 

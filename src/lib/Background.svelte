@@ -52,23 +52,44 @@
         }
     });
 
+    let currentBlurredBg = $derived(
+        appState.background.type === "image" &&
+            appState["image-cache"]?.url === appState.background.value &&
+            appState["image-cache"]?.blurredUrl
+            ? `url("${appState["image-cache"].blurredUrl}")`
+            : currentBg,
+    );
+
     let activeBg = $state(untrack(() => currentBg));
     let stagingBg = $state(untrack(() => currentBg));
+    let activeBlurredBg = $state(untrack(() => currentBlurredBg));
+    let stagingBlurredBg = $state(untrack(() => currentBlurredBg));
     let isFading = $state(false);
 
     $effect(() => {
         const nextBg = currentBg;
-        if (nextBg !== activeBg) {
-            stagingBg = nextBg;
-            isFading = true;
+        const nextBlurredBg = currentBlurredBg;
 
-            const timer = setTimeout(() => {
-                activeBg = nextBg;
-                isFading = false;
-            }, 500);
+        const unchanged = untrack(
+            () => nextBg === activeBg && nextBlurredBg === activeBlurredBg,
+        );
 
-            return () => clearTimeout(timer);
+        if (unchanged) {
+            isFading = false;
+            return;
         }
+
+        stagingBg = nextBg;
+        stagingBlurredBg = nextBlurredBg;
+        isFading = true;
+
+        const timer = setTimeout(() => {
+            activeBg = nextBg;
+            activeBlurredBg = nextBlurredBg;
+            isFading = false;
+        }, 500);
+
+        return () => clearTimeout(timer);
     });
 
     let isFocused = $derived(appState.sentenceVisible || uiState.optionsOpen);
@@ -82,7 +103,7 @@
 
     <div
         class="bg-layer blurred"
-        style="background-image: {activeBg}; background-color: {backgroundColor};"
+        style="background-image: {activeBlurredBg}; background-color: {backgroundColor};"
     ></div>
 
     {#if isFading}
@@ -92,7 +113,7 @@
         ></div>
         <div
             class="bg-layer blurred staging"
-            style="background-image: {stagingBg}; background-color: {backgroundColor};"
+            style="background-image: {stagingBlurredBg}; background-color: {backgroundColor};"
         ></div>
     {/if}
 </div>
@@ -125,7 +146,6 @@
     }
 
     .blurred {
-        filter: blur(4px);
         transform: scale(1);
         opacity: 0;
         transition:
@@ -134,7 +154,7 @@
     }
 
     /* Staging layers fade in smoothly over the active layers */
-    .staging {
+    .sharp.staging {
         opacity: 0;
         animation: fadeIn 0.5s ease-out forwards;
     }

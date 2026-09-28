@@ -11,7 +11,7 @@
     import "../styles/inputs.css";
     import { slide } from "svelte/transition";
 
-    import appIcon from "../assets/app_icon.png";
+    import BMAC_logo from "../assets/bmac-button.webp";
 
     const COOLDOWN_MS = 60 * 60 * 1000;
 
@@ -117,7 +117,10 @@
             <header class="options-header">
                 <div class="brand">
                     <div class="brand-logo">
-                        <img src={appIcon} alt="" />
+                        <img
+                            src="/app_logo.png"
+                            alt="Logo icon of Panorama Tab"
+                        />
                     </div>
                     <div class="stack" style="gap: 0;">
                         <div class="brand-title">
@@ -136,7 +139,7 @@
                     target="_blank"
                     class="coffee-link"
                 >
-                    <img src="/media/bmac-button.webp" alt="Coffee" />
+                    <img src={BMAC_logo} alt="Coffee" />
                 </a>
             </header>
 

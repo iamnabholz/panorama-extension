@@ -174,7 +174,7 @@
     }
 
     .month-label {
-        color: var(--color-text-summary-muted);
+        color: color-mix(in srgb, var(--color-text) 60%, transparent 20%);
         font-size: var(--font-size-xs);
         text-transform: uppercase;
     }

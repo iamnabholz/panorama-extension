@@ -19,14 +19,18 @@
   },
 
   "{{chrome}}.icons": {
-    "48": "media/icon-512.png",
-    "128": "media/icon-512.png"
+    "32": "app_logo.png",
+    "48": "app_logo.png",
+    "64": "app_logo.png",
+    "96": "app_logo.png",
+    "128": "app_logo.png"
   },
 
   "{{firefox}}.icons": {
-    "32": "icon.svg",
-    "64": "icon.svg",
-    "96": "icon.svg",
-    "128": "icon.svg"
+    "32": "app_logo.png",
+    "48": "app_logo.png",
+    "64": "app_logo.png",
+    "96": "app_logo.png",
+    "128": "app_logo.png"
   }
 }

@@ -29,9 +29,9 @@
     --color-border-strong: rgba(0, 0, 0, 0.16);
 
     /* Color — accent / interactive */
-    --color-accent: #0066cc;
-    --color-accent-hover: #0077ed;
-    --color-accent-active: #005bb5;
+    --color-accent: #00d2ff;
+    --color-accent-hover: #00b8e0;
+    --color-accent-active: #009ec0;
     --color-focus: var(--color-white);
 
     --color-white: #fafafa;
@@ -115,10 +115,6 @@
 
     --color-border: rgba(255, 255, 255, 0.1);
     --color-border-strong: rgba(255, 255, 255, 0.2);
-
-    --color-accent: #0a84ff;
-    --color-accent-hover: #409cff;
-    --color-accent-active: #006edd;
 }
 
 @font-face {

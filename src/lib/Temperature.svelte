@@ -27,5 +27,4 @@
     title={`Press to switch to ${appState.useMetric ? "Fahrenheit" : "Celsius"}.`}
     text={`${displayTemp != null ? displayTemp : "-"}°${unit}`}
     onclick={toggleFormat}
-    disabled={displayTemp == null}
 />

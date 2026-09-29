@@ -174,13 +174,18 @@
     }
 
     .month-label {
-        color: color-mix(in srgb, var(--color-text) 60%, transparent 20%);
+        color: var(--color-red);
         font-size: var(--font-size-xs);
         text-transform: uppercase;
     }
 
-    .month-label.showing-today {
-        color: var(--color-red);
+    .month-label.showing-today::after {
+        content: "\00B7";
+        font-size: 3em;
+        line-height: 0;
+        position: relative;
+        top: 0.13em;
+        right: -0.13em;
     }
 
     button:disabled {

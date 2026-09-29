@@ -15,7 +15,6 @@
     let {
         text,
         icon,
-
         onclick,
         title,
         zoomIcon = false,
@@ -24,7 +23,6 @@
     }: Props = $props();
 
     const hasIcon = $derived(!textOnly && !!icon);
-    const words = $derived(text.trim().split(/\s+/).filter(Boolean));
 </script>
 
 {#snippet iconSlot()}
@@ -48,6 +46,7 @@
     data-sentence-piece
     type="button"
     class="widget"
+    aria-disabled={!onclick}
     onclick={(event) => {
         sound.playClick();
         onclick?.(event);
@@ -81,8 +80,9 @@
         font-weight: var(--font-weight-bold);
 
         white-space: nowrap;
-        cursor: inherit;
+        cursor: pointer;
         overflow: visible;
+        box-shadow: none;
     }
 
     .visual {
@@ -94,39 +94,28 @@
         transition: transform 400ms cubic-bezier(0.34, 1.85, 0.64, 1);
     }
 
-    button.widget {
-        cursor: pointer;
-        box-shadow: none;
-    }
-
-    button.widget:not(:disabled):not(.text-only):is(:hover, :focus-visible) {
+    .widget:not(.text-only):is(:hover, :focus-visible) {
         padding-inline: 0.05em;
-
-        &:has(.icon-slot) {
-            padding-inline: 0.38em;
-        }
     }
 
-    button.widget:not(:disabled):not(.text-only):is(:hover, :focus-visible)
-        .icon-slot {
-        padding-inline: 0.6em;
+    .widget:not(.text-only):is(:hover, :focus-visible):has(.icon-slot) {
+        padding-inline: 0.4em;
     }
 
-    button.widget:not(:disabled):not(.text-only):is(:hover, :focus-visible)
-        .visual {
+    .widget:not(.text-only):is(:hover, :focus-visible) .visual {
         transform: scale(var(--growth));
     }
 
-    button.widget:not(:disabled):not(.text-only):active .visual {
+    .widget:not(.text-only):active .visual {
         transform: scale(0.985);
         transition-duration: 90ms;
     }
 
-    button.widget:disabled {
+    .widget[aria-disabled="true"] {
         cursor: default;
     }
 
-    button.widget:focus-visible {
+    .widget:focus-visible {
         outline: 2px solid currentColor;
         outline-offset: 0.09em;
         border-radius: 0.12em;
@@ -166,16 +155,36 @@
         width: 100%;
         height: 100%;
         object-fit: contain;
+
         transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    button.widget:not(:disabled):is(:hover, :focus-visible)
+    /* actionable widgets get the extra enlargement and rotation on icons */
+    .widget:not([aria-disabled="true"]):not(.text-only):is(
+            :hover,
+            :focus-visible
+        )
+        .icon-slot.zoom-icon {
+        margin-inline-start: 0.25em;
+        margin-inline-end: 0.15em;
+    }
+
+    .widget:not([aria-disabled="true"]):not(.text-only):is(
+            :hover,
+            :focus-visible
+        )
         .zoom-icon
         .icon-art {
         transform: rotate(-7deg);
+    }
 
+    .widget:not([aria-disabled="true"]):not(.text-only):is(
+            :hover,
+            :focus-visible
+        )
+        .zoom-icon
+        .icon-art
         :global(svg) {
-            transform: scale(1.4);
-        }
+        transform: scale(1.4);
     }
 </style>
